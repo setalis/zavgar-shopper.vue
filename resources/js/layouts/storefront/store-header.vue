@@ -36,7 +36,7 @@ function isCategoryActive(slug: string): boolean {
         class="sticky top-0 z-30 border-b border-zinc-200 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900"
     >
         <AnnouncementBar
-            message="Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!"
+            message="Акция на автохимию от Лаверат - 20%!"
         />
 
         <Container>

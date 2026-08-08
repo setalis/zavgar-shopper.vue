@@ -36,6 +36,26 @@ final class ZoneSessionManager
             ->firstWhere('countryCode', $countryCode);
     }
 
+    public static function ensureDefaultSession(): ?CountryByZoneData
+    {
+        $current = self::getSession();
+
+        if ($current !== null) {
+            return $current;
+        }
+
+        $countries = resolve(GetCountriesByZone::class)->handle();
+
+        if ($countries->count() !== 1) {
+            return null;
+        }
+
+        /** @var CountryByZoneData $only */
+        $only = $countries->first();
+
+        return self::setSessionForCountryCode($only->countryCode);
+    }
+
     public static function setSessionForCountryCode(string $countryCode): ?CountryByZoneData
     {
         $zone = resolve(GetCountriesByZone::class)

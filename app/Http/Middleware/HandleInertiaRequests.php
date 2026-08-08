@@ -71,7 +71,7 @@ class HandleInertiaRequests extends Middleware
     private function shopProps(): array
     {
         $cart = resolve(CartSessionManager::class)->current();
-        $zone = ZoneSessionManager::getSession();
+        $zone = ZoneSessionManager::ensureDefaultSession();
 
         return [
             'cart_count' => $cart?->lines->sum('quantity') ?? 0,

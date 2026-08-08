@@ -19,9 +19,17 @@ const open = ref<boolean>(false);
 watch(
     [zone, availableZones],
     ([currentZone, zones]) => {
-        if (!currentZone && zones.length > 1) {
-            open.value = true;
+        if (currentZone || zones.length === 0) {
+            return;
         }
+
+        if (zones.length === 1) {
+            changeZone(zones[0].countryCode);
+
+            return;
+        }
+
+        open.value = true;
     },
     { immediate: true },
 );

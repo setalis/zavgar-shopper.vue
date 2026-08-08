@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Livewire\Shopper\Pages\Order\Detail as OrderDetail;
 use App\Livewire\Shopper\SlideOvers\AttributeForm;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -34,6 +35,10 @@ class AppServiceProvider extends ServiceProvider
     protected function registerShopperLivewireOverrides(): void
     {
         Livewire::component('shopper-slide-overs.attribute-form', AttributeForm::class);
+
+        config([
+            'shopper.components.order.pages.order-detail' => OrderDetail::class,
+        ]);
     }
 
     /**

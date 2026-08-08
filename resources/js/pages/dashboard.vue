@@ -50,6 +50,7 @@ const firstName =
                     </p>
                     <p class="text-xs text-zinc-500">
                         {{ t('dashboard.orders.description') }}
+                    </p>
                 </div>
             </Card>
         </Link>
@@ -72,6 +73,7 @@ const firstName =
                     </p>
                     <p class="text-xs text-zinc-500">
                         {{ t('dashboard.addresses.description') }}
+                    </p>
                 </div>
             </Card>
         </Link>
@@ -94,6 +96,7 @@ const firstName =
                     </p>
                     <p class="text-xs text-zinc-500">
                         {{ t('dashboard.profile.description') }}
+                    </p>
                 </div>
             </Card>
         </Link>

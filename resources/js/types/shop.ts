@@ -51,11 +51,20 @@ export type Collection = BaseCollection &
 
 export type ProductVariant = BaseProductVariant & WithStorefrontMedia;
 
+export type StorefrontPrice = {
+  amount: number;
+  compare_amount: number | null;
+  from: boolean;
+};
+
 export type Product = BaseProduct &
   WithStorefrontMedia & {
     variants?: ProductVariant[];
     related_products?: Product[];
+    storefront_price?: StorefrontPrice | null;
   };
+
+export type ProductPrice = StorefrontPrice;
 
 export type VariantOptions = {
   productOptions: Array<{

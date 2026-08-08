@@ -153,7 +153,7 @@ final class CheckoutController extends Controller
             ->first(fn (array $option): bool => (string) $option['service_code'] === (string) $data['service_code']);
 
         if (! $selected) {
-            return back()->withErrors(['service_code' => __('Selected option is no longer available.')]);
+            return back()->withErrors(['service_code' => __('backend.checkout.option_unavailable')]);
         }
 
         session()->forget(CheckoutSession::SHIPPING_OPTION);
@@ -222,11 +222,11 @@ final class CheckoutController extends Controller
         } catch (Throwable $e) {
             report($e);
 
-            return back()->withErrors(['payment' => __('Unable to prepare payment. Please try again.')]);
+            return back()->withErrors(['payment' => __('backend.checkout.payment_prepare_failed')]);
         }
 
         if (! $result->success || ! $result->clientSecret) {
-            return back()->withErrors(['payment' => $result->message ?? __('Payment preparation failed.')]);
+            return back()->withErrors(['payment' => $result->message ?? __('backend.checkout.payment_preparation_failed')]);
         }
 
         $intentId = explode('_secret_', $result->clientSecret)[0] ?? null;
@@ -257,7 +257,7 @@ final class CheckoutController extends Controller
         }
 
         if (($selectedMethod['driver'] ?? null) === 'stripe') {
-            return back()->withErrors(['payment' => __('Use the Stripe payment form to complete this order.')]);
+            return back()->withErrors(['payment' => __('backend.checkout.use_stripe_form')]);
         }
 
         session()->forget(CheckoutSession::PAYMENT);
@@ -272,7 +272,7 @@ final class CheckoutController extends Controller
             if (! $result->success) {
                 return redirect()
                     ->route('shop.checkout.success', ['order' => $order->id])
-                    ->with('error', $result->message ?? __('Payment initiation failed.'));
+                    ->with('error', $result->message ?? __('backend.checkout.payment_initiation_failed'));
             }
 
             if ($result->redirectUrl) {
@@ -283,7 +283,7 @@ final class CheckoutController extends Controller
         } catch (Throwable $e) {
             report($e);
 
-            return back()->withErrors(['order' => __('An error occurred while placing your order. Please try again.')]);
+            return back()->withErrors(['order' => __('backend.checkout.order_error')]);
         }
     }
 
@@ -298,7 +298,7 @@ final class CheckoutController extends Controller
 
         if ($intentId === '' || $intentId !== $sessionIntentId) {
             return redirect()->route('shop.checkout.index')
-                ->withErrors(['payment' => __('Invalid payment session.')]);
+                ->withErrors(['payment' => __('backend.checkout.invalid_session')]);
         }
 
         $lock = Cache::lock('stripe.return.'.$intentId, 15);
@@ -307,7 +307,7 @@ final class CheckoutController extends Controller
             $lock->block(10);
         } catch (LockTimeoutException) {
             return redirect()->route('shop.checkout.index')
-                ->withErrors(['payment' => __('Your payment is still being processed. Please wait a moment.')]);
+                ->withErrors(['payment' => __('backend.checkout.payment_processing')]);
         }
 
         try {
@@ -335,7 +335,7 @@ final class CheckoutController extends Controller
             session()->forget(['stripe_payment', 'stripe_intent_id']);
 
             return redirect()->route('shop.checkout.index', ['step' => 3])
-                ->withErrors(['payment' => __('Payment was not completed. Please try again.').' ('.($redirectStatus ?: 'unknown').')']);
+                ->withErrors(['payment' => __('backend.checkout.payment_not_completed').' ('.($redirectStatus ?: 'unknown').')']);
         }
 
         try {
@@ -348,7 +348,7 @@ final class CheckoutController extends Controller
         } catch (Throwable $e) {
             report($e);
 
-            return redirect()->route('shop.cart')->withErrors(['order' => __('Order creation failed after payment.')]);
+            return redirect()->route('shop.cart')->withErrors(['order' => __('backend.checkout.order_creation_failed')]);
         }
 
         session()->forget(['stripe_payment', 'stripe_intent_id', CheckoutSession::KEY, 'checkout_cart_id']);
@@ -374,7 +374,7 @@ final class CheckoutController extends Controller
             ->first(fn (array $method): bool => $method['id'] === $paymentMethodId);
 
         if (! $selected) {
-            return [null, back()->withErrors(['payment_method_id' => __('Selected payment method is no longer available.')])];
+            return [null, back()->withErrors(['payment_method_id' => __('backend.checkout.payment_method_unavailable')])];
         }
 
         return [$selected, null];

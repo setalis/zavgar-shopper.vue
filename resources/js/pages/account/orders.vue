@@ -4,6 +4,7 @@ import { ShoppingBag } from 'lucide-vue-next';
 import { computed } from 'vue';
 import OrderStatusBadge from '@/components/account/order-status-badge.vue';
 import { Button } from '@/components/ui/button';
+import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import { orders as accountOrders } from '@/routes/account';
 import { show as ordersShow } from '@/routes/account/orders';
@@ -57,11 +58,13 @@ const props = defineProps<{
     filters: { tab: string };
 }>();
 
-const tabs = [
-    { value: 'all', label: 'Orders' },
-    { value: 'not-shipped', label: 'Not Yet Shipped' },
-    { value: 'cancelled', label: 'Cancelled Orders' },
-];
+const { t } = useTrans();
+
+const tabs = computed(() => [
+    { value: 'all', label: t('account.orders.tabs.all') },
+    { value: 'not-shipped', label: t('account.orders.tabs.not_shipped') },
+    { value: 'cancelled', label: t('account.orders.tabs.cancelled') },
+]);
 
 const activeTab = computed<string>(() => props.filters.tab || 'all');
 
@@ -90,31 +93,39 @@ function itemThumbnail(item: OrderItem): string | null {
 
 function shippingLabel(order: Order): string {
     const date = formatDate(order.updated_at, 'short');
-    if (order.shipping_status === 'delivered') return `Delivered ${date}`;
+    if (order.shipping_status === 'delivered') {
+        return t('account.orders.shipping.delivered', { date });
+    }
     if (
         order.shipping_status === 'shipped' ||
         order.shipping_status === 'partially_shipped'
-    )
-        return `Shipped ${date}`;
+    ) {
+        return t('account.orders.shipping.shipped', { date });
+    }
     if (
         order.shipping_status === 'returned' ||
         order.shipping_status === 'partially_returned'
-    )
-        return 'Returned';
-    if (order.status === 'cancelled') return 'Cancelled';
-    if (order.status === 'completed') return `Completed ${date}`;
-    return 'Processing';
+    ) {
+        return t('account.orders.shipping.returned');
+    }
+    if (order.status === 'cancelled') {
+        return t('account.orders.shipping.cancelled');
+    }
+    if (order.status === 'completed') {
+        return t('account.orders.shipping.completed', { date });
+    }
+    return t('account.orders.shipping.processing');
 }
 </script>
 
 <template>
-    <Head title="Your Orders" />
+    <Head :title="t('account.orders.title')" />
 
     <div class="flex items-center gap-3">
         <h1
             class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
         >
-            Your Orders
+            {{ t('account.orders.heading') }}
         </h1>
         <span
             v-if="orders.total > 0"
@@ -154,13 +165,13 @@ function shippingLabel(order: Order): string {
             aria-hidden="true"
         />
         <h3 class="mt-4 text-sm font-medium text-zinc-900 dark:text-white">
-            No orders found
+            {{ t('account.orders.empty.title') }}
         </h3>
         <p class="mt-1 text-sm text-zinc-500">
-            Your orders will appear here once you make a purchase.
+            {{ t('account.orders.empty.description') }}
         </p>
         <Link :href="shop.index.url()" class="mt-6">
-            <Button>Start Shopping</Button>
+            <Button>{{ t('account.orders.empty.cta') }}</Button>
         </Link>
     </div>
 
@@ -176,7 +187,9 @@ function shippingLabel(order: Order): string {
                 >
                     <div class="flex flex-wrap items-center gap-8 text-sm">
                         <div>
-                            <dt class="text-xs text-zinc-500">Order placed</dt>
+                            <dt class="text-xs text-zinc-500">
+                                {{ t('account.orders.order_placed') }}
+                            </dt>
                             <dd
                                 class="mt-0.5 font-medium text-zinc-900 dark:text-white"
                             >
@@ -184,7 +197,9 @@ function shippingLabel(order: Order): string {
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-xs text-zinc-500">Total</dt>
+                            <dt class="text-xs text-zinc-500">
+                                {{ t('account.orders.total') }}
+                            </dt>
                             <dd
                                 class="mt-0.5 font-medium text-zinc-900 dark:text-white"
                             >
@@ -197,7 +212,9 @@ function shippingLabel(order: Order): string {
                             </dd>
                         </div>
                         <div v-if="order.shipping_address" class="max-w-xs">
-                            <dt class="text-xs text-zinc-500">Ship to</dt>
+                            <dt class="text-xs text-zinc-500">
+                                {{ t('account.orders.ship_to') }}
+                            </dt>
                             <dd
                                 class="mt-0.5 font-medium text-zinc-900 dark:text-white"
                             >
@@ -230,14 +247,16 @@ function shippingLabel(order: Order): string {
                         </div>
                     </div>
                     <div class="flex flex-col items-end gap-1.5 text-sm">
-                        <span class="font-medium text-zinc-900 dark:text-white"
-                            >Order #{{ order.number }}</span
-                        >
+                        <span class="font-medium text-zinc-900 dark:text-white">{{
+                            t('account.orders.order_number', {
+                                number: order.number,
+                            })
+                        }}</span>
                         <Link
                             :href="ordersShow.url(order.id)"
                             class="text-sm font-medium text-zinc-900 hover:underline dark:text-white"
                         >
-                            View order details
+                            {{ t('account.orders.view_details') }}
                         </Link>
                     </div>
                 </div>
@@ -306,15 +325,21 @@ function shippingLabel(order: Order): string {
                                     v-if="item.sku"
                                     class="mt-0.5 text-xs text-zinc-500"
                                 >
-                                    SKU: {{ item.sku }}
+                                    {{
+                                        t('account.orders.sku', {
+                                            sku: item.sku,
+                                        })
+                                    }}
                                 </p>
                                 <p class="mt-1 text-sm text-zinc-500">
-                                    Qty: {{ item.quantity }} ·
                                     {{
-                                        formatMoney(
-                                            item.unit_price_amount,
-                                            order.currency_code,
-                                        )
+                                        t('account.orders.quantity_price', {
+                                            quantity: item.quantity,
+                                            price: formatMoney(
+                                                item.unit_price_amount,
+                                                order.currency_code,
+                                            ),
+                                        })
                                     }}
                                 </p>
                             </div>
@@ -337,7 +362,7 @@ function shippingLabel(order: Order): string {
         <nav
             v-if="orders.last_page > 1"
             class="mt-8 flex justify-center gap-1"
-            aria-label="Pagination"
+            :aria-label="t('account.orders.pagination')"
         >
             <Link
                 v-for="link in orders.links"

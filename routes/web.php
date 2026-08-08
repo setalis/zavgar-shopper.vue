@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Account\AddressController;
 use App\Http\Controllers\Account\OrderController as AccountOrderController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\CategoryController;
 use App\Http\Controllers\Shop\CheckoutController;
@@ -37,6 +38,9 @@ Route::middleware('throttle:60,1')->group(function (): void {
 
 // Zone
 Route::patch('zone', [ZoneController::class, 'update'])->middleware('throttle:30,1')->name('shop.zone.update');
+
+// Locale
+Route::patch('locale', [LocaleController::class, 'update'])->middleware('throttle:30,1')->name('locale.update');
 
 // Checkout
 Route::middleware(['auth', 'verified'])->group(function (): void {

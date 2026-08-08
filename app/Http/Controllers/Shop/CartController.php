@@ -51,12 +51,12 @@ final class CartController extends Controller
         try {
             resolve(AddToCart::class)->handle($product, $variant, $data['quantity'] ?? 1);
         } catch (InsufficientStockException) {
-            return back()->withErrors(['cart' => __('Insufficient stock available.')]);
+            return back()->withErrors(['cart' => __('backend.cart.insufficient_stock')]);
         }
 
         $this->invalidateCheckoutSession();
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Product added to cart!')]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('backend.cart.added')]);
 
         return back();
     }

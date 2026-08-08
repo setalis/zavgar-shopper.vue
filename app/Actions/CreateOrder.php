@@ -22,7 +22,7 @@ final class CreateOrder
             && data_get($checkout, 'shipping_option')
             && data_get($checkout, 'payment'),
             422,
-            __('Checkout session is incomplete or expired.'),
+            __('backend.order.session_incomplete'),
         );
 
         $cart = cartSession();
@@ -38,7 +38,7 @@ final class CreateOrder
 
         $lock = Cache::lock('checkout.create-order.'.$cart->id, 10);
 
-        abort_unless($lock->get(), 409, __('A checkout is already in progress.'));
+        abort_unless($lock->get(), 409, __('backend.order.checkout_in_progress'));
 
         try {
             return DB::transaction(function () use ($cart, $checkout): Order {

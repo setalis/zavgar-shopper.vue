@@ -6,12 +6,14 @@ import AnnouncementBar from '@/components/shop/announcement-bar.vue';
 import BrandIcon from '@/components/shop/brand-icon.vue';
 import Container from '@/components/shop/container.vue';
 import { useShop } from '@/composables/useShop';
+import { useTrans } from '@/composables/useTrans';
 import { dashboard, home, login, logout, register } from '@/routes';
 import * as shop from '@/routes/shop';
 import type { NavCategory } from '@/types/shop';
 
 const page = usePage();
 const { cartCount } = useShop();
+const { t } = useTrans();
 
 const mobileOpen = ref<boolean>(false);
 const currentUrl = computed<string>(() => page.url ?? '');
@@ -35,16 +37,14 @@ function isCategoryActive(slug: string): boolean {
     <header
         class="sticky top-0 z-30 border-b border-zinc-200 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900"
     >
-        <AnnouncementBar
-            message="Акция на автохимию от Лаверат - 20%!"
-        />
+        <AnnouncementBar :message="t('shop.announcement.promo')" />
 
         <Container>
             <div class="flex h-16 items-center justify-between">
                 <button
                     type="button"
                     class="-ml-2 rounded-md p-2 text-zinc-500 hover:text-zinc-900 lg:hidden dark:hover:text-white"
-                    aria-label="Open menu"
+                    :aria-label="t('shop.nav.open_menu')"
                     @click="mobileOpen = !mobileOpen"
                 >
                     <Menu
@@ -74,7 +74,7 @@ function isCategoryActive(slug: string): boolean {
                                 : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white',
                         ]"
                     >
-                        Home
+                        {{ t('shop.nav.home') }}
                     </Link>
                     <Link
                         :href="shop.index.url()"
@@ -86,7 +86,7 @@ function isCategoryActive(slug: string): boolean {
                                 : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white',
                         ]"
                     >
-                        Shop
+                        {{ t('shop.nav.shop') }}
                     </Link>
                     <Link
                         v-for="category in navCategories"
@@ -107,7 +107,7 @@ function isCategoryActive(slug: string): boolean {
                     <Link
                         :href="shop.search.url()"
                         class="text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
-                        aria-label="Search"
+                        :aria-label="t('shop.nav.search')"
                     >
                         <Search class="size-5" aria-hidden="true" />
                     </Link>
@@ -115,7 +115,7 @@ function isCategoryActive(slug: string): boolean {
                     <Link
                         :href="shop.cart.url()"
                         class="relative text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
-                        aria-label="Cart"
+                        :aria-label="t('shop.nav.cart')"
                     >
                         <ShoppingBag class="size-5" aria-hidden="true" />
                         <span
@@ -130,7 +130,7 @@ function isCategoryActive(slug: string): boolean {
                         v-if="page.props.auth.user"
                         :href="dashboard.url()"
                         class="hidden text-zinc-500 transition hover:text-zinc-900 lg:inline-flex dark:hover:text-white"
-                        aria-label="Account"
+                        :aria-label="t('shop.nav.account')"
                     >
                         <User class="size-5" aria-hidden="true" />
                     </Link>
@@ -138,7 +138,7 @@ function isCategoryActive(slug: string): boolean {
                         v-else
                         :href="login.url()"
                         class="hidden text-zinc-500 transition hover:text-zinc-900 lg:inline-flex dark:hover:text-white"
-                        aria-label="Sign in"
+                        :aria-label="t('shop.nav.sign_in')"
                     >
                         <User class="size-5" aria-hidden="true" />
                     </Link>
@@ -156,14 +156,14 @@ function isCategoryActive(slug: string): boolean {
                     class="block text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                     @click="mobileOpen = false"
                 >
-                    Home
+                    {{ t('shop.nav.home') }}
                 </Link>
                 <Link
                     :href="shop.index.url()"
                     class="block text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                     @click="mobileOpen = false"
                 >
-                    Shop
+                    {{ t('shop.nav.shop') }}
                 </Link>
                 <Link
                     v-for="category in navCategories"
@@ -184,14 +184,14 @@ function isCategoryActive(slug: string): boolean {
                             class="block text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                             @click="mobileOpen = false"
                         >
-                            My account
+                            {{ t('shop.nav.my_account') }}
                         </Link>
                         <form method="POST" :action="logout.url()">
                             <button
                                 type="submit"
                                 class="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                             >
-                                Log out
+                                {{ t('shop.nav.log_out') }}
                             </button>
                         </form>
                     </template>
@@ -201,14 +201,14 @@ function isCategoryActive(slug: string): boolean {
                             class="block text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                             @click="mobileOpen = false"
                         >
-                            Log in
+                            {{ t('shop.nav.log_in') }}
                         </Link>
                         <Link
                             :href="register.url()"
                             class="block text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                             @click="mobileOpen = false"
                         >
-                            Create account
+                            {{ t('shop.nav.create_account') }}
                         </Link>
                     </template>
                 </div>

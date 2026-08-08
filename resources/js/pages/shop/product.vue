@@ -7,9 +7,10 @@ import PriceDisplay from '@/components/shop/price-display.vue';
 import ProductCard from '@/components/shop/product-card.vue';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/composables/useCart';
+import { useTrans } from '@/composables/useTrans';
 import { home } from '@/routes';
 import * as shop from '@/routes/shop';
-import type { Product, VariantOptions } from '@/types/shop';
+import type { Product, StorefrontPrice, VariantOptions } from '@/types/shop';
 
 const props = defineProps<{
     product: Product;
@@ -17,6 +18,7 @@ const props = defineProps<{
 }>();
 
 const cart = useCart();
+const { t } = useTrans();
 
 const selectedOptions = ref<Record<number, number>>({});
 const quantity = ref<number>(1);
@@ -52,9 +54,19 @@ const selectedVariant = computed(() =>
         : null,
 );
 
-const displayPrice = computed(
-    () => selectedVariant.value?.prices?.[0] ?? props.product.prices?.[0],
-);
+const displayPrice = computed<StorefrontPrice | null>(() => {
+    const selected = selectedVariant.value?.prices?.[0];
+
+    if (selected?.amount != null) {
+        return {
+            amount: selected.amount,
+            compare_amount: selected.compare_amount ?? null,
+            from: false,
+        };
+    }
+
+    return props.product.storefront_price ?? null;
+});
 
 const outOfStock = computed<boolean>(() => {
     if (hasVariants.value) {
@@ -100,18 +112,18 @@ function addToCart(): void {
     <Container class="py-8 sm:py-12">
         <nav
             class="mb-8 flex items-center gap-2 text-sm text-zinc-500"
-            aria-label="Breadcrumb"
+            :aria-label="t('shop.product.breadcrumb')"
         >
             <Link
                 :href="home.url()"
                 class="transition hover:text-zinc-900 dark:hover:text-white"
-                >Home</Link
+                >{{ t('shop.product.breadcrumb.home') }}</Link
             >
             <span>/</span>
             <Link
                 :href="shop.index.url()"
                 class="transition hover:text-zinc-900 dark:hover:text-white"
-                >Shop</Link
+                >{{ t('shop.product.breadcrumb.shop') }}</Link
             >
             <span>/</span>
             <span class="text-zinc-900 dark:text-white">{{
@@ -167,7 +179,7 @@ function addToCart(): void {
                     v-if="outOfStock"
                     class="mt-2 inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-600 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20"
                 >
-                    Out of stock
+                    {{ t('shop.product.out_of_stock') }}
                 </p>
 
                 <div class="mt-4">
@@ -255,7 +267,7 @@ function addToCart(): void {
                             type="button"
                             class="px-3 py-2 text-zinc-500 transition hover:text-zinc-900 disabled:opacity-40 dark:hover:text-white"
                             :disabled="quantity <= 1"
-                            aria-label="Decrease"
+                            :aria-label="t('shop.product.decrease')"
                             @click="quantity = Math.max(1, quantity - 1)"
                         >
                             <Minus class="size-4" aria-hidden="true" />
@@ -267,7 +279,7 @@ function addToCart(): void {
                         <button
                             type="button"
                             class="px-3 py-2 text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
-                            aria-label="Increase"
+                            :aria-label="t('shop.product.increase')"
                             @click="quantity = Math.min(10, quantity + 1)"
                         >
                             <Plus class="size-4" aria-hidden="true" />
@@ -286,10 +298,10 @@ function addToCart(): void {
                     >
                         {{
                             outOfStock
-                                ? 'Out of stock'
+                                ? t('shop.product.out_of_stock')
                                 : adding
-                                  ? 'Adding...'
-                                  : 'Add to Cart'
+                                  ? t('shop.product.adding')
+                                  : t('shop.product.add_to_cart')
                         }}
                     </Button>
                 </div>
@@ -301,7 +313,7 @@ function addToCart(): void {
                     <h3
                         class="text-sm font-medium text-zinc-900 dark:text-white"
                     >
-                        Description
+                        {{ t('shop.product.description') }}
                     </h3>
                     <div
                         class="prose prose-sm mt-3 max-w-none prose-zinc dark:prose-invert"
@@ -318,7 +330,7 @@ function addToCart(): void {
             <h2
                 class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
             >
-                Related Products
+                {{ t('shop.product.related') }}
             </h2>
             <div
                 class="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-6"

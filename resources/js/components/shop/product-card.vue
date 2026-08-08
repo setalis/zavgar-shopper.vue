@@ -11,7 +11,7 @@ const thumbnail = computed<string | null>(
     () => props.product.thumbnail ?? props.product.images?.[0]?.url ?? null,
 );
 
-const price = computed(() => props.product.prices[0]);
+const price = computed(() => props.product.storefront_price ?? null);
 
 const percentage = computed<number | null>(() => {
     if (
@@ -62,7 +62,7 @@ const percentage = computed<number | null>(() => {
         </p>
 
         <div class="mt-1">
-            <PriceDisplay :price="price ?? null" size="sm" />
+            <PriceDisplay :price="price" size="sm" />
         </div>
     </div>
 </template>

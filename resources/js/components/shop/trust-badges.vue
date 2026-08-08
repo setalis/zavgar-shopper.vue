@@ -1,24 +1,32 @@
 <script setup lang="ts">
 import { MessageCircle, RotateCcw, ShieldCheck, Truck } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { useTrans } from '@/composables/useTrans';
 
-const badges = [
-    { icon: Truck, title: 'Free Shipping', description: 'On orders over $50' },
+const { t } = useTrans();
+
+const badges = computed(() => [
+    {
+        icon: Truck,
+        title: t('shop.trust.free_shipping.title'),
+        description: t('shop.trust.free_shipping.description'),
+    },
     {
         icon: ShieldCheck,
-        title: 'Secure Payment',
-        description: '100% secure checkout',
+        title: t('shop.trust.secure_payment.title'),
+        description: t('shop.trust.secure_payment.description'),
     },
     {
         icon: RotateCcw,
-        title: 'Easy Returns',
-        description: '30-day return policy',
+        title: t('shop.trust.easy_returns.title'),
+        description: t('shop.trust.easy_returns.description'),
     },
     {
         icon: MessageCircle,
-        title: '24/7 Support',
-        description: 'Dedicated support',
+        title: t('shop.trust.support.title'),
+        description: t('shop.trust.support.description'),
     },
-];
+]);
 </script>
 
 <template>

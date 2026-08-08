@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTrans } from '@/composables/useTrans';
 import * as profileRoutes from '@/routes/profile';
 import * as verification from '@/routes/verification';
 
@@ -23,6 +24,8 @@ const props = defineProps<{
     status?: string;
     genders: GenderOption[];
 }>();
+
+const { t } = useTrans();
 
 const page = usePage();
 const user = page.props.auth.user as {
@@ -65,19 +68,23 @@ function confirmDelete(): void {
 </script>
 
 <template>
-    <Head title="Profile settings" />
+    <Head :title="t('settings.profile.title')" />
 
     <div class="space-y-1">
         <h2 class="text-lg font-medium text-zinc-900 dark:text-white">
-            Profile
+            {{ t('settings.profile.heading') }}
         </h2>
-        <p class="text-sm text-zinc-500">Update your name and email address</p>
+        <p class="text-sm text-zinc-500">
+            {{ t('settings.profile.description') }}
+        </p>
     </div>
 
     <form class="my-6 w-full max-w-lg space-y-6" @submit.prevent="submit">
         <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">
-                <Label for="last_name">Last name</Label>
+                <Label for="last_name">{{
+                    t('settings.profile.last_name')
+                }}</Label>
                 <Input
                     id="last_name"
                     v-model="form.last_name"
@@ -93,7 +100,9 @@ function confirmDelete(): void {
                 </p>
             </div>
             <div class="space-y-2">
-                <Label for="first_name">First name</Label>
+                <Label for="first_name">{{
+                    t('settings.profile.first_name')
+                }}</Label>
                 <Input
                     id="first_name"
                     v-model="form.first_name"
@@ -111,10 +120,16 @@ function confirmDelete(): void {
         </div>
 
         <div class="space-y-2">
-            <Label for="gender">Gender</Label>
+            <Label for="gender">{{ t('settings.profile.gender') }}</Label>
             <Select v-model="form.gender">
-                <SelectTrigger id="gender" aria-label="Gender" class="w-full">
-                    <SelectValue placeholder="Select gender" />
+                <SelectTrigger
+                    id="gender"
+                    :aria-label="t('settings.profile.gender')"
+                    class="w-full"
+                >
+                    <SelectValue
+                        :placeholder="t('settings.profile.gender_placeholder')"
+                    />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem
@@ -132,7 +147,7 @@ function confirmDelete(): void {
         </div>
 
         <div class="space-y-2">
-            <Label for="email">Email</Label>
+            <Label for="email">{{ t('settings.profile.email') }}</Label>
             <Input
                 id="email"
                 v-model="form.email"
@@ -146,43 +161,45 @@ function confirmDelete(): void {
 
             <div v-if="hasUnverifiedEmail" class="mt-4">
                 <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                    Your email address is unverified.
+                    {{ t('settings.profile.unverified_email') }}
                     <Link
                         :href="verification.send.url()"
                         method="post"
                         as="button"
                         class="text-zinc-900 underline dark:text-white"
                     >
-                        Click here to re-send the verification email.
+                        {{ t('settings.profile.resend_verification') }}
                     </Link>
                 </p>
                 <p
                     v-if="status === 'verification-link-sent'"
                     class="mt-2 text-sm font-medium text-green-600 dark:text-green-400"
                 >
-                    A new verification link has been sent to your email address.
+                    {{ t('settings.profile.verification_link_sent') }}
                 </p>
             </div>
         </div>
 
         <div class="flex items-center gap-4">
-            <Button type="submit" :disabled="form.processing">Save</Button>
+            <Button type="submit" :disabled="form.processing">{{
+                t('settings.profile.save')
+            }}</Button>
             <p v-if="form.recentlySuccessful" class="text-sm text-zinc-500">
-                Saved.
+                {{ t('settings.profile.saved') }}
             </p>
         </div>
     </form>
 
     <div class="mt-10 max-w-lg space-y-3">
         <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">
-            Delete account
+            {{ t('settings.profile.delete.heading') }}
         </h3>
         <p class="text-sm text-zinc-500">
-            Delete your account and all of its resources
+            {{ t('settings.profile.delete.description') }}
         </p>
-        <Button type="button" variant="destructive" @click="openDelete"
-            >Delete account</Button
-        >
+        <Button type="button" variant="destructive" @click="openDelete">{{
+            t('settings.profile.delete.button')
+        }}</Button>
     </div>
 
     <Dialog v-model:open="deleteOpen">
@@ -190,16 +207,16 @@ function confirmDelete(): void {
             <DialogTitle
                 class="text-lg font-semibold text-zinc-900 dark:text-white"
             >
-                Are you sure you want to delete your account?
+                {{ t('settings.profile.delete.confirm_title') }}
             </DialogTitle>
             <p class="mt-2 text-sm text-zinc-500">
-                Once your account is deleted, all of its resources and data will
-                be permanently deleted. Please enter your password to confirm
-                you would like to permanently delete your account.
+                {{ t('settings.profile.delete.confirm_description') }}
             </p>
             <form class="mt-6 space-y-4" @submit.prevent="confirmDelete">
                 <div class="space-y-2">
-                    <Label for="delete_password">Password</Label>
+                    <Label for="delete_password">{{
+                        t('settings.profile.delete.password')
+                    }}</Label>
                     <PasswordInput
                         id="delete_password"
                         v-model="deleteForm.password"
@@ -217,13 +234,13 @@ function confirmDelete(): void {
                         type="button"
                         variant="outline"
                         @click="deleteOpen = false"
-                        >Cancel</Button
+                        >{{ t('settings.profile.delete.cancel') }}</Button
                     >
                     <Button
                         type="submit"
                         variant="destructive"
                         :disabled="deleteForm.processing"
-                        >Delete account</Button
+                        >{{ t('settings.profile.delete.submit') }}</Button
                     >
                 </div>
             </form>

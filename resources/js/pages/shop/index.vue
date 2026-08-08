@@ -12,8 +12,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Category, Product } from '@/types/shop';
+
+const { t } = useTrans();
 
 type Paginated<T> = {
     data: T[];
@@ -68,7 +71,7 @@ function filterByCategory(categoryId: number | null): void {
 </script>
 
 <template>
-    <Head title="Shop" />
+    <Head :title="t('shop.index.title')" />
 
     <Container class="py-8 sm:py-12">
         <div
@@ -78,20 +81,20 @@ function filterByCategory(categoryId: number | null): void {
                 <h1
                     class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
                 >
-                    Shop
+                    {{ t('shop.index.title') }}
                 </h1>
                 <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    Browse our entire collection
+                    {{ t('shop.index.subtitle') }}
                 </p>
             </div>
 
             <Select v-model="sort">
-                <SelectTrigger class="w-auto" aria-label="Sort">
-                    <SelectValue placeholder="Sort by" />
+                <SelectTrigger class="w-auto" :aria-label="t('shop.index.sort_aria')">
+                    <SelectValue :placeholder="t('shop.index.sort_placeholder')" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="latest">Newest</SelectItem>
-                    <SelectItem value="name">Name</SelectItem>
+                    <SelectItem value="latest">{{ t('shop.index.sort.newest') }}</SelectItem>
+                    <SelectItem value="name">{{ t('shop.index.sort.name') }}</SelectItem>
                 </SelectContent>
             </Select>
         </div>
@@ -99,7 +102,7 @@ function filterByCategory(categoryId: number | null): void {
         <div class="mt-8 lg:grid lg:grid-cols-4 lg:gap-x-8">
             <aside class="hidden lg:block">
                 <div class="mb-6">
-                    <label for="shop-search" class="sr-only">Search</label>
+                    <label for="shop-search" class="sr-only">{{ t('shop.nav.search') }}</label>
                     <div class="relative">
                         <Search
                             class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
@@ -109,7 +112,7 @@ function filterByCategory(categoryId: number | null): void {
                             id="shop-search"
                             v-model="search"
                             type="search"
-                            placeholder="Search products..."
+                            :placeholder="t('shop.index.search_placeholder')"
                             class="pl-9"
                         />
                     </div>
@@ -119,7 +122,7 @@ function filterByCategory(categoryId: number | null): void {
                     <h3
                         class="text-sm font-semibold text-zinc-900 dark:text-white"
                     >
-                        Categories
+                        {{ t('shop.index.categories') }}
                     </h3>
                     <ul role="list" class="mt-3 space-y-2">
                         <li>
@@ -133,7 +136,7 @@ function filterByCategory(categoryId: number | null): void {
                                 ]"
                                 @click="filterByCategory(null)"
                             >
-                                All
+                                {{ t('shop.index.all') }}
                             </button>
                         </li>
                         <li v-for="cat in categories" :key="cat.id">
@@ -164,7 +167,7 @@ function filterByCategory(categoryId: number | null): void {
                         <Input
                             v-model="search"
                             type="search"
-                            placeholder="Search products..."
+                            :placeholder="t('shop.index.search_placeholder')"
                             class="pl-9"
                         />
                     </div>
@@ -181,10 +184,10 @@ function filterByCategory(categoryId: number | null): void {
                     <h3
                         class="mt-4 text-sm font-semibold text-zinc-900 dark:text-white"
                     >
-                        No products found
+                        {{ t('shop.index.empty.title') }}
                     </h3>
                     <p class="mt-1 text-sm text-zinc-500">
-                        Try adjusting your search or filters.
+                        {{ t('shop.index.empty.subtitle') }}
                     </p>
                 </div>
 
@@ -202,7 +205,7 @@ function filterByCategory(categoryId: number | null): void {
                     <nav
                         v-if="products.last_page > 1"
                         class="mt-8 flex justify-center gap-1"
-                        aria-label="Pagination"
+                        :aria-label="t('shop.index.pagination')"
                     >
                         <Link
                             v-for="link in products.links"

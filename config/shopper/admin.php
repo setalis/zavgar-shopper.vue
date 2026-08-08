@@ -129,8 +129,8 @@ return [
     */
 
     'locales' => [
+        'uk' => ['label' => 'Українська', 'flag' => 'ua'],
         'en' => ['label' => 'English', 'flag' => 'gb'],
-        'fr' => ['label' => 'Français', 'flag' => 'fr'],
     ],
 
     /*
@@ -149,6 +149,7 @@ return [
     'icon-picker' => [
         'cache' => true,
         'duration' => '7 days',
+        'sets' => ['phosphor'],
     ],
 
 ];

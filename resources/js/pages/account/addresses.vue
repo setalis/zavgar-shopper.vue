@@ -27,6 +27,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import AddressController from '@/actions/App/Http/Controllers/Account/AddressController';
+import { useTrans } from '@/composables/useTrans';
 import { AddressType, type Address } from '@/types/shop';
 
 type CountryOption = { id: number; name: string; cca2: string };
@@ -48,6 +49,8 @@ const props = defineProps<{
     addresses: Address[];
     countries: CountryOption[];
 }>();
+
+const { t } = useTrans();
 
 const editing = ref<Address | null>(null);
 const open = ref<boolean>(false);
@@ -107,7 +110,7 @@ function submit(): void {
 }
 
 function destroy(address: Address): void {
-    if (!window.confirm('Do you really want to delete this address?')) return;
+    if (!window.confirm(t('account.addresses.delete_confirm'))) return;
     router.delete(AddressController.destroy.url(address.id), {
         preserveScroll: true,
     });
@@ -131,16 +134,16 @@ function setDefaultBilling(address: Address): void {
 </script>
 
 <template>
-    <Head title="My Addresses" />
+    <Head :title="t('account.addresses.title')" />
 
     <div>
         <h1
             class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
         >
-            My Addresses
+            {{ t('account.addresses.heading') }}
         </h1>
         <p class="mt-1 text-sm text-zinc-500">
-            View and update your delivery and billing addresses.
+            {{ t('account.addresses.description') }}
         </p>
     </div>
 
@@ -150,7 +153,7 @@ function setDefaultBilling(address: Address): void {
             variant="outline"
             class="w-full sm:w-auto"
             @click="startCreate"
-            >Add address</Button
+            >{{ t('account.addresses.add') }}</Button
         >
 
         <div
@@ -172,7 +175,7 @@ function setDefaultBilling(address: Address): void {
                         <span
                             v-if="address.type === AddressType.BILLING"
                             class="inline-flex shrink-0 items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
-                            >Billing</span
+                            >{{ t('account.addresses.billing') }}</span
                         >
                     </div>
 
@@ -199,14 +202,14 @@ function setDefaultBilling(address: Address): void {
                             class="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
                         >
                             <Check class="size-3" aria-hidden="true" />
-                            Default shipping
+                            {{ t('account.addresses.default_shipping') }}
                         </span>
                         <span
                             v-if="address.billing_default"
                             class="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
                         >
                             <Check class="size-3" aria-hidden="true" />
-                            Default billing
+                            {{ t('account.addresses.default_billing') }}
                         </span>
                     </div>
                 </div>
@@ -226,7 +229,7 @@ function setDefaultBilling(address: Address): void {
                         size="sm"
                         @click="startEdit(address)"
                     >
-                        Edit
+                        {{ t('account.addresses.edit') }}
                     </Button>
                     <DropdownMenu
                         v-if="
@@ -247,7 +250,7 @@ function setDefaultBilling(address: Address): void {
                                 @click="setDefaultShipping(address)"
                             >
                                 <Truck class="size-4" aria-hidden="true" />
-                                Set as default shipping
+                                {{ t('account.addresses.set_default_shipping') }}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 v-if="!address.billing_default"
@@ -257,7 +260,7 @@ function setDefaultBilling(address: Address): void {
                                     class="size-4"
                                     aria-hidden="true"
                                 />
-                                Set as default billing
+                                {{ t('account.addresses.set_default_billing') }}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -266,7 +269,7 @@ function setDefaultBilling(address: Address): void {
         </div>
 
         <p v-else class="text-sm text-zinc-500">
-            You have not yet added any addresses.
+            {{ t('account.addresses.empty') }}
         </p>
     </div>
 
@@ -275,12 +278,18 @@ function setDefaultBilling(address: Address): void {
             <DialogTitle
                 class="text-lg font-semibold text-zinc-900 dark:text-white"
             >
-                {{ editing ? 'Update address' : 'Add new address' }}
+                {{
+                    editing
+                        ? t('account.addresses.form.update_title')
+                        : t('account.addresses.form.add_title')
+                }}
             </DialogTitle>
             <form class="space-y-6" @submit.prevent="submit">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="space-y-2">
-                        <Label for="first_name">First name</Label>
+                        <Label for="first_name">{{
+                            t('account.addresses.form.first_name')
+                        }}</Label>
                         <Input
                             id="first_name"
                             v-model="form.first_name"
@@ -294,7 +303,9 @@ function setDefaultBilling(address: Address): void {
                         </p>
                     </div>
                     <div class="space-y-2">
-                        <Label for="last_name">Last name</Label>
+                        <Label for="last_name">{{
+                            t('account.addresses.form.last_name')
+                        }}</Label>
                         <Input
                             id="last_name"
                             v-model="form.last_name"
@@ -308,7 +319,9 @@ function setDefaultBilling(address: Address): void {
                         </p>
                     </div>
                     <div class="space-y-2 sm:col-span-2">
-                        <Label for="street_address">Street address</Label>
+                        <Label for="street_address">{{
+                            t('account.addresses.form.street_address')
+                        }}</Label>
                         <Input
                             id="street_address"
                             v-model="form.street_address"
@@ -322,20 +335,24 @@ function setDefaultBilling(address: Address): void {
                         </p>
                     </div>
                     <div class="space-y-2 sm:col-span-2">
-                        <Label for="street_address_plus"
-                            >Apartment, suite, etc.</Label
-                        >
+                        <Label for="street_address_plus">{{
+                            t('account.addresses.form.street_address_plus')
+                        }}</Label>
                         <Input
                             id="street_address_plus"
                             v-model="form.street_address_plus"
                         />
                     </div>
                     <div class="space-y-2">
-                        <Label for="city">City</Label>
+                        <Label for="city">{{
+                            t('account.addresses.form.city')
+                        }}</Label>
                         <Input id="city" v-model="form.city" required />
                     </div>
                     <div class="space-y-2">
-                        <Label for="postal_code">Postal / Zip code</Label>
+                        <Label for="postal_code">{{
+                            t('account.addresses.form.postal_code')
+                        }}</Label>
                         <Input
                             id="postal_code"
                             v-model="form.postal_code"
@@ -343,11 +360,15 @@ function setDefaultBilling(address: Address): void {
                         />
                     </div>
                     <div class="space-y-2">
-                        <Label for="state">State / Province</Label>
+                        <Label for="state">{{
+                            t('account.addresses.form.state')
+                        }}</Label>
                         <Input id="state" v-model="form.state" />
                     </div>
                     <div class="space-y-2">
-                        <Label for="country_id">Country</Label>
+                        <Label for="country_id">{{
+                            t('account.addresses.form.country')
+                        }}</Label>
                         <Select
                             :model-value="form.country_id?.toString() ?? ''"
                             @update:model-value="
@@ -356,10 +377,16 @@ function setDefaultBilling(address: Address): void {
                         >
                             <SelectTrigger
                                 id="country_id"
-                                aria-label="Country"
+                                :aria-label="t('account.addresses.form.country')"
                                 class="w-full"
                             >
-                                <SelectValue placeholder="Select a country" />
+                                <SelectValue
+                                    :placeholder="
+                                        t(
+                                            'account.addresses.form.country_placeholder',
+                                        )
+                                    "
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem
@@ -379,7 +406,9 @@ function setDefaultBilling(address: Address): void {
                         </p>
                     </div>
                     <div class="space-y-2 sm:col-span-2">
-                        <Label for="phone_number">Phone number</Label>
+                        <Label for="phone_number">{{
+                            t('account.addresses.form.phone_number')
+                        }}</Label>
                         <Input
                             id="phone_number"
                             v-model="form.phone_number"
@@ -389,7 +418,7 @@ function setDefaultBilling(address: Address): void {
                         <legend
                             class="text-sm font-medium text-zinc-900 dark:text-white"
                         >
-                            Address type
+                            {{ t('account.addresses.form.type') }}
                         </legend>
                         <div class="flex flex-wrap items-center gap-6 pt-1">
                             <label
@@ -401,7 +430,7 @@ function setDefaultBilling(address: Address): void {
                                     :value="AddressType.SHIPPING"
                                     class="border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600"
                                 />
-                                Shipping address
+                                {{ t('account.addresses.form.shipping') }}
                             </label>
                             <label
                                 class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"
@@ -412,17 +441,17 @@ function setDefaultBilling(address: Address): void {
                                     :value="AddressType.BILLING"
                                     class="border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600"
                                 />
-                                Billing address
+                                {{ t('account.addresses.form.billing') }}
                             </label>
                         </div>
                     </fieldset>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <Button type="button" variant="ghost" @click="open = false"
-                        >Cancel</Button
-                    >
+                    <Button type="button" variant="ghost" @click="open = false">{{
+                        t('account.addresses.form.cancel')
+                    }}</Button>
                     <Button type="submit" :disabled="form.processing">{{
-                        editing ? 'Save' : 'Save'
+                        t('account.addresses.form.save')
                     }}</Button>
                 </div>
             </form>

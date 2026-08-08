@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useTrans } from '@/composables/useTrans';
 import * as appearance from '@/routes/appearance';
 import * as profile from '@/routes/profile';
 import * as security from '@/routes/security';
@@ -8,11 +9,12 @@ import * as security from '@/routes/security';
 type Item = { href: string; label: string };
 
 const page = usePage();
+const { t } = useTrans();
 
 const items = computed<Item[]>(() => [
-    { href: profile.edit.url(), label: 'Profile' },
-    { href: security.edit.url(), label: 'Security' },
-    { href: appearance.edit.url(), label: 'Appearance' },
+    { href: profile.edit.url(), label: t('settings.nav.profile') },
+    { href: security.edit.url(), label: t('settings.nav.security') },
+    { href: appearance.edit.url(), label: t('settings.nav.appearance') },
 ]);
 
 function isActive(item: Item): boolean {
@@ -27,17 +29,20 @@ function isActive(item: Item): boolean {
             <h1
                 class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
             >
-                Settings
+                {{ t('settings.layout.title') }}
             </h1>
             <p class="mt-1 mb-6 text-base text-zinc-500">
-                Manage your profile and account settings
+                {{ t('settings.layout.description') }}
             </p>
             <hr class="border-zinc-200/60 dark:border-zinc-700/60" />
         </div>
 
         <div class="flex items-start max-md:flex-col">
             <div class="me-10 w-full pb-4 md:w-[220px]">
-                <nav class="flex flex-col gap-1" :aria-label="'Settings'">
+                <nav
+                    class="flex flex-col gap-1"
+                    :aria-label="t('settings.layout.title')"
+                >
                     <Link
                         v-for="item in items"
                         :key="item.href"

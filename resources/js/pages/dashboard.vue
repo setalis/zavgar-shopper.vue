@@ -2,6 +2,7 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { MapPin, ShoppingBag, User } from 'lucide-vue-next';
 import Card from '@/components/shop/card.vue';
+import { useTrans } from '@/composables/useTrans';
 import {
     addresses as accountAddresses,
     orders as accountOrders,
@@ -9,6 +10,7 @@ import {
 import * as profile from '@/routes/profile';
 
 const page = usePage();
+const { t } = useTrans();
 
 const firstName =
     (page.props.auth.user as { first_name?: string; name?: string } | null)
@@ -18,10 +20,15 @@ const firstName =
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head :title="t('dashboard.title')" />
 
     <h1 class="font-heading text-2xl font-bold text-zinc-900 dark:text-white">
-        Welcome back<span v-if="firstName">, {{ firstName }}</span>
+        <template v-if="firstName">
+            {{ t('dashboard.welcome_name', { name: firstName }) }}
+        </template>
+        <template v-else>
+            {{ t('dashboard.welcome') }}
+        </template>
     </h1>
 
     <div class="mt-8 grid gap-4 sm:grid-cols-3">
@@ -39,9 +46,10 @@ const firstName =
                     <p
                         class="text-sm font-medium text-zinc-900 dark:text-white"
                     >
-                        Orders
+                        {{ t('dashboard.orders.title') }}
                     </p>
-                    <p class="text-xs text-zinc-500">View your order history</p>
+                    <p class="text-xs text-zinc-500">
+                        {{ t('dashboard.orders.description') }}
                 </div>
             </Card>
         </Link>
@@ -60,9 +68,10 @@ const firstName =
                     <p
                         class="text-sm font-medium text-zinc-900 dark:text-white"
                     >
-                        Addresses
+                        {{ t('dashboard.addresses.title') }}
                     </p>
-                    <p class="text-xs text-zinc-500">Manage your addresses</p>
+                    <p class="text-xs text-zinc-500">
+                        {{ t('dashboard.addresses.description') }}
                 </div>
             </Card>
         </Link>
@@ -81,9 +90,10 @@ const firstName =
                     <p
                         class="text-sm font-medium text-zinc-900 dark:text-white"
                     >
-                        Profile
+                        {{ t('dashboard.profile.title') }}
                     </p>
-                    <p class="text-xs text-zinc-500">Manage your account</p>
+                    <p class="text-xs text-zinc-500">
+                        {{ t('dashboard.profile.description') }}
                 </div>
             </Card>
         </Link>

@@ -8,9 +8,11 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { useShop } from '@/composables/useShop';
+import { useTrans } from '@/composables/useTrans';
 import type { CountryByZoneData } from '@/types/shop';
 
 const { zone, availableZones, changeZone } = useShop();
+const { t } = useTrans();
 
 const open = ref<boolean>(false);
 
@@ -51,7 +53,7 @@ function select(country: CountryByZoneData): void {
     <div>
         <div v-if="zone" class="flex items-center">
             <p class="text-sm/5 text-zinc-700 dark:text-zinc-300">
-                Shipping to :
+                {{ t('shop.zone.shipping_to') }}
             </p>
             <button
                 type="button"
@@ -77,14 +79,14 @@ function select(country: CountryByZoneData): void {
                 <Card class="space-y-4">
                     <DialogTitle
                         class="font-heading text-lg font-semibold text-zinc-900 dark:text-white"
-                        >Select your country</DialogTitle
+                        >{{ t('shop.zone.select_country') }}</DialogTitle
                     >
 
                     <DialogDescription
                         v-if="zone"
                         class="text-sm text-zinc-600 dark:text-zinc-400"
                     >
-                        Currently shipping to:
+                        {{ t('shop.zone.currently_shipping') }}
                         <span
                             class="font-semibold text-zinc-900 dark:text-white"
                             >{{ zone.country_name }}</span
@@ -94,7 +96,7 @@ function select(country: CountryByZoneData): void {
                     <DialogDescription
                         class="text-sm text-zinc-600 dark:text-zinc-400"
                     >
-                        Changing your country may update prices and currency.
+                        {{ t('shop.zone.change_notice') }}
                     </DialogDescription>
 
                     <div

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Actions\ZoneSessionManager;
+use App\DTO\CountryByZoneData;
 use App\Models\Channel;
 use Shopper\Cart\CartSessionManager;
 use Shopper\Cart\Models\Cart;
@@ -43,7 +44,7 @@ if (! function_exists('current_tax_label')) {
         return once(function (): string {
             $zone = ZoneSessionManager::getSession();
 
-            if (! $zone instanceof App\DTO\CountryByZoneData) {
+            if (! $zone instanceof CountryByZoneData) {
                 return '';
             }
 
@@ -52,7 +53,7 @@ if (! function_exists('current_tax_label')) {
                 ->whereNull('province_code')
                 ->first();
 
-            return $taxZone?->is_tax_inclusive ? __('TTC') : __('HT');
+            return $taxZone?->is_tax_inclusive ? __('backend.tax.ttc') : __('backend.tax.ht');
         });
     }
 }

@@ -6,12 +6,14 @@ import BrandShopper from '@/components/shop/brand-shopper.vue';
 import BrandVue from '@/components/shop/brand-vue.vue';
 import Container from '@/components/shop/container.vue';
 import ZoneSelector from '@/components/shop/zone-selector.vue';
+import { useTrans } from '@/composables/useTrans';
 import { dashboard, home, login, register } from '@/routes';
 import { orders as accountOrders } from '@/routes/account';
 import * as shop from '@/routes/shop';
 import type { NavCategory } from '@/types/shop';
 
 const page = usePage();
+const { t } = useTrans();
 
 const currentYear = new Date().getFullYear();
 
@@ -25,7 +27,9 @@ const footerCategories = computed<NavCategory[]>(
         aria-labelledby="footer-heading"
         class="border-t border-zinc-200 bg-linear-to-b from-zinc-50 to-white dark:border-white/10 dark:from-zinc-900/95 dark:to-zinc-950"
     >
-        <h2 id="footer-heading" class="sr-only">Footer</h2>
+        <h2 id="footer-heading" class="sr-only">
+            {{ t('shop.footer.sr_only') }}
+        </h2>
         <Container>
             <div
                 class="py-10 sm:py-20 lg:grid lg:grid-cols-2 lg:gap-10 lg:py-24"
@@ -40,9 +44,7 @@ const footerCategories = computed<NavCategory[]>(
                         <p
                             class="mt-8 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
                         >
-                            Build modern, scalable online stores. It includes
-                            essential features like product management,
-                            checkout, and order handling.
+                            {{ t('shop.footer.tagline') }}
                         </p>
                     </div>
 
@@ -58,21 +60,21 @@ const footerCategories = computed<NavCategory[]>(
                         <h3
                             class="text-sm leading-6 font-semibold text-zinc-900 dark:text-white"
                         >
-                            Shop
+                            {{ t('shop.footer.shop') }}
                         </h3>
                         <ul role="list" class="mt-6 space-y-4">
                             <li>
                                 <Link
                                     :href="shop.index.url()"
                                     class="text-sm leading-6 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                                    >All Products</Link
+                                    >{{ t('shop.footer.all_products') }}</Link
                                 >
                             </li>
                             <li>
                                 <Link
                                     :href="shop.categories.url()"
                                     class="text-sm leading-6 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                                    >Categories</Link
+                                    >{{ t('shop.footer.categories') }}</Link
                                 >
                             </li>
                         </ul>
@@ -82,7 +84,7 @@ const footerCategories = computed<NavCategory[]>(
                         <h3
                             class="text-sm leading-6 font-semibold text-zinc-900 dark:text-white"
                         >
-                            Categories
+                            {{ t('shop.footer.categories_heading') }}
                         </h3>
                         <ul role="list" class="mt-6 space-y-4">
                             <li
@@ -107,7 +109,7 @@ const footerCategories = computed<NavCategory[]>(
                         <h3
                             class="text-sm leading-6 font-semibold text-zinc-900 dark:text-white"
                         >
-                            Account
+                            {{ t('shop.footer.account') }}
                         </h3>
                         <ul role="list" class="mt-6 space-y-4">
                             <template v-if="page.props.auth.user">
@@ -115,14 +117,14 @@ const footerCategories = computed<NavCategory[]>(
                                     <Link
                                         :href="dashboard.url()"
                                         class="text-sm leading-6 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                                        >My account</Link
+                                        >{{ t('shop.footer.my_account') }}</Link
                                     >
                                 </li>
                                 <li>
                                     <Link
                                         :href="accountOrders.url()"
                                         class="text-sm leading-6 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                                        >My orders</Link
+                                        >{{ t('shop.footer.my_orders') }}</Link
                                     >
                                 </li>
                             </template>
@@ -131,14 +133,16 @@ const footerCategories = computed<NavCategory[]>(
                                     <Link
                                         :href="login.url()"
                                         class="text-sm leading-6 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                                        >Log in</Link
+                                        >{{ t('shop.footer.log_in') }}</Link
                                     >
                                 </li>
                                 <li>
                                     <Link
                                         :href="register.url()"
                                         class="text-sm leading-6 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                                        >Create account</Link
+                                        >{{
+                                            t('shop.footer.create_account')
+                                        }}</Link
                                     >
                                 </li>
                             </template>
@@ -151,7 +155,9 @@ const footerCategories = computed<NavCategory[]>(
                 class="justify-between border-t border-zinc-100 py-6 sm:flex sm:items-center lg:py-14 dark:border-zinc-800"
             >
                 <p class="text-sm text-zinc-500">
-                    © {{ currentYear }} Shopper Labs, Inc. All rights reserved.
+                    {{
+                        t('shop.footer.copyright', { year: currentYear })
+                    }}
                 </p>
                 <a
                     href="https://laravelshopper.dev"
@@ -159,7 +165,7 @@ const footerCategories = computed<NavCategory[]>(
                     target="_blank"
                     rel="noopener"
                 >
-                    <span>Powered by</span>
+                    <span>{{ t('shop.footer.powered_by') }}</span>
                     <BrandShopper class="size-5 opacity-45" />
                     <span>&amp;</span>
                     <BrandVue class="size-5 opacity-45" />

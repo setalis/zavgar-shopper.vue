@@ -1,20 +1,23 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useFormat } from '@/composables/useFormat';
 import { useShop } from '@/composables/useShop';
-import { formatMoney } from '@/lib/format';
-import type { ProductPrice } from '@/types/shop';
+import { useTrans } from '@/composables/useTrans';
+import type { StorefrontPrice } from '@/types/shop';
 
 type Size = 'sm' | 'md' | 'lg';
 
 const props = withDefaults(
     defineProps<{
-        price: ProductPrice | null;
+        price: StorefrontPrice | null;
         size?: Size;
     }>(),
     { size: 'sm' },
 );
 
 const { currency, taxLabel } = useShop();
+const { t } = useTrans();
+const { money } = useFormat();
 
 const textSize = computed<string>(() => {
     return {
@@ -43,9 +46,12 @@ const percentage = computed<number | null>(() => {
     <div :class="textSize">
         <template v-if="price">
             <p class="flex items-center gap-2">
-                <span class="font-semibold text-zinc-900 dark:text-white">{{
-                    formatMoney(price.amount, currency)
-                }}</span>
+                <span class="font-semibold text-zinc-900 dark:text-white">
+                    {{
+                        (price.from ? `${t('shop.price.from')} ` : '') +
+                        money(price.amount, currency)
+                    }}
+                </span>
                 <span v-if="taxLabel" class="text-xs text-zinc-500">{{
                     taxLabel
                 }}</span>
@@ -55,9 +61,9 @@ const percentage = computed<number | null>(() => {
                 v-if="percentage"
                 class="mt-0.5 flex items-center gap-1.5 sm:mt-0 sm:inline-flex"
             >
-                <span class="sr-only">Original:</span>
+                <span class="sr-only">{{ t('shop.price.original_sr') }}</span>
                 <span class="text-zinc-400 line-through">{{
-                    formatMoney(price.compare_amount ?? 0, currency)
+                    money(price.compare_amount ?? 0, currency)
                 }}</span>
                 <span
                     class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
@@ -67,7 +73,7 @@ const percentage = computed<number | null>(() => {
             </p>
         </template>
         <p v-else class="font-semibold text-zinc-900 dark:text-white">
-            Price unavailable
+            {{ t('shop.price.unavailable') }}
         </p>
     </div>
 </template>

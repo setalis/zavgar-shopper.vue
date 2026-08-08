@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { stripHtml } from '@/lib/format';
 import { home } from '@/routes';
+import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Collection, Product } from '@/types/shop';
 
@@ -28,6 +29,8 @@ const props = defineProps<{
     products: Paginated<Product>;
     filters: { sort: string };
 }>();
+
+const { t } = useTrans();
 
 const sort = ref<string>(props.filters.sort);
 
@@ -46,12 +49,12 @@ watch(sort, (value) => {
     <Container class="py-8 sm:py-12">
         <nav
             class="mb-8 flex items-center gap-2 text-sm text-zinc-500"
-            aria-label="Breadcrumb"
+            :aria-label="t('shop.collection_page.breadcrumb')"
         >
             <Link
                 :href="home.url()"
                 class="transition hover:text-zinc-900 dark:hover:text-white"
-                >Home</Link
+                >{{ t('shop.collection_page.breadcrumb.home') }}</Link
             >
             <span>/</span>
             <span class="text-zinc-900 dark:text-white">{{
@@ -77,12 +80,12 @@ watch(sort, (value) => {
             </div>
 
             <Select v-model="sort">
-                <SelectTrigger class="w-auto" aria-label="Sort">
-                    <SelectValue placeholder="Sort by" />
+                <SelectTrigger class="w-auto" :aria-label="t('shop.collection_page.sort_aria')">
+                    <SelectValue :placeholder="t('shop.collection_page.sort_placeholder')" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="latest">Newest</SelectItem>
-                    <SelectItem value="name">Name</SelectItem>
+                    <SelectItem value="latest">{{ t('shop.collection_page.sort.newest') }}</SelectItem>
+                    <SelectItem value="name">{{ t('shop.collection_page.sort.name') }}</SelectItem>
                 </SelectContent>
             </Select>
         </div>
@@ -96,7 +99,7 @@ watch(sort, (value) => {
                 aria-hidden="true"
             />
             <h3 class="mt-4 text-sm font-medium text-zinc-900 dark:text-white">
-                No products in this collection
+                {{ t('shop.collection_page.empty') }}
             </h3>
         </div>
 
@@ -114,7 +117,7 @@ watch(sort, (value) => {
             <nav
                 v-if="products.last_page > 1"
                 class="mt-8 flex justify-center gap-1"
-                aria-label="Pagination"
+                :aria-label="t('shop.collection_page.pagination')"
             >
                 <Link
                     v-for="link in products.links"

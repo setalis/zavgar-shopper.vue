@@ -2,6 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import Container from '@/components/shop/container.vue';
+import { useTrans } from '@/composables/useTrans';
 import { dashboard, logout } from '@/routes';
 import {
     addresses as accountAddresses,
@@ -12,12 +13,13 @@ import * as profile from '@/routes/profile';
 type NavItem = { href: string; label: string; exact?: boolean };
 
 const page = usePage();
+const { t } = useTrans();
 
 const items = computed<NavItem[]>(() => [
-    { href: dashboard.url(), label: 'Overview', exact: true },
-    { href: accountOrders.url(), label: 'Orders' },
-    { href: accountAddresses.url(), label: 'Addresses' },
-    { href: profile.edit.url(), label: 'Profile' },
+    { href: dashboard.url(), label: t('account.nav.overview'), exact: true },
+    { href: accountOrders.url(), label: t('account.nav.orders') },
+    { href: accountAddresses.url(), label: t('account.nav.addresses') },
+    { href: profile.edit.url(), label: t('account.nav.profile') },
 ]);
 
 function isActive(item: NavItem): boolean {
@@ -33,7 +35,7 @@ function isActive(item: NavItem): boolean {
                 <h2
                     class="hidden font-heading text-xl leading-6 font-medium text-zinc-900 lg:block dark:text-white"
                 >
-                    My account
+                    {{ t('account.nav.title') }}
                 </h2>
 
                 <nav
@@ -78,7 +80,7 @@ function isActive(item: NavItem): boolean {
                             type="submit"
                             class="text-sm text-red-600 transition hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                         >
-                            Log out
+                            {{ t('account.nav.log_out') }}
                         </button>
                     </form>
                 </nav>

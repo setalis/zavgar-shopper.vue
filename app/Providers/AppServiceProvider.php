@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Livewire\Shopper\SlideOvers\AttributeForm;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,7 +27,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerShopperLivewireOverrides();
         $this->configureDefaults();
+    }
+
+    protected function registerShopperLivewireOverrides(): void
+    {
+        Livewire::component('shopper-slide-overs.attribute-form', AttributeForm::class);
     }
 
     /**

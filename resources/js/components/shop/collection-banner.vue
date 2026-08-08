@@ -2,11 +2,14 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowRight } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useTrans } from '@/composables/useTrans';
 import { stripHtml } from '@/lib/format';
 import * as shop from '@/routes/shop';
 import type { Collection } from '@/types/shop';
 
 const props = defineProps<{ collection: Collection }>();
+
+const { t } = useTrans();
 
 const description = computed<string>(() =>
     stripHtml(props.collection.description),
@@ -44,7 +47,7 @@ const description = computed<string>(() =>
             <span
                 class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-white transition-all group-hover:gap-2.5"
             >
-                Shop now
+                {{ t('shop.collection.shop_now') }}
                 <ArrowRight class="size-4" aria-hidden="true" />
             </span>
         </div>

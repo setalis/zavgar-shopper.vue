@@ -5,6 +5,7 @@ import { ref, watch } from 'vue';
 import Container from '@/components/shop/container.vue';
 import ProductCard from '@/components/shop/product-card.vue';
 import { Input } from '@/components/ui/input';
+import { useTrans } from '@/composables/useTrans';
 import { search as searchRoute } from '@/routes/shop';
 import type { Product } from '@/types/shop';
 
@@ -20,6 +21,8 @@ const props = defineProps<{
     query: string;
     products: Paginated<Product> | null;
 }>();
+
+const { t } = useTrans();
 
 const search = ref<string>(props.query);
 let debounceId: number | undefined;
@@ -37,14 +40,14 @@ watch(search, (value) => {
 </script>
 
 <template>
-    <Head title="Search" />
+    <Head :title="t('shop.search.title')" />
 
     <Container class="py-8 sm:py-12">
         <div class="mx-auto max-w-xl text-center">
             <h1
                 class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
             >
-                Search
+                {{ t('shop.search.heading') }}
             </h1>
             <div class="relative mt-6">
                 <SearchIcon
@@ -54,9 +57,9 @@ watch(search, (value) => {
                 <Input
                     v-model="search"
                     type="search"
-                    placeholder="Search for products..."
+                    :placeholder="t('shop.search.placeholder')"
                     autofocus
-                    aria-label="Search"
+                    :aria-label="t('shop.search.heading')"
                     class="pl-9"
                 />
             </div>
@@ -67,7 +70,7 @@ watch(search, (value) => {
                 v-if="products === null"
                 class="text-center text-sm text-zinc-500"
             >
-                Type at least 2 characters to search.
+                {{ t('shop.search.min_chars') }}
             </p>
 
             <div
@@ -81,20 +84,25 @@ watch(search, (value) => {
                 <h3
                     class="mt-4 text-sm font-semibold text-zinc-900 dark:text-white"
                 >
-                    No results found
+                    {{ t('shop.search.no_results') }}
                 </h3>
                 <p class="mt-1 text-sm text-zinc-500">
-                    Try a different search term.
+                    {{ t('shop.search.try_different') }}
                 </p>
             </div>
 
             <template v-else>
                 <p class="mb-6 text-sm text-zinc-500">
-                    {{ products.total }}
-                    {{ products.total === 1 ? 'result' : 'results' }} for "<span
-                        class="font-medium text-zinc-900 dark:text-white"
-                        >{{ query }}</span
-                    >"
+                    {{
+                        t('shop.search.results_for', {
+                            count: products.total,
+                            results:
+                                products.total === 1
+                                    ? t('shop.search.result')
+                                    : t('shop.search.results'),
+                            query,
+                        })
+                    }}
                 </p>
 
                 <div
@@ -110,7 +118,7 @@ watch(search, (value) => {
                 <nav
                     v-if="products.last_page > 1"
                     class="mt-8 flex justify-center gap-1"
-                    aria-label="Pagination"
+                    :aria-label="t('shop.search.pagination')"
                 >
                     <Link
                         v-for="link in products.links"

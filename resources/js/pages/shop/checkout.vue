@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useShop } from '@/composables/useShop';
+import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import * as checkout from '@/routes/shop/checkout';
 import type {
@@ -53,6 +54,7 @@ const props = defineProps<{
 }>();
 
 const { currency, taxLabel, zone } = useShop();
+const { t } = useTrans();
 
 const step = computed<1 | 2 | 3>(() => props.step);
 
@@ -187,21 +189,21 @@ function lineName(line: Cart['lines'][number]): string {
     return (line.purchasable as { name?: string })?.name ?? '';
 }
 
-const steps = [
-    { n: 1, label: 'Shipping' },
-    { n: 2, label: 'Delivery' },
-    { n: 3, label: 'Payment' },
-] as const;
+const steps = computed(() => [
+    { n: 1 as const, label: t('shop.checkout.step.shipping') },
+    { n: 2 as const, label: t('shop.checkout.step.delivery') },
+    { n: 3 as const, label: t('shop.checkout.step.payment') },
+]);
 </script>
 
 <template>
-    <Head title="Checkout" />
+    <Head :title="t('shop.checkout.title')" />
 
     <Container class="py-8 sm:py-12">
         <h1
             class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
         >
-            Checkout
+            {{ t('shop.checkout.heading') }}
         </h1>
 
         <nav class="mt-8 mb-10">
@@ -259,7 +261,7 @@ const steps = [
                         <h2
                             class="text-lg font-semibold text-zinc-900 dark:text-white"
                         >
-                            Saved Addresses
+                            {{ t('shop.checkout.saved_addresses') }}
                         </h2>
                         <div class="mt-4 grid gap-3 sm:grid-cols-2">
                             <button
@@ -293,7 +295,7 @@ const steps = [
                                         v-if="address.shipping_default"
                                         class="mt-2 inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                                     >
-                                        Default
+                                        {{ t('shop.checkout.default') }}
                                     </span>
                                 </Card>
                             </button>
@@ -305,7 +307,7 @@ const steps = [
                             class="mt-3 text-sm text-zinc-500 underline transition hover:text-zinc-900 dark:hover:text-white"
                             @click="clearAddress"
                         >
-                            Use a new address instead
+                            {{ t('shop.checkout.use_new_address') }}
                         </button>
 
                         <hr
@@ -317,12 +319,14 @@ const steps = [
                         <h2
                             class="text-lg font-semibold text-zinc-900 dark:text-white"
                         >
-                            Shipping Address
+                            {{ t('shop.checkout.shipping_address') }}
                         </h2>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
-                                <Label for="first_name">First name</Label>
+                                <Label for="first_name">{{
+                                    t('shop.checkout.first_name')
+                                }}</Label>
                                 <Input
                                     id="first_name"
                                     v-model="addressForm.first_name"
@@ -335,7 +339,9 @@ const steps = [
                                 </p>
                             </div>
                             <div class="space-y-2">
-                                <Label for="last_name">Last name</Label>
+                                <Label for="last_name">{{
+                                    t('shop.checkout.last_name')
+                                }}</Label>
                                 <Input
                                     id="last_name"
                                     v-model="addressForm.last_name"
@@ -350,7 +356,9 @@ const steps = [
                         </div>
 
                         <div class="space-y-2">
-                            <Label for="street_address">Address</Label>
+                            <Label for="street_address">{{
+                                t('shop.checkout.address')
+                            }}</Label>
                             <Input
                                 id="street_address"
                                 v-model="addressForm.street_address"
@@ -364,9 +372,9 @@ const steps = [
                         </div>
 
                         <div class="space-y-2">
-                            <Label for="street_address_plus"
-                                >Apartment, suite, etc. (optional)</Label
-                            >
+                            <Label for="street_address_plus">{{
+                                t('shop.checkout.address_line_2')
+                            }}</Label>
                             <Input
                                 id="street_address_plus"
                                 v-model="addressForm.street_address_plus"
@@ -375,7 +383,9 @@ const steps = [
 
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
-                                <Label for="city">City</Label>
+                                <Label for="city">{{
+                                    t('shop.checkout.city')
+                                }}</Label>
                                 <Input id="city" v-model="addressForm.city" />
                                 <p
                                     v-if="addressForm.errors.city"
@@ -385,7 +395,9 @@ const steps = [
                                 </p>
                             </div>
                             <div class="space-y-2">
-                                <Label for="postal_code">Postal code</Label>
+                                <Label for="postal_code">{{
+                                    t('shop.checkout.postal_code')
+                                }}</Label>
                                 <Input
                                     id="postal_code"
                                     v-model="addressForm.postal_code"
@@ -398,7 +410,9 @@ const steps = [
                                 </p>
                             </div>
                             <div class="space-y-2">
-                                <Label for="state">State / Province</Label>
+                                <Label for="state">{{
+                                    t('shop.checkout.state')
+                                }}</Label>
                                 <Input id="state" v-model="addressForm.state" />
                                 <p
                                     v-if="addressForm.errors.state"
@@ -408,7 +422,9 @@ const steps = [
                                 </p>
                             </div>
                             <div class="space-y-2">
-                                <Label for="country">Country</Label>
+                                <Label for="country">{{
+                                    t('shop.checkout.country')
+                                }}</Label>
                                 <Input
                                     id="country"
                                     :value="zone?.country_name ?? ''"
@@ -418,7 +434,9 @@ const steps = [
                         </div>
 
                         <div class="space-y-2">
-                            <Label for="phone_number">Phone (optional)</Label>
+                            <Label for="phone_number">{{
+                                t('shop.checkout.phone')
+                            }}</Label>
                             <Input
                                 id="phone_number"
                                 v-model="addressForm.phone_number"
@@ -431,7 +449,7 @@ const steps = [
                                 type="submit"
                                 :disabled="addressForm.processing"
                             >
-                                Continue to Delivery
+                                {{ t('shop.checkout.continue_delivery') }}
                             </Button>
                         </div>
                     </form>
@@ -447,7 +465,7 @@ const steps = [
                                 aria-hidden="true"
                             />
                             <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                                No delivery option available for your address.
+                                {{ t('shop.checkout.no_delivery') }}
                             </p>
                         </div>
                         <button
@@ -455,7 +473,7 @@ const steps = [
                             class="mt-4 text-sm text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
                             @click="goToStep(1)"
                         >
-                            ← Return to shipping
+                            {{ t('shop.checkout.return_shipping') }}
                         </button>
                     </div>
 
@@ -467,7 +485,7 @@ const steps = [
                         <h2
                             class="text-lg font-semibold text-zinc-900 dark:text-white"
                         >
-                            Delivery Method
+                            {{ t('shop.checkout.delivery_method') }}
                         </h2>
                         <p
                             v-if="shippingForm.errors.service_code"
@@ -510,8 +528,14 @@ const steps = [
                                         <span
                                             v-if="option.estimated_days"
                                             class="text-sm text-zinc-500"
-                                            >{{ option.estimated_days }} days
-                                            delivery</span
+                                            >{{
+                                                t(
+                                                    'shop.checkout.days_delivery',
+                                                    {
+                                                        days: option.estimated_days,
+                                                    },
+                                                )
+                                            }}</span
                                         >
                                         <span
                                             v-else-if="option.description"
@@ -540,7 +564,7 @@ const steps = [
                                     shippingForm.processing
                                 "
                             >
-                                Continue to Payment
+                                {{ t('shop.checkout.continue_payment') }}
                             </Button>
                         </div>
                     </form>
@@ -552,10 +576,10 @@ const steps = [
                             <h2
                                 class="text-lg font-semibold text-zinc-900 dark:text-white"
                             >
-                                Payment Method
+                                {{ t('shop.checkout.payment_method') }}
                             </h2>
                             <p class="text-sm text-zinc-500">
-                                All transactions are secure and encrypted.
+                                {{ t('shop.checkout.secure_transactions') }}
                             </p>
                         </div>
 
@@ -570,7 +594,7 @@ const steps = [
                             v-if="!paymentOptions.length"
                             class="text-sm text-zinc-600 dark:text-zinc-400"
                         >
-                            No payment methods available for your region.
+                            {{ t('shop.checkout.no_payment_methods') }}
                         </p>
 
                         <template v-else>
@@ -635,7 +659,7 @@ const steps = [
                                     <h3
                                         class="text-xs font-medium tracking-wider text-zinc-500 uppercase"
                                     >
-                                        Card details
+                                        {{ t('shop.checkout.card_details') }}
                                     </h3>
                                     <span
                                         class="h-px flex-1 bg-zinc-200 dark:bg-zinc-700"
@@ -665,7 +689,8 @@ const steps = [
                                     >
                                         <div class="flex flex-col">
                                             <span class="text-xs text-zinc-500"
-                                                >Total {{ taxLabel }}</span
+                                                >{{ t('shop.checkout.total') }}
+                                                {{ taxLabel }}</span
                                             >
                                             <span
                                                 class="text-lg font-semibold text-zinc-900 dark:text-white"
@@ -681,8 +706,12 @@ const steps = [
                                         >
                                             {{
                                                 paymentForm.processing
-                                                    ? 'Processing...'
-                                                    : 'Place my order'
+                                                    ? t(
+                                                          'shop.checkout.processing',
+                                                      )
+                                                    : t(
+                                                          'shop.checkout.place_order',
+                                                      )
                                             }}
                                         </Button>
                                     </div>
@@ -693,7 +722,7 @@ const steps = [
                                             class="size-3"
                                             aria-hidden="true"
                                         />
-                                        Secure &amp; encrypted
+                                        {{ t('shop.checkout.secure_encrypted') }}
                                     </p>
                                 </div>
                             </template>
@@ -709,7 +738,7 @@ const steps = [
                                 <span
                                     class="inline-block size-4 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900 dark:border-zinc-700 dark:border-t-white"
                                 />
-                                Preparing secure payment form...
+                                {{ t('shop.checkout.preparing_payment') }}
                             </div>
                         </template>
                     </div>
@@ -721,7 +750,7 @@ const steps = [
                     <h2
                         class="font-heading text-lg font-semibold text-zinc-900 dark:text-white"
                     >
-                        Order Summary
+                        {{ t('shop.checkout.order_summary') }}
                     </h2>
 
                     <ul
@@ -752,7 +781,11 @@ const steps = [
                                         {{ lineName(line) }}
                                     </p>
                                     <p class="text-xs text-zinc-500">
-                                        Qty: {{ line.quantity }}
+                                        {{
+                                            t('shop.checkout.qty', {
+                                                quantity: line.quantity,
+                                            })
+                                        }}
                                     </p>
                                 </div>
                                 <p
@@ -776,7 +809,7 @@ const steps = [
                         <div
                             class="flex items-center justify-between border-b border-zinc-200 pb-3 dark:border-zinc-700"
                         >
-                            <dt>Tax</dt>
+                            <dt>{{ t('shop.checkout.tax') }}</dt>
                             <dd class="text-base text-zinc-900 dark:text-white">
                                 {{
                                     formatMoney(
@@ -790,7 +823,7 @@ const steps = [
                         <div
                             class="flex items-center justify-between border-b border-zinc-200 pb-3 dark:border-zinc-700"
                         >
-                            <dt>Delivery</dt>
+                            <dt>{{ t('shop.checkout.delivery') }}</dt>
                             <dd class="text-base text-zinc-900 dark:text-white">
                                 <template v-if="selectedDelivery">{{
                                     selectedDelivery.amount > 0
@@ -798,10 +831,12 @@ const steps = [
                                               selectedDelivery.amount,
                                               selectedDelivery.currency,
                                           )
-                                        : 'Free'
+                                        : t('shop.checkout.free')
                                 }}</template>
                                 <template v-else
-                                    >Calculated at next step</template
+                                    >{{
+                                        t('shop.checkout.delivery_calculated')
+                                    }}</template
                                 >
                             </dd>
                         </div>
@@ -810,7 +845,7 @@ const steps = [
                             v-if="cartContext && cartContext.discountTotal > 0"
                             class="flex items-center justify-between border-b border-zinc-200 pb-3 dark:border-zinc-700"
                         >
-                            <dt>Discount</dt>
+                            <dt>{{ t('shop.checkout.discount') }}</dt>
                             <dd class="text-emerald-600">
                                 −{{
                                     formatMoney(
@@ -825,7 +860,7 @@ const steps = [
                             <dt
                                 class="text-base font-semibold text-zinc-900 dark:text-white"
                             >
-                                Total {{ taxLabel }}
+                                {{ t('shop.checkout.total') }} {{ taxLabel }}
                             </dt>
                             <dd
                                 class="text-base font-semibold text-zinc-900 dark:text-white"

@@ -5,6 +5,7 @@ import Container from '@/components/shop/container.vue';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/composables/useCart';
 import { useShop } from '@/composables/useShop';
+import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import * as shop from '@/routes/shop';
 import * as checkout from '@/routes/shop/checkout';
@@ -18,6 +19,7 @@ defineProps<{
 const page = usePage();
 const { currency, taxLabel } = useShop();
 const cartActions = useCart();
+const { t } = useTrans();
 
 function productSlug(
     purchasable: Cart['lines'][number]['purchasable'],
@@ -35,20 +37,20 @@ function productSlug(
 }
 
 function confirmClear(): void {
-    if (window.confirm('Are you sure you want to clear your cart?')) {
+    if (window.confirm(t('shop.cart.clear_confirm'))) {
         cartActions.clear();
     }
 }
 </script>
 
 <template>
-    <Head title="Cart" />
+    <Head :title="t('shop.cart.title')" />
 
     <Container class="py-8 sm:py-12">
         <h1
             class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
         >
-            Shopping Cart
+            {{ t('shop.cart.heading') }}
         </h1>
 
         <div
@@ -62,13 +64,13 @@ function confirmClear(): void {
             <h2
                 class="mt-4 text-lg font-semibold text-zinc-900 dark:text-white"
             >
-                Your cart is empty
+                {{ t('shop.cart.empty.title') }}
             </h2>
             <p class="mt-1 text-sm text-zinc-500">
-                Start shopping to add items to your cart.
+                {{ t('shop.cart.empty.subtitle') }}
             </p>
             <Link :href="shop.index.url()" class="mt-6">
-                <Button>Continue Shopping</Button>
+                <Button>{{ t('shop.cart.continue_shopping') }}</Button>
             </Link>
         </div>
 
@@ -157,7 +159,7 @@ function confirmClear(): void {
                                         type="button"
                                         class="px-2 py-1 text-zinc-500 hover:text-zinc-900 disabled:opacity-40 dark:hover:text-white"
                                         :disabled="line.quantity <= 1"
-                                        aria-label="Decrease"
+                                        :aria-label="t('shop.cart.decrease')"
                                         @click="
                                             cartActions.update(
                                                 line.id,
@@ -177,7 +179,7 @@ function confirmClear(): void {
                                     <button
                                         type="button"
                                         class="px-2 py-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
-                                        aria-label="Increase"
+                                        :aria-label="t('shop.cart.increase')"
                                         @click="
                                             cartActions.update(
                                                 line.id,
@@ -197,7 +199,7 @@ function confirmClear(): void {
                                     class="text-sm text-red-500 transition hover:text-red-700"
                                     @click="cartActions.remove(line.id)"
                                 >
-                                    Remove
+                                    {{ t('shop.cart.remove') }}
                                 </button>
                             </div>
                         </div>
@@ -211,14 +213,14 @@ function confirmClear(): void {
                         :href="shop.index.url()"
                         class="text-sm text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
                     >
-                        ← Continue Shopping
+                        {{ t('shop.cart.continue_shopping_back') }}
                     </Link>
                     <button
                         type="button"
                         class="text-sm text-red-500 transition hover:text-red-700"
                         @click="confirmClear"
                     >
-                        Clear Cart
+                        {{ t('shop.cart.clear') }}
                     </button>
                 </div>
             </div>
@@ -228,14 +230,14 @@ function confirmClear(): void {
                     <h2
                         class="text-lg font-semibold text-zinc-900 dark:text-white"
                     >
-                        Order Summary
+                        {{ t('shop.cart.order_summary') }}
                     </h2>
 
                     <dl class="mt-6 space-y-3 text-sm text-zinc-500">
                         <div
                             class="flex items-center justify-between border-b border-zinc-200 pb-3 dark:border-zinc-700"
                         >
-                            <dt>Tax</dt>
+                            <dt>{{ t('shop.cart.tax') }}</dt>
                             <dd class="text-base text-zinc-900 dark:text-white">
                                 {{
                                     formatMoney(
@@ -249,15 +251,15 @@ function confirmClear(): void {
                         <div
                             class="flex items-center justify-between border-b border-zinc-200 pb-3 dark:border-zinc-700"
                         >
-                            <dt>Delivery</dt>
-                            <dd>Calculated at checkout</dd>
+                            <dt>{{ t('shop.cart.delivery') }}</dt>
+                            <dd>{{ t('shop.cart.delivery_calculated') }}</dd>
                         </div>
 
                         <div
                             v-if="cartContext && cartContext.discountTotal > 0"
                             class="flex items-center justify-between border-b border-zinc-200 pb-3 dark:border-zinc-700"
                         >
-                            <dt>Discount</dt>
+                            <dt>{{ t('shop.cart.discount') }}</dt>
                             <dd class="text-emerald-600">
                                 −{{
                                     formatMoney(
@@ -272,7 +274,7 @@ function confirmClear(): void {
                             <dt
                                 class="text-base font-semibold text-zinc-900 dark:text-white"
                             >
-                                Subtotal {{ taxLabel }}
+                                {{ t('shop.cart.subtotal') }} {{ taxLabel }}
                             </dt>
                             <dd
                                 class="text-base font-semibold text-zinc-900 dark:text-white"
@@ -292,8 +294,8 @@ function confirmClear(): void {
                             <Button class="w-full">
                                 {{
                                     page.props.auth.user
-                                        ? 'Proceed to checkout'
-                                        : 'Sign in to checkout'
+                                        ? t('shop.cart.proceed_checkout')
+                                        : t('shop.cart.sign_in_checkout')
                                 }}
                             </Button>
                         </Link>

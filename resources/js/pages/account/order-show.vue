@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import Card from '@/components/shop/card.vue';
 import OrderStatusBadge from '@/components/account/order-status-badge.vue';
+import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import { dashboard } from '@/routes';
 import { orders as accountOrders } from '@/routes/account';
@@ -54,6 +55,8 @@ type Order = {
 
 const props = defineProps<{ order: Order }>();
 
+const { t } = useTrans();
+
 const shippingPrice = props.order.shipping_option?.price ?? 0;
 const itemsTotal =
     props.order.price_amount - (props.order.tax_amount ?? 0) - shippingPrice;
@@ -72,34 +75,50 @@ function formatDate(value: string): string {
 </script>
 
 <template>
-    <Head :title="`Order ${order.number}`" />
+    <Head
+        :title="
+            t('account.order_show.title', {
+                number: order.number,
+            })
+        "
+    />
 
     <nav class="flex items-center gap-2 text-sm text-zinc-500">
         <Link
             :href="dashboard.url()"
             class="hover:text-zinc-900 dark:hover:text-white"
-            >Account</Link
+            >{{ t('account.order_show.breadcrumb.account') }}</Link
         >
         <span>/</span>
         <Link
             :href="accountOrders.url()"
             class="hover:text-zinc-900 dark:hover:text-white"
-            >Orders</Link
+            >{{ t('account.order_show.breadcrumb.orders') }}</Link
         >
         <span>/</span>
-        <span class="text-zinc-900 dark:text-white">Order details</span>
+        <span class="text-zinc-900 dark:text-white">{{
+            t('account.order_show.breadcrumb.details')
+        }}</span>
     </nav>
 
     <div class="mt-6">
         <h1
             class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
         >
-            Order details
+            {{ t('account.order_show.heading') }}
         </h1>
         <p class="mt-1 text-sm text-zinc-500">
-            Ordered on {{ formatDate(order.created_at) }}
+            {{
+                t('account.order_show.ordered_on', {
+                    date: formatDate(order.created_at),
+                })
+            }}
             <span class="mx-2">|</span>
-            Order #{{ order.number }}
+            {{
+                t('account.order_show.order_number', {
+                    number: order.number,
+                })
+            }}
         </p>
     </div>
 
@@ -119,7 +138,7 @@ function formatDate(value: string): string {
                 <h3
                     class="font-heading text-sm font-semibold text-zinc-900 dark:text-white"
                 >
-                    Shipping address
+                    {{ t('account.order_show.shipping_address') }}
                 </h3>
                 <address class="mt-3 text-sm text-zinc-500 not-italic">
                     <p class="font-medium text-zinc-900 dark:text-white">
@@ -156,18 +175,20 @@ function formatDate(value: string): string {
                 <h3
                     class="font-heading text-sm font-semibold text-zinc-900 dark:text-white"
                 >
-                    Order summary
+                    {{ t('account.order_show.summary.heading') }}
                 </h3>
                 <dl class="mt-3 space-y-2 text-sm">
                     <div class="flex justify-between">
-                        <dt class="text-zinc-500">Items</dt>
+                        <dt class="text-zinc-500">
+                            {{ t('account.order_show.summary.items') }}
+                        </dt>
                         <dd class="text-zinc-900 dark:text-white">
                             {{ formatMoney(itemsTotal, order.currency_code) }}
                         </dd>
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-zinc-500">
-                            Delivery
+                            {{ t('account.order_show.summary.delivery') }}
                             <span
                                 v-if="order.shipping_option?.carrier?.name"
                                 class="text-zinc-400"
@@ -183,7 +204,7 @@ function formatDate(value: string): string {
                                           shippingPrice,
                                           order.currency_code,
                                       )
-                                    : 'Free'
+                                    : t('account.order_show.summary.free')
                             }}
                         </dd>
                     </div>
@@ -191,7 +212,9 @@ function formatDate(value: string): string {
                         v-if="(order.tax_amount ?? 0) > 0"
                         class="flex justify-between"
                     >
-                        <dt class="text-zinc-500">Tax</dt>
+                        <dt class="text-zinc-500">
+                            {{ t('account.order_show.summary.tax') }}
+                        </dt>
                         <dd class="text-zinc-900 dark:text-white">
                             {{
                                 formatMoney(
@@ -205,7 +228,7 @@ function formatDate(value: string): string {
                         class="flex justify-between border-t border-zinc-200 pt-2 dark:border-zinc-700"
                     >
                         <dt class="font-semibold text-zinc-900 dark:text-white">
-                            Total
+                            {{ t('account.order_show.summary.total') }}
                         </dt>
                         <dd class="font-semibold text-zinc-900 dark:text-white">
                             {{
@@ -257,15 +280,21 @@ function formatDate(value: string): string {
                             {{ item.name }}
                         </p>
                         <p v-if="item.sku" class="mt-0.5 text-xs text-zinc-500">
-                            SKU: {{ item.sku }}
+                            {{
+                                t('account.order_show.sku', {
+                                    sku: item.sku,
+                                })
+                            }}
                         </p>
                         <p class="mt-1 text-sm text-zinc-500">
-                            Qty: {{ item.quantity }} ·
                             {{
-                                formatMoney(
-                                    item.unit_price_amount,
-                                    order.currency_code,
-                                )
+                                t('account.order_show.quantity_price', {
+                                    quantity: item.quantity,
+                                    price: formatMoney(
+                                        item.unit_price_amount,
+                                        order.currency_code,
+                                    ),
+                                })
                             }}
                         </p>
                     </div>

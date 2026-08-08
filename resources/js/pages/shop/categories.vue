@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import Container from '@/components/shop/container.vue';
+import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Category } from '@/types/shop';
 
@@ -8,23 +9,31 @@ defineProps<{
     categories: Category[];
 }>();
 
+const { t } = useTrans();
+
 function productLabel(count: number): string {
-    return count === 1 ? `${count} product` : `${count} products`;
+    return t('shop.categories.product_count', {
+        count,
+        label:
+            count === 1
+                ? t('shop.categories.product')
+                : t('shop.categories.products'),
+    });
 }
 </script>
 
 <template>
-    <Head title="Categories" />
+    <Head :title="t('shop.categories.title')" />
 
     <Container class="py-8 sm:py-12">
         <div class="text-center">
             <h1
                 class="font-heading text-3xl font-bold text-zinc-900 dark:text-white"
             >
-                Categories
+                {{ t('shop.categories.heading') }}
             </h1>
             <p class="mt-2 text-sm text-zinc-500">
-                Browse products by category
+                {{ t('shop.categories.subtitle') }}
             </p>
         </div>
 
@@ -33,7 +42,7 @@ function productLabel(count: number): string {
             class="mt-16 flex flex-col items-center justify-center text-center"
         >
             <h3 class="text-sm font-medium text-zinc-900 dark:text-white">
-                No categories found
+                {{ t('shop.categories.empty') }}
             </h3>
         </div>
 

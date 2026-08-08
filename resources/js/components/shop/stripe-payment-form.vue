@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { useStripeElements } from '@/composables/useStripeElements';
 import { useShop } from '@/composables/useShop';
+import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 
 const props = defineProps<{
@@ -15,6 +16,7 @@ const props = defineProps<{
 
 const mount = ref<HTMLElement | null>(null);
 const { currency, taxLabel } = useShop();
+const { t } = useTrans();
 
 const { submitting, error, confirm } = useStripeElements(
     {
@@ -41,7 +43,7 @@ async function pay(): Promise<void> {
             <div class="flex items-center justify-between gap-4">
                 <div v-if="total !== undefined" class="flex flex-col">
                     <span class="text-xs text-zinc-500"
-                        >Total {{ taxLabel }}</span
+                        >{{ t('shop.stripe.total') }} {{ taxLabel }}</span
                     >
                     <span
                         class="text-lg font-semibold text-zinc-900 dark:text-white"
@@ -49,12 +51,16 @@ async function pay(): Promise<void> {
                     >
                 </div>
                 <Button type="button" :disabled="submitting" @click="pay">
-                    {{ submitting ? 'Processing...' : 'Pay now' }}
+                    {{
+                        submitting
+                            ? t('shop.stripe.processing')
+                            : t('shop.stripe.pay_now')
+                    }}
                 </Button>
             </div>
             <p class="inline-flex items-center gap-1.5 text-xs text-zinc-500">
                 <Lock class="size-3" aria-hidden="true" />
-                Secure &amp; encrypted
+                {{ t('shop.stripe.secure') }}
             </p>
         </div>
     </div>

@@ -68,6 +68,8 @@ final class ProductController extends Controller
             'relatedProducts.brand',
             'relatedProducts.media',
             'relatedProducts.prices' => $priceConstraint,
+            'relatedProducts.variants' => fn ($q) => $q->select(['id', 'product_id']),
+            'relatedProducts.variants.prices' => $priceConstraint,
             'variants.media',
             'variants.values.attribute',
             'variants.prices' => $priceConstraint,

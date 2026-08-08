@@ -234,6 +234,7 @@
     "shop.category.breadcrumb": "Навігація категорії",
     "shop.category.breadcrumb.categories": "Категорії",
     "shop.category.breadcrumb.home": "Головна",
+    "shop.category.children": "Підкатегорії",
     "shop.category.empty": "У цій категорії товарів не знайдено.",
     "shop.category.pagination": "Пагінація категорії",
     "shop.category.sort.name": "За назвою",

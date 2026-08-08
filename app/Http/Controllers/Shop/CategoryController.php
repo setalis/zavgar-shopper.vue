@@ -43,6 +43,12 @@ final class CategoryController extends Controller
 
         return Inertia::render('shop/category', [
             'category' => $category->load('media'),
+            'children' => $category->children()
+                ->scopes('enabled')
+                ->with('media')
+                ->withCount(['products' => fn ($q) => $q->whereNull(shopper_table('products').'.deleted_at')])
+                ->orderBy('position')
+                ->get(),
             'products' => $query->paginate(12)->withQueryString(),
             'filters' => ['sort' => $sort],
         ]);

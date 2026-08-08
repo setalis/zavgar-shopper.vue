@@ -234,6 +234,7 @@
     "shop.category.breadcrumb": "Category breadcrumb",
     "shop.category.breadcrumb.categories": "Categories",
     "shop.category.breadcrumb.home": "Home",
+    "shop.category.children": "Subcategories",
     "shop.category.empty": "No products found in this category.",
     "shop.category.pagination": "Category pagination",
     "shop.category.sort.name": "Name",

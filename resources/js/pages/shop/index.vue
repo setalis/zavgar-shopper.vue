@@ -2,6 +2,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import CategoryTile from '@/components/shop/category-tile.vue';
 import Container from '@/components/shop/container.vue';
 import ProductCard from '@/components/shop/product-card.vue';
 import { Input } from '@/components/ui/input';
@@ -31,9 +32,14 @@ type Filters = {
     sort: string;
 };
 
+type ShopCategory = Pick<Category, 'id' | 'name' | 'slug'> & {
+    children?: Pick<Category, 'id' | 'name' | 'slug'>[];
+};
+
 const props = defineProps<{
     products: Paginated<Product>;
-    categories: Pick<Category, 'id' | 'name' | 'slug'>[];
+    categories: ShopCategory[];
+    children: Category[];
     filters: Filters;
 }>();
 
@@ -67,6 +73,19 @@ function filterByCategory(categoryId: number | null): void {
         { ...props.filters, category: categoryId },
         { preserveState: true, preserveScroll: true, replace: true },
     );
+}
+
+function categoryFilterUrl(categoryId: number): string {
+    return shop.index.url({
+        query: {
+            ...props.filters,
+            category: categoryId,
+        },
+    });
+}
+
+function isCategoryActive(categoryId: number): boolean {
+    return props.filters.category === categoryId;
 }
 </script>
 
@@ -144,7 +163,7 @@ function filterByCategory(categoryId: number | null): void {
                                 type="button"
                                 :class="[
                                     'text-sm transition',
-                                    filters.category === cat.id
+                                    isCategoryActive(cat.id)
                                         ? 'font-medium text-zinc-900 dark:text-white'
                                         : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white',
                                 ]"
@@ -152,6 +171,29 @@ function filterByCategory(categoryId: number | null): void {
                             >
                                 {{ cat.name }}
                             </button>
+                            <ul
+                                v-if="cat.children?.length"
+                                role="list"
+                                class="mt-2 ml-3 space-y-2 border-l border-zinc-200 pl-3 dark:border-zinc-700"
+                            >
+                                <li
+                                    v-for="child in cat.children"
+                                    :key="child.id"
+                                >
+                                    <button
+                                        type="button"
+                                        :class="[
+                                            'text-sm transition',
+                                            isCategoryActive(child.id)
+                                                ? 'font-medium text-zinc-900 dark:text-white'
+                                                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white',
+                                        ]"
+                                        @click="filterByCategory(child.id)"
+                                    >
+                                        {{ child.name }}
+                                    </button>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -172,6 +214,28 @@ function filterByCategory(categoryId: number | null): void {
                         />
                     </div>
                 </div>
+
+                <section
+                    v-if="children.length"
+                    class="mb-8"
+                    :aria-label="t('shop.category.children')"
+                >
+                    <h2
+                        class="text-sm font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400"
+                    >
+                        {{ t('shop.category.children') }}
+                    </h2>
+                    <div
+                        class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3"
+                    >
+                        <CategoryTile
+                            v-for="child in children"
+                            :key="child.id"
+                            :category="child"
+                            :href="categoryFilterUrl(child.id)"
+                        />
+                    </div>
+                </section>
 
                 <div
                     v-if="!products.data.length"

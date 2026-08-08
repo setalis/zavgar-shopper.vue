@@ -2,6 +2,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import CategoryTile from '@/components/shop/category-tile.vue';
 import Container from '@/components/shop/container.vue';
 import ProductCard from '@/components/shop/product-card.vue';
 import {
@@ -11,9 +12,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTrans } from '@/composables/useTrans';
 import { stripHtml } from '@/lib/format';
 import { home } from '@/routes';
-import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Category, Product } from '@/types/shop';
 
@@ -26,6 +27,7 @@ type Paginated<T> = {
 
 const props = defineProps<{
     category: Category;
+    children: Category[];
     products: Paginated<Product>;
     filters: { sort: string };
 }>();
@@ -85,16 +87,46 @@ watch(sort, (value) => {
                 </p>
             </div>
 
-            <Select v-model="sort">
-                <SelectTrigger class="w-auto" :aria-label="t('shop.category.sort_aria')">
-                    <SelectValue :placeholder="t('shop.category.sort_placeholder')" />
+            <Select v-if="products.data.length" v-model="sort">
+                <SelectTrigger
+                    class="w-auto"
+                    :aria-label="t('shop.category.sort_aria')"
+                >
+                    <SelectValue
+                        :placeholder="t('shop.category.sort_placeholder')"
+                    />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="latest">{{ t('shop.category.sort.newest') }}</SelectItem>
-                    <SelectItem value="name">{{ t('shop.category.sort.name') }}</SelectItem>
+                    <SelectItem value="latest">{{
+                        t('shop.category.sort.newest')
+                    }}</SelectItem>
+                    <SelectItem value="name">{{
+                        t('shop.category.sort.name')
+                    }}</SelectItem>
                 </SelectContent>
             </Select>
         </div>
+
+        <section
+            v-if="children.length"
+            class="mt-8"
+            :aria-label="t('shop.category.children')"
+        >
+            <h2
+                class="text-sm font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400"
+            >
+                {{ t('shop.category.children') }}
+            </h2>
+            <div
+                class="mt-4 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4"
+            >
+                <CategoryTile
+                    v-for="child in children"
+                    :key="child.id"
+                    :category="child"
+                />
+            </div>
+        </section>
 
         <div
             v-if="!products.data.length"

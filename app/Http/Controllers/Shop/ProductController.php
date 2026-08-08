@@ -29,8 +29,29 @@ final class ProductController extends Controller
             $query->where('name', 'like', "%{$escaped}%");
         }
 
-        if ($categoryId = $request->integer('category')) {
-            $query->whereHas('categories', fn ($q) => $q->where('id', $categoryId));
+        $categoryId = $request->integer('category') ?: null;
+        $selectedCategory = null;
+        $children = collect();
+
+        if ($categoryId !== null) {
+            $selectedCategory = Category::query()
+                ->scopes('enabled')
+                ->where('id', $categoryId)
+                ->first();
+
+            if ($selectedCategory !== null) {
+                $query->whereHas(
+                    'categories',
+                    fn ($q) => $q->where('id', $selectedCategory->id),
+                );
+
+                $children = $selectedCategory->children()
+                    ->scopes('enabled')
+                    ->with('media')
+                    ->withCount(['products' => fn ($q) => $q->whereNull(shopper_table('products').'.deleted_at')])
+                    ->orderBy('position')
+                    ->get();
+            }
         }
 
         $sort = (string) $request->string('sort', 'latest');
@@ -44,11 +65,13 @@ final class ProductController extends Controller
             'categories' => Category::query()
                 ->scopes('enabled')
                 ->whereNull('parent_id')
+                ->with(['children' => fn ($q) => $q->scopes('enabled')->orderBy('position')->select(['id', 'name', 'slug', 'parent_id'])])
                 ->orderBy('position')
                 ->get(['id', 'name', 'slug']),
+            'children' => $children,
             'filters' => [
                 'search' => $search,
-                'category' => $categoryId,
+                'category' => $selectedCategory?->id,
                 'sort' => $sort,
             ],
         ]);

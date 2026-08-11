@@ -42,7 +42,12 @@ export type Category = BaseCategory &
     products_count?: number;
   };
 
-export type NavCategory = Pick<BaseCategory, 'id' | 'name' | 'slug'>;
+export type NavCategoryChild = Pick<BaseCategory, 'id' | 'name' | 'slug'>;
+
+export type NavCategory = Pick<BaseCategory, 'id' | 'name' | 'slug'> & {
+  thumbnail?: string | null;
+  children?: NavCategoryChild[];
+};
 
 export type Collection = BaseCollection &
   WithStorefrontMedia & {

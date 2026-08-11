@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Actions\FlushStorefrontCategoryCache;
 use App\Actions\GetCountriesByZone;
 use App\Actions\ZoneSessionManager;
+use App\Models\Category;
 use App\Models\Channel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 use Shopper\Cart\CartSessionManager;
-use Shopper\Core\Models\Category;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -89,9 +90,49 @@ class HandleInertiaRequests extends Middleware
                 ->toArray(),
             'available_zones' => fn (): array => resolve(GetCountriesByZone::class)->handle()->values()->toArray(),
             'tax_label' => current_tax_label(),
-            'nav_categories' => $this->topCategories(4, 'nav'),
-            'footer_categories' => $this->topCategories(6, 'footer'),
+            'nav_categories' => $this->navCategories(),
+            'footer_categories' => $this->topCategories(FlushStorefrontCategoryCache::FOOTER_LIMIT, 'footer'),
         ];
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, slug: string, thumbnail: ?string, children: array<int, array{id: int, name: string, slug: string}>}>
+     */
+    private function navCategories(): array
+    {
+        return Cache::remember(
+            FlushStorefrontCategoryCache::navKey(app()->getLocale()),
+            FlushStorefrontCategoryCache::CACHE_TTL,
+            fn (): array => Category::query()
+                ->scopes('enabled')
+                ->whereNull('parent_id')
+                ->with([
+                    'media',
+                    'children' => fn ($query) => $query
+                        ->scopes('enabled')
+                        ->with('media')
+                        ->orderBy('position'),
+                ])
+                ->orderBy('position')
+                ->get(['id', 'name', 'slug'])
+                ->map(fn (Category $category): array => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'thumbnail' => $category->getFirstMedia(
+                        (string) config('shopper.media.storage.thumbnail_collection', 'thumbnail'),
+                    )?->getUrl(),
+                    'children' => $category->children
+                        ->map(fn (Category $child): array => [
+                            'id' => $child->id,
+                            'name' => $child->name,
+                            'slug' => $child->slug,
+                        ])
+                        ->values()
+                        ->all(),
+                ])
+                ->all(),
+        );
     }
 
     /**
@@ -99,9 +140,14 @@ class HandleInertiaRequests extends Middleware
      */
     private function topCategories(int $limit, string $cacheKey): array
     {
+        $locale = app()->getLocale();
+        $key = $cacheKey === 'footer'
+            ? FlushStorefrontCategoryCache::footerKey($locale, $limit)
+            : "{$cacheKey}.categories.{$locale}.{$limit}";
+
         return Cache::remember(
-            "{$cacheKey}.categories.".app()->getLocale().".{$limit}",
-            7200,
+            $key,
+            FlushStorefrontCategoryCache::CACHE_TTL,
             fn (): array => Category::query()
                 ->scopes('enabled')
                 ->whereNull('parent_id')

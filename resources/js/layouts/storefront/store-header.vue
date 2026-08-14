@@ -123,7 +123,7 @@ onBeforeUnmount(() => {
 
                     <Link :href="home.url()" class="flex items-center gap-2">
                         <BrandIcon
-                            class="size-8 fill-current text-black dark:text-white"
+                            class="h-8 w-auto fill-current text-black dark:text-white"
                         />
                     </Link>
                 </div>

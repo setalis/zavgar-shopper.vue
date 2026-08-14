@@ -144,6 +144,7 @@ export type ShopSharedProps = {
   channels: Channel[];
   available_zones: CountryByZoneData[];
   tax_label: string;
+  logo: string | null;
   nav_categories: NavCategory[];
   footer_categories: NavCategory[];
 };

@@ -90,6 +90,7 @@ class HandleInertiaRequests extends Middleware
                 ->toArray(),
             'available_zones' => fn (): array => resolve(GetCountriesByZone::class)->handle()->values()->toArray(),
             'tax_label' => current_tax_label(),
+            'logo' => storefront_logo_url(),
             'nav_categories' => $this->navCategories(),
             'footer_categories' => $this->topCategories(FlushStorefrontCategoryCache::FOOTER_LIMIT, 'footer'),
         ];

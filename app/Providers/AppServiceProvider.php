@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Livewire\Shopper\Pages\Order\Detail as OrderDetail;
+use App\Livewire\Shopper\Pages\Settings\General as GeneralSettings;
 use App\Livewire\Shopper\SlideOvers\AttributeForm;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -20,7 +21,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Config must be overridden in register() so Shopper routes pick up
+        // app Livewire page classes when package routes are loaded during boot.
+        $this->app->booting(function (): void {
+            config([
+                'shopper.components.order.pages.order-detail' => OrderDetail::class,
+                'shopper.components.setting.pages.general' => GeneralSettings::class,
+            ]);
+        });
     }
 
     /**
@@ -28,17 +36,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->registerShopperLivewireOverrides();
+        $this->registerShopperLivewireAliases();
         $this->configureDefaults();
     }
 
-    protected function registerShopperLivewireOverrides(): void
+    protected function registerShopperLivewireAliases(): void
     {
         Livewire::component('shopper-slide-overs.attribute-form', AttributeForm::class);
-
-        config([
-            'shopper.components.order.pages.order-detail' => OrderDetail::class,
-        ]);
+        Livewire::component('shopper-general', GeneralSettings::class);
     }
 
     /**

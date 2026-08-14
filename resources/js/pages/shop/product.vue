@@ -23,14 +23,7 @@ const { t } = useTrans();
 const selectedOptions = ref<Record<number, number>>({});
 const quantity = ref<number>(1);
 const adding = ref<boolean>(false);
-
-const gallery = computed<string[]>(() =>
-    (props.product.images ?? []).map((image) => image.url),
-);
-
-const activeImage = ref<string | null>(
-    props.product.thumbnail ?? gallery.value[0] ?? null,
-);
+const manualImage = ref<string | null>(null);
 
 const hasVariants = computed<boolean>(() =>
     Boolean(props.variantOptions?.hasStructuredAttributes),
@@ -53,6 +46,55 @@ const selectedVariant = computed(() =>
           ) ?? null)
         : null,
 );
+
+const productGallery = computed<string[]>(() => {
+    const images = (props.product.images ?? []).map((image) => image.url);
+
+    if (images.length > 0) {
+        return images;
+    }
+
+    return props.product.thumbnail ? [props.product.thumbnail] : [];
+});
+
+const variantGallery = computed<string[]>(() => {
+    const variant = selectedVariant.value;
+
+    if (!variant) {
+        return [];
+    }
+
+    const images = (variant.images ?? []).map((image) => image.url);
+
+    if (images.length > 0) {
+        return images;
+    }
+
+    return variant.thumbnail ? [variant.thumbnail] : [];
+});
+
+const gallery = computed<string[]>(() =>
+    variantGallery.value.length > 0
+        ? variantGallery.value
+        : productGallery.value,
+);
+
+const activeImage = computed<string | null>(() => {
+    if (manualImage.value && gallery.value.includes(manualImage.value)) {
+        return manualImage.value;
+    }
+
+    return gallery.value[0] ?? null;
+});
+
+function selectGalleryImage(url: string): void {
+    manualImage.value = url;
+}
+
+function selectOption(optionId: number, valueId: number): void {
+    manualImage.value = null;
+    selectedOptions.value = { ...selectedOptions.value, [optionId]: valueId };
+}
 
 const displayPrice = computed<StorefrontPrice | null>(() => {
     const selected = selectedVariant.value?.prices?.[0];
@@ -88,10 +130,6 @@ function isOptionAvailable(attributeId: number, valueId: number): boolean {
     return (
         props.variantOptions?.availabilityMatrix[attributeId]?.[valueId] ?? true
     );
-}
-
-function selectOption(optionId: number, valueId: number): void {
-    selectedOptions.value = { ...selectedOptions.value, [optionId]: valueId };
 }
 
 function addToCart(): void {
@@ -157,7 +195,7 @@ function addToCart(): void {
                             activeImage === url &&
                                 'ring-zinc-900 dark:ring-white',
                         ]"
-                        @click="activeImage = url"
+                        @click="selectGalleryImage(url)"
                     >
                         <img
                             :src="url"

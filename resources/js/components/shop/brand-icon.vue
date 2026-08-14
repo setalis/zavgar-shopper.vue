@@ -1,12 +1,42 @@
 <script setup lang="ts">
-defineProps<{
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { cn } from '@/lib/utils';
+
+const props = defineProps<{
     class?: string;
 }>();
+
+const page = usePage();
+
+const logoUrl = computed<string | null>(
+    () => page.props.shop?.logo ?? null,
+);
+
+const storeName = computed<string>(() => page.props.name);
+
+const imageClass = computed<string>(() => {
+    const raw = props.class ?? '';
+    const heightClass =
+        raw.match(/\bh-(\S+)/)?.[0] ??
+        (raw.match(/\bsize-(\S+)/)?.[1]
+            ? `h-${raw.match(/\bsize-(\S+)/)?.[1]}`
+            : 'h-8');
+
+    return cn(heightClass, 'w-auto max-w-none object-contain object-left');
+});
 </script>
 
 <template>
+    <img
+        v-if="logoUrl"
+        :src="logoUrl"
+        :alt="storeName"
+        :class="imageClass"
+    />
     <svg
-        :class="$props.class"
+        v-else
+        :class="props.class"
         viewBox="0 0 40 42"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"

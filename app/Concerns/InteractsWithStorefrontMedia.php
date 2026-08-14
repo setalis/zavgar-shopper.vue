@@ -17,11 +17,11 @@ trait InteractsWithStorefrontMedia
     protected function thumbnail(): Attribute
     {
         return Attribute::get(function (): ?string {
-            $url = $this->getFirstMediaUrl(
+            $media = $this->getFirstMedia(
                 (string) config('shopper.media.storage.thumbnail_collection', 'thumbnail'),
             );
 
-            return $url !== '' ? $url : null;
+            return $media?->getUrl();
         });
     }
 

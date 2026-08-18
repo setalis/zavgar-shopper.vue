@@ -25,8 +25,7 @@ final class ProductController extends Controller
         $search = (string) $request->string('search', '');
 
         if ($search !== '') {
-            $escaped = str_replace(['%', '_'], ['\%', '\_'], $search);
-            $query->where('name', 'like', "%{$escaped}%");
+            $query->matchingSearch($search);
         }
 
         $categoryId = $request->integer('category') ?: null;

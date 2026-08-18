@@ -19,6 +19,27 @@ final class Product extends Model
     use InteractsWithStorefrontMedia;
     use ResolvesStorefrontPrice;
 
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    #[Scope]
+    protected function matchingSearch(Builder $query, string $term): Builder
+    {
+        $escaped = str_replace(['%', '_'], ['\%', '\_'], $term);
+        $like = "%{$escaped}%";
+        $table = $query->getModel()->getTable();
+
+        return $query->where(function (Builder $query) use ($like, $table): void {
+            $query->where("{$table}.name", 'like', $like)
+                ->orWhere("{$table}.sku", 'like', $like)
+                ->orWhereHas(
+                    'variants',
+                    fn (Builder $variants): Builder => $variants->where('sku', 'like', $like),
+                );
+        });
+    }
+
     /** @param  Builder<self>  $query */
     #[Scope]
     protected function withCurrentPrices(Builder $query): Builder

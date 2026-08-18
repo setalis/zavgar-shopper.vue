@@ -234,8 +234,8 @@ abandonedCarts.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => 
     
     abandonedCarts.form = abandonedCartsForm
 /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
 export const detail = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -249,8 +249,8 @@ detail.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
 detail.url = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -277,8 +277,8 @@ detail.url = (args: { order: string | number } | [order: string | number ] | str
 }
 
 /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
 detail.get = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -286,8 +286,8 @@ detail.get = (args: { order: string | number } | [order: string | number ] | str
     method: 'get',
 })
 /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
 detail.head = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -296,8 +296,8 @@ detail.head = (args: { order: string | number } | [order: string | number ] | st
 })
 
     /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
     const detailForm = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -306,8 +306,8 @@ detail.head = (args: { order: string | number } | [order: string | number ] | st
     })
 
             /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
         detailForm.get = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -315,8 +315,8 @@ detail.head = (args: { order: string | number } | [order: string | number ] | st
             method: 'get',
         })
             /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
         detailForm.head = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

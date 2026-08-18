@@ -34,7 +34,7 @@ function productLabel(count: number): string {
         :href="categoryHref"
         class="group relative overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800"
     >
-        <div class="aspect-4/3">
+        <div class="aspect-4/3 p-4">
             <img
                 v-if="category.thumbnail"
                 :src="category.thumbnail"

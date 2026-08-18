@@ -4,7 +4,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
  * @see vendor/filament/actions/src/Imports/Http/Controllers/DownloadImportFailureCsv.php:17
  * @route '/filament/imports/{import}/failed-rows/download'
  */
-export const download = (args: { import: string | number | { id: string | number } } | [importParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const download = (args: { import: number | { id: number } } | [importParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: download.url(args, options),
     method: 'get',
 })
@@ -19,7 +19,7 @@ download.definition = {
  * @see vendor/filament/actions/src/Imports/Http/Controllers/DownloadImportFailureCsv.php:17
  * @route '/filament/imports/{import}/failed-rows/download'
  */
-download.url = (args: { import: string | number | { id: string | number } } | [importParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+download.url = (args: { import: number | { id: number } } | [importParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { import: args }
     }
@@ -52,7 +52,7 @@ download.url = (args: { import: string | number | { id: string | number } } | [i
  * @see vendor/filament/actions/src/Imports/Http/Controllers/DownloadImportFailureCsv.php:17
  * @route '/filament/imports/{import}/failed-rows/download'
  */
-download.get = (args: { import: string | number | { id: string | number } } | [importParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+download.get = (args: { import: number | { id: number } } | [importParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: download.url(args, options),
     method: 'get',
 })
@@ -61,7 +61,7 @@ download.get = (args: { import: string | number | { id: string | number } } | [i
  * @see vendor/filament/actions/src/Imports/Http/Controllers/DownloadImportFailureCsv.php:17
  * @route '/filament/imports/{import}/failed-rows/download'
  */
-download.head = (args: { import: string | number | { id: string | number } } | [importParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+download.head = (args: { import: number | { id: number } } | [importParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: download.url(args, options),
     method: 'head',
 })
@@ -71,7 +71,7 @@ download.head = (args: { import: string | number | { id: string | number } } | [
  * @see vendor/filament/actions/src/Imports/Http/Controllers/DownloadImportFailureCsv.php:17
  * @route '/filament/imports/{import}/failed-rows/download'
  */
-    const downloadForm = (args: { import: string | number | { id: string | number } } | [importParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    const downloadForm = (args: { import: number | { id: number } } | [importParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
         action: download.url(args, options),
         method: 'get',
     })
@@ -81,7 +81,7 @@ download.head = (args: { import: string | number | { id: string | number } } | [
  * @see vendor/filament/actions/src/Imports/Http/Controllers/DownloadImportFailureCsv.php:17
  * @route '/filament/imports/{import}/failed-rows/download'
  */
-        downloadForm.get = (args: { import: string | number | { id: string | number } } | [importParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        downloadForm.get = (args: { import: number | { id: number } } | [importParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
             action: download.url(args, options),
             method: 'get',
         })
@@ -90,7 +90,7 @@ download.head = (args: { import: string | number | { id: string | number } } | [
  * @see vendor/filament/actions/src/Imports/Http/Controllers/DownloadImportFailureCsv.php:17
  * @route '/filament/imports/{import}/failed-rows/download'
  */
-        downloadForm.head = (args: { import: string | number | { id: string | number } } | [importParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        downloadForm.head = (args: { import: number | { id: number } } | [importParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
             action: download.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'HEAD',

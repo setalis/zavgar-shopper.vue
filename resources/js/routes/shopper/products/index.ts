@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
-* @see \Shopper\Livewire\Pages\Product\Index::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Product/Index.php:7
+* @see \App\Livewire\Shopper\Pages\Product\Index::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/Index.php:7
  * @route '/cpanel/products'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -15,8 +15,8 @@ index.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \Shopper\Livewire\Pages\Product\Index::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Product/Index.php:7
+* @see \App\Livewire\Shopper\Pages\Product\Index::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/Index.php:7
  * @route '/cpanel/products'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -24,8 +24,8 @@ index.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see \Shopper\Livewire\Pages\Product\Index::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Product/Index.php:7
+* @see \App\Livewire\Shopper\Pages\Product\Index::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/Index.php:7
  * @route '/cpanel/products'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -33,8 +33,8 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
-* @see \Shopper\Livewire\Pages\Product\Index::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Product/Index.php:7
+* @see \App\Livewire\Shopper\Pages\Product\Index::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/Index.php:7
  * @route '/cpanel/products'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -43,8 +43,8 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
     /**
-* @see \Shopper\Livewire\Pages\Product\Index::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Product/Index.php:7
+* @see \App\Livewire\Shopper\Pages\Product\Index::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/Index.php:7
  * @route '/cpanel/products'
  */
     const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -53,8 +53,8 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     })
 
             /**
-* @see \Shopper\Livewire\Pages\Product\Index::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Product/Index.php:7
+* @see \App\Livewire\Shopper\Pages\Product\Index::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/Index.php:7
  * @route '/cpanel/products'
  */
         indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -62,8 +62,8 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
             method: 'get',
         })
             /**
-* @see \Shopper\Livewire\Pages\Product\Index::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Product/Index.php:7
+* @see \App\Livewire\Shopper\Pages\Product\Index::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/Index.php:7
  * @route '/cpanel/products'
  */
         indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -269,10 +269,89 @@ variant.head = (args: { product: string | number, variant: string | number } | [
         })
     
     variant.form = variantForm
+/**
+* @see \App\Livewire\Shopper\Pages\Product\PendingImports::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/PendingImports.php:7
+ * @route '/cpanel/products/pending-imports'
+ */
+export const pendingImports = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: pendingImports.url(options),
+    method: 'get',
+})
+
+pendingImports.definition = {
+    methods: ["get","head"],
+    url: '/cpanel/products/pending-imports',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Livewire\Shopper\Pages\Product\PendingImports::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/PendingImports.php:7
+ * @route '/cpanel/products/pending-imports'
+ */
+pendingImports.url = (options?: RouteQueryOptions) => {
+    return pendingImports.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Livewire\Shopper\Pages\Product\PendingImports::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/PendingImports.php:7
+ * @route '/cpanel/products/pending-imports'
+ */
+pendingImports.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: pendingImports.url(options),
+    method: 'get',
+})
+/**
+* @see \App\Livewire\Shopper\Pages\Product\PendingImports::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/PendingImports.php:7
+ * @route '/cpanel/products/pending-imports'
+ */
+pendingImports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: pendingImports.url(options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Livewire\Shopper\Pages\Product\PendingImports::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/PendingImports.php:7
+ * @route '/cpanel/products/pending-imports'
+ */
+    const pendingImportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: pendingImports.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Livewire\Shopper\Pages\Product\PendingImports::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/PendingImports.php:7
+ * @route '/cpanel/products/pending-imports'
+ */
+        pendingImportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: pendingImports.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Livewire\Shopper\Pages\Product\PendingImports::__invoke
+ * @see app/Livewire/Shopper/Pages/Product/PendingImports.php:7
+ * @route '/cpanel/products/pending-imports'
+ */
+        pendingImportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: pendingImports.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    pendingImports.form = pendingImportsForm
 const products = {
     index: Object.assign(index, index),
 edit: Object.assign(edit, edit),
 variant: Object.assign(variant, variant),
+pendingImports: Object.assign(pendingImports, pendingImports),
 }
 
 export default products

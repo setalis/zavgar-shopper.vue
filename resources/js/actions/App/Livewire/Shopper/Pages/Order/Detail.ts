@@ -1,7 +1,7 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../../wayfinder'
 /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
 const Detail = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -15,8 +15,8 @@ Detail.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
 Detail.url = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -43,8 +43,8 @@ Detail.url = (args: { order: string | number } | [order: string | number ] | str
 }
 
 /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
 Detail.get = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -52,8 +52,8 @@ Detail.get = (args: { order: string | number } | [order: string | number ] | str
     method: 'get',
 })
 /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
 Detail.head = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -62,8 +62,8 @@ Detail.head = (args: { order: string | number } | [order: string | number ] | st
 })
 
     /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
     const DetailForm = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -72,8 +72,8 @@ Detail.head = (args: { order: string | number } | [order: string | number ] | st
     })
 
             /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
         DetailForm.get = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -81,8 +81,8 @@ Detail.head = (args: { order: string | number } | [order: string | number ] | st
             method: 'get',
         })
             /**
-* @see \Shopper\Livewire\Pages\Order\Detail::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Order/Detail.php:7
+* @see \App\Livewire\Shopper\Pages\Order\Detail::__invoke
+ * @see app/Livewire/Shopper/Pages/Order/Detail.php:7
  * @route '/cpanel/orders/{order}/detail'
  */
         DetailForm.head = (args: { order: string | number } | [order: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

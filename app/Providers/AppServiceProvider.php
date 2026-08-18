@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Livewire\Shopper\Pages\Order\Detail as OrderDetail;
+use App\Livewire\Shopper\Pages\Product\Index as ProductIndex;
 use App\Livewire\Shopper\Pages\Settings\General as GeneralSettings;
 use App\Livewire\Shopper\SlideOvers\AttributeForm;
+use App\Sidebar\PendingProductImportsSidebar;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Livewire;
+use Shopper\Sidebar\SidebarBuilder;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->booting(function (): void {
             config([
                 'shopper.components.order.pages.order-detail' => OrderDetail::class,
+                'shopper.components.product.pages.product-index' => ProductIndex::class,
                 'shopper.components.setting.pages.general' => GeneralSettings::class,
             ]);
         });
@@ -37,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerShopperLivewireAliases();
+        $this->registerShopperSidebar();
         $this->configureDefaults();
     }
 
@@ -44,6 +49,11 @@ class AppServiceProvider extends ServiceProvider
     {
         Livewire::component('shopper-slide-overs.attribute-form', AttributeForm::class);
         Livewire::component('shopper-general', GeneralSettings::class);
+    }
+
+    protected function registerShopperSidebar(): void
+    {
+        $this->app['events']->listen(SidebarBuilder::class, PendingProductImportsSidebar::class);
     }
 
     /**

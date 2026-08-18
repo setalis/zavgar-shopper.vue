@@ -4,7 +4,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
  * @see vendor/filament/actions/src/Exports/Http/Controllers/DownloadExport.php:15
  * @route '/filament/exports/{export}/download'
  */
-const DownloadExport = (args: { export: string | number | { id: string | number } } | [exportParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+const DownloadExport = (args: { export: number | { id: number } } | [exportParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: DownloadExport.url(args, options),
     method: 'get',
 })
@@ -19,7 +19,7 @@ DownloadExport.definition = {
  * @see vendor/filament/actions/src/Exports/Http/Controllers/DownloadExport.php:15
  * @route '/filament/exports/{export}/download'
  */
-DownloadExport.url = (args: { export: string | number | { id: string | number } } | [exportParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+DownloadExport.url = (args: { export: number | { id: number } } | [exportParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { export: args }
     }
@@ -52,7 +52,7 @@ DownloadExport.url = (args: { export: string | number | { id: string | number } 
  * @see vendor/filament/actions/src/Exports/Http/Controllers/DownloadExport.php:15
  * @route '/filament/exports/{export}/download'
  */
-DownloadExport.get = (args: { export: string | number | { id: string | number } } | [exportParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+DownloadExport.get = (args: { export: number | { id: number } } | [exportParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: DownloadExport.url(args, options),
     method: 'get',
 })
@@ -61,7 +61,7 @@ DownloadExport.get = (args: { export: string | number | { id: string | number } 
  * @see vendor/filament/actions/src/Exports/Http/Controllers/DownloadExport.php:15
  * @route '/filament/exports/{export}/download'
  */
-DownloadExport.head = (args: { export: string | number | { id: string | number } } | [exportParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+DownloadExport.head = (args: { export: number | { id: number } } | [exportParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: DownloadExport.url(args, options),
     method: 'head',
 })
@@ -71,7 +71,7 @@ DownloadExport.head = (args: { export: string | number | { id: string | number }
  * @see vendor/filament/actions/src/Exports/Http/Controllers/DownloadExport.php:15
  * @route '/filament/exports/{export}/download'
  */
-    const DownloadExportForm = (args: { export: string | number | { id: string | number } } | [exportParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    const DownloadExportForm = (args: { export: number | { id: number } } | [exportParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
         action: DownloadExport.url(args, options),
         method: 'get',
     })
@@ -81,7 +81,7 @@ DownloadExport.head = (args: { export: string | number | { id: string | number }
  * @see vendor/filament/actions/src/Exports/Http/Controllers/DownloadExport.php:15
  * @route '/filament/exports/{export}/download'
  */
-        DownloadExportForm.get = (args: { export: string | number | { id: string | number } } | [exportParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        DownloadExportForm.get = (args: { export: number | { id: number } } | [exportParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
             action: DownloadExport.url(args, options),
             method: 'get',
         })
@@ -90,7 +90,7 @@ DownloadExport.head = (args: { export: string | number | { id: string | number }
  * @see vendor/filament/actions/src/Exports/Http/Controllers/DownloadExport.php:15
  * @route '/filament/exports/{export}/download'
  */
-        DownloadExportForm.head = (args: { export: string | number | { id: string | number } } | [exportParam: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        DownloadExportForm.head = (args: { export: number | { id: number } } | [exportParam: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
             action: DownloadExport.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'HEAD',

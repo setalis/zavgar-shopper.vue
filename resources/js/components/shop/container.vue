@@ -6,7 +6,7 @@ defineOptions({ inheritAttrs: false });
 
 const attrs = useAttrs();
 const className = computed<string>(() =>
-    cn('mx-auto max-w-7xl px-4 sm:px-6', attrs.class as string),
+    cn('mx-auto w-full max-w-7xl px-4 md:px-6', attrs.class as string),
 );
 </script>
 

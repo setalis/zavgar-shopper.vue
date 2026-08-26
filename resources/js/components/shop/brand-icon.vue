@@ -9,9 +9,7 @@ const props = defineProps<{
 
 const page = usePage();
 
-const logoUrl = computed<string | null>(
-    () => page.props.shop?.logo ?? null,
-);
+const logoUrl = computed<string | null>(() => page.props.shop?.logo ?? null);
 
 const storeName = computed<string>(() => page.props.name);
 
@@ -28,12 +26,7 @@ const imageClass = computed<string>(() => {
 </script>
 
 <template>
-    <img
-        v-if="logoUrl"
-        :src="logoUrl"
-        :alt="storeName"
-        :class="imageClass"
-    />
+    <img v-if="logoUrl" :src="logoUrl" :alt="storeName" :class="imageClass" />
     <svg
         v-else
         :class="props.class"

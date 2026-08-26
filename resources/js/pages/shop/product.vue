@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Minus, Plus } from 'lucide-vue-next';
+import {
+    Heart,
+    MessageCircle,
+    RotateCcw,
+    ShieldCheck,
+    Truck,
+} from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import BrandLink from '@/components/shop/brand-link.vue';
 import Container from '@/components/shop/container.vue';
-import PriceDisplay from '@/components/shop/price-display.vue';
 import ProductCard from '@/components/shop/product-card.vue';
+import QtyStepper from '@/components/shop/qty-stepper.vue';
+import SectionHead from '@/components/shop/section-head.vue';
+import StarRating from '@/components/shop/star-rating.vue';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useCart } from '@/composables/useCart';
+import { useFormat } from '@/composables/useFormat';
+import { useShop } from '@/composables/useShop';
 import { useTrans } from '@/composables/useTrans';
 import { home } from '@/routes';
 import * as shop from '@/routes/shop';
@@ -20,6 +33,8 @@ const props = defineProps<{
 
 const cart = useCart();
 const { t } = useTrans();
+const { currency, taxLabel } = useShop();
+const { money } = useFormat();
 
 const selectedOptions = ref<Record<number, number>>({});
 const quantity = ref<number>(1);
@@ -31,12 +46,20 @@ const hasVariants = computed<boolean>(() =>
 );
 
 const selectedVariantId = computed<number | null>(() => {
-    if (!props.variantOptions || !hasVariants.value) return null;
+    if (!props.variantOptions || !hasVariants.value) {
+        return null;
+    }
+
     const required = props.variantOptions.productOptions.length;
-    if (Object.keys(selectedOptions.value).length !== required) return null;
+
+    if (Object.keys(selectedOptions.value).length !== required) {
+        return null;
+    }
+
     const key = Object.values(selectedOptions.value)
         .sort((a, b) => a - b)
         .join('-');
+
     return props.variantOptions.variantIndex[key] ?? null;
 });
 
@@ -48,15 +71,49 @@ const selectedVariant = computed(() =>
         : null,
 );
 
-const productGallery = computed<string[]>(() => {
-    const images = (props.product.images ?? []).map((image) => image.url);
+function mediaFileKey(url: string): string {
+    const path = url.split('?')[0] ?? url;
+    const segments = path.split('/');
 
-    if (images.length > 0) {
-        return images;
+    return segments[segments.length - 1] ?? path;
+}
+
+function mediaUrls(
+    thumbnail: string | null | undefined,
+    images: { url: string }[] | undefined,
+): string[] {
+    const urls: string[] = [];
+    const keys = new Set<string>();
+
+    const push = (url: string): void => {
+        if (url === '') {
+            return;
+        }
+
+        const key = mediaFileKey(url);
+
+        if (keys.has(key) || urls.includes(url)) {
+            return;
+        }
+
+        keys.add(key);
+        urls.push(url);
+    };
+
+    if (thumbnail) {
+        push(thumbnail);
     }
 
-    return props.product.thumbnail ? [props.product.thumbnail] : [];
-});
+    for (const image of images ?? []) {
+        push(image.url);
+    }
+
+    return urls;
+}
+
+const productGallery = computed<string[]>(() =>
+    mediaUrls(props.product.thumbnail, props.product.images),
+);
 
 const variantGallery = computed<string[]>(() => {
     const variant = selectedVariant.value;
@@ -65,13 +122,7 @@ const variantGallery = computed<string[]>(() => {
         return [];
     }
 
-    const images = (variant.images ?? []).map((image) => image.url);
-
-    if (images.length > 0) {
-        return images;
-    }
-
-    return variant.thumbnail ? [variant.thumbnail] : [];
+    return mediaUrls(variant.thumbnail, variant.images);
 });
 
 const gallery = computed<string[]>(() =>
@@ -92,9 +143,16 @@ function selectGalleryImage(url: string): void {
     manualImage.value = url;
 }
 
-function selectOption(optionId: number, valueId: number): void {
+function selectOption(optionId: number, valueId: string): void {
+    if (valueId === '') {
+        return;
+    }
+
     manualImage.value = null;
-    selectedOptions.value = { ...selectedOptions.value, [optionId]: valueId };
+    selectedOptions.value = {
+        ...selectedOptions.value,
+        [optionId]: Number(valueId),
+    };
 }
 
 const displayPrice = computed<StorefrontPrice | null>(() => {
@@ -111,6 +169,16 @@ const displayPrice = computed<StorefrontPrice | null>(() => {
     return props.product.storefront_price ?? null;
 });
 
+const savedAmount = computed<number | null>(() => {
+    const price = displayPrice.value;
+
+    if (!price?.compare_amount || price.compare_amount <= price.amount) {
+        return null;
+    }
+
+    return price.compare_amount - price.amount;
+});
+
 const outOfStock = computed<boolean>(() => {
     if (hasVariants.value) {
         if (selectedVariant.value) {
@@ -119,22 +187,92 @@ const outOfStock = computed<boolean>(() => {
                 !selectedVariant.value.allow_backorder
             );
         }
+
         return (props.product.variants ?? []).every(
             (variant) => variant.stock <= 0 && !variant.allow_backorder,
         );
     }
+
     const stock = (props.product as { stock?: number }).stock ?? 0;
+
     return stock <= 0 && !props.product.allow_backorder;
 });
 
-function isOptionAvailable(attributeId: number, valueId: number): boolean {
+const reviews = computed(() => props.product.reviews ?? []);
+
+const averageRating = computed<number>(() => {
+    if (reviews.value.length === 0) {
+        return 0;
+    }
+
     return (
-        props.variantOptions?.availabilityMatrix[attributeId]?.[valueId] ?? true
+        reviews.value.reduce((total, review) => total + review.rating, 0) /
+        reviews.value.length
     );
-}
+});
+
+const ratingDistribution = computed(() =>
+    [5, 4, 3, 2, 1].map((score) => {
+        const matching = reviews.value.filter(
+            (review) => Math.round(review.rating) === score,
+        ).length;
+
+        return {
+            score,
+            count: matching,
+            percentage:
+                reviews.value.length === 0
+                    ? 0
+                    : Math.round((matching / reviews.value.length) * 100),
+        };
+    }),
+);
+
+const specs = computed(() =>
+    [
+        { label: t('shop.product.specs.sku'), value: props.product.sku },
+        {
+            label: t('shop.product.specs.brand'),
+            value: props.product.brand?.name,
+        },
+        {
+            label: t('shop.product.specs.barcode'),
+            value: props.product.barcode,
+        },
+        {
+            label: t('shop.product.specs.weight'),
+            value: props.product.weight_value
+                ? `${props.product.weight_value} ${props.product.weight_unit ?? ''}`.trim()
+                : null,
+        },
+        {
+            label: t('shop.product.specs.dimensions'),
+            value:
+                props.product.width_value && props.product.height_value
+                    ? `${props.product.width_value} × ${props.product.height_value} × ${props.product.depth_value ?? 0} ${props.product.width_unit ?? ''}`.trim()
+                    : null,
+        },
+        {
+            label: t('shop.product.specs.availability'),
+            value: outOfStock.value
+                ? t('shop.product.out_of_stock')
+                : t('shop.product.in_stock'),
+        },
+    ].filter((spec) => Boolean(spec.value)),
+);
+
+const features = computed(() => [
+    { icon: Truck, key: 'free_shipping' },
+    { icon: ShieldCheck, key: 'secure_payment' },
+    { icon: RotateCcw, key: 'easy_returns' },
+    { icon: MessageCircle, key: 'support' },
+]);
 
 function addToCart(): void {
-    if (adding.value || outOfStock.value) return;
+    if (adding.value || outOfStock.value) {
+        return;
+    }
+
     adding.value = true;
     cart.add({
         product_id: props.product.id,
@@ -148,54 +286,44 @@ function addToCart(): void {
 <template>
     <Head :title="product.name" />
 
-    <Container class="py-8 sm:py-12">
+    <Container class="py-8 md:py-12">
         <nav
-            class="mb-8 flex items-center gap-2 text-sm text-zinc-500"
+            class="mb-8 flex flex-wrap items-center gap-1.5 font-mono text-xs tracking-[0.04em] text-ink-mute"
             :aria-label="t('shop.product.breadcrumb')"
         >
-            <Link
-                :href="home.url()"
-                class="transition hover:text-zinc-900 dark:hover:text-white"
-                >{{ t('shop.product.breadcrumb.home') }}</Link
-            >
-            <span>/</span>
-            <Link
-                :href="shop.index.url()"
-                class="transition hover:text-zinc-900 dark:hover:text-white"
-                >{{ t('shop.product.breadcrumb.shop') }}</Link
-            >
-            <span>/</span>
-            <span class="text-zinc-900 dark:text-white">{{
-                product.name
-            }}</span>
+            <Link :href="home.url()" class="transition hover:text-brand">
+                {{ t('shop.nav.home') }}
+            </Link>
+            <span aria-hidden="true" class="text-ink-faint">/</span>
+            <Link :href="shop.index.url()" class="transition hover:text-brand">
+                {{ t('shop.nav.shop') }}
+            </Link>
+            <span aria-hidden="true" class="text-ink-faint">/</span>
+            <span aria-current="page" class="text-ink">{{ product.name }}</span>
         </nav>
 
-        <div class="lg:grid lg:grid-cols-2 lg:gap-x-12">
-            <div>
+        <div class="grid gap-10 lg:grid-cols-2 lg:gap-14">
+            <div
+                :class="[
+                    'grid gap-4',
+                    gallery.length > 1 ? 'md:grid-cols-[80px_1fr]' : '',
+                ]"
+            >
                 <div
-                    class="aspect-square overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800"
-                >
-                    <img
-                        v-if="activeImage"
-                        :src="activeImage"
-                        :alt="product.name"
-                        class="size-full object-cover object-center"
-                    />
-                </div>
-
-                <div
-                    v-if="gallery.length"
-                    class="mt-4 grid grid-cols-4 gap-3"
+                    v-if="gallery.length > 1"
+                    class="order-2 grid grid-cols-4 gap-2 md:order-1 md:grid-cols-1"
                 >
                     <button
-                        v-for="url in gallery"
+                        v-for="url in gallery.slice(0, 5)"
                         :key="url"
                         type="button"
                         :class="[
-                            'aspect-square overflow-hidden rounded-lg bg-zinc-100 ring-2 ring-transparent focus:ring-zinc-900 dark:bg-zinc-800 dark:focus:ring-white',
-                            activeImage === url &&
-                                'ring-zinc-900 dark:ring-white',
+                            'aspect-square overflow-hidden rounded-sm border bg-muted transition',
+                            activeImage === url
+                                ? 'border-brand'
+                                : 'border-rule hover:border-brand-line',
                         ]"
+                        :aria-current="activeImage === url ? 'true' : undefined"
                         @click="selectGalleryImage(url)"
                     >
                         <img
@@ -205,130 +333,174 @@ function addToCart(): void {
                         />
                     </button>
                 </div>
+
+                <div
+                    class="order-1 aspect-square w-full min-w-0 overflow-hidden rounded-xl border border-rule bg-muted md:order-2"
+                >
+                    <img
+                        v-if="activeImage"
+                        :src="activeImage"
+                        :alt="product.name"
+                        class="size-full object-cover object-center"
+                    />
+                </div>
             </div>
 
-            <div class="mt-8 lg:mt-0">
-                <h1
-                    class="font-heading text-3xl font-bold text-zinc-900 dark:text-white"
+            <div>
+                <p
+                    v-if="product.brand"
+                    class="mb-2 font-mono text-xs tracking-[0.08em] text-brand uppercase"
                 >
+                    <BrandLink :brand="product.brand" />
+                </p>
+
+                <h1 class="mb-3 text-2xl leading-[1.1] md:text-3xl">
                     {{ product.name }}
                 </h1>
 
-                <BrandLink v-if="product.brand" :brand="product.brand" />
-
-                <p
-                    v-if="outOfStock"
-                    class="mt-2 inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-600 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20"
+                <div
+                    v-if="reviews.length"
+                    class="mb-4 inline-flex items-center gap-3 text-sm text-ink-mute"
                 >
-                    {{ t('shop.product.out_of_stock') }}
-                </p>
-
-                <div class="mt-4">
-                    <PriceDisplay :price="displayPrice ?? null" size="lg" />
+                    <StarRating
+                        :rating="averageRating"
+                        :count="reviews.length"
+                        size="md"
+                    />
                 </div>
 
                 <div
-                    v-if="hasVariants && variantOptions"
-                    class="mt-6 space-y-5"
+                    class="mt-5 flex flex-wrap items-baseline gap-4 border-t border-rule pt-5"
                 >
+                    <template v-if="displayPrice">
+                        <span
+                            class="font-heading text-2xl font-extrabold text-ink md:text-3xl"
+                        >
+                            {{ money(displayPrice.amount, currency) }}
+                        </span>
+                        <span
+                            v-if="savedAmount"
+                            class="font-mono text-ink-faint line-through"
+                        >
+                            {{
+                                money(
+                                    displayPrice.compare_amount ?? 0,
+                                    currency,
+                                )
+                            }}
+                        </span>
+                        <span
+                            v-if="savedAmount"
+                            class="rounded-[4px] bg-card-green px-2 py-1 font-mono text-xs font-semibold text-paper"
+                        >
+                            {{
+                                t('shop.price.save', {
+                                    amount: money(savedAmount, currency),
+                                })
+                            }}
+                        </span>
+                        <span
+                            v-if="taxLabel"
+                            class="font-mono text-[11px] text-ink-mute"
+                        >
+                            {{ taxLabel }}
+                        </span>
+                    </template>
+                    <span v-else class="font-heading text-xl text-ink-mute">
+                        {{ t('shop.price.unavailable') }}
+                    </span>
+                </div>
+
+                <p
+                    v-if="product.summary"
+                    class="mb-5 text-md leading-relaxed text-ink-soft"
+                >
+                    {{ product.summary }}
+                </p>
+
+                <span
+                    class="mb-5 inline-flex items-center gap-2 font-mono text-xs tracking-[0.04em] text-ink-mute"
+                >
+                    <span
+                        class="size-1.5 rounded-full"
+                        :class="outOfStock ? 'bg-rose' : 'bg-emerald'"
+                        aria-hidden="true"
+                    />
+                    {{
+                        outOfStock
+                            ? t('shop.product.out_of_stock')
+                            : t('shop.product.in_stock')
+                    }}
+                </span>
+
+                <div v-if="hasVariants && variantOptions" class="space-y-5">
                     <div
                         v-for="option in variantOptions.productOptions"
                         :key="option.id"
                     >
-                        <h3
-                            class="text-sm font-medium text-zinc-900 dark:text-white"
+                        <p
+                            class="mb-3 font-mono text-xs tracking-[0.08em] text-ink-mute uppercase"
                         >
                             {{ option.name }}
-                        </h3>
-                        <div class="mt-2 flex flex-wrap gap-2">
-                            <template
+                        </p>
+
+                        <ToggleGroup
+                            type="single"
+                            :model-value="
+                                selectedOptions[option.id]?.toString() ?? ''
+                            "
+                            class="flex-wrap justify-start gap-2"
+                            :aria-label="option.name"
+                            @update:model-value="
+                                (value) =>
+                                    selectOption(option.id, String(value ?? ''))
+                            "
+                        >
+                            <ToggleGroupItem
                                 v-for="value in option.values"
                                 :key="value.id"
+                                :value="value.id.toString()"
+                                :disabled="
+                                    !(
+                                        variantOptions.availabilityMatrix[
+                                            option.id
+                                        ]?.[value.id] ?? true
+                                    )
+                                "
+                                :class="
+                                    option.type === 'colorpicker'
+                                        ? 'size-9 rounded-full border-2 border-rule-strong p-0 data-[state=on]:border-brand data-[state=on]:ring-2 data-[state=on]:ring-brand data-[state=on]:ring-offset-2'
+                                        : 'h-auto rounded-sm border border-rule-strong px-4 py-2.5 text-sm font-semibold data-[state=on]:border-brand data-[state=on]:bg-primary data-[state=on]:text-paper'
+                                "
+                                :style="
+                                    option.type === 'colorpicker' && value.key
+                                        ? { backgroundColor: value.key }
+                                        : undefined
+                                "
+                                :title="value.value"
                             >
-                                <button
+                                <span
                                     v-if="option.type === 'colorpicker'"
-                                    type="button"
-                                    :class="[
-                                        'size-8 rounded-full border-2 transition',
-                                        selectedOptions[option.id] === value.id
-                                            ? 'border-zinc-900 ring-2 ring-zinc-900 ring-offset-2 dark:border-white dark:ring-white'
-                                            : isOptionAvailable(
-                                                    option.id,
-                                                    value.id,
-                                                )
-                                              ? 'border-zinc-300 hover:border-zinc-500 dark:border-zinc-600'
-                                              : 'cursor-not-allowed border-zinc-200 opacity-30 dark:border-zinc-700',
-                                    ]"
-                                    :style="
-                                        value.key
-                                            ? { backgroundColor: value.key }
-                                            : undefined
-                                    "
-                                    :disabled="
-                                        !isOptionAvailable(option.id, value.id)
-                                    "
-                                    :title="value.value"
-                                    @click="selectOption(option.id, value.id)"
-                                >
-                                    <span class="sr-only">{{
-                                        value.value
-                                    }}</span>
-                                </button>
-                                <button
-                                    v-else
-                                    type="button"
-                                    :class="[
-                                        'rounded-lg border px-4 py-2 text-sm font-medium transition',
-                                        selectedOptions[option.id] === value.id
-                                            ? 'border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900'
-                                            : isOptionAvailable(
-                                                    option.id,
-                                                    value.id,
-                                                )
-                                              ? 'border-zinc-300 text-zinc-900 hover:border-zinc-500 dark:border-zinc-600 dark:text-white dark:hover:border-zinc-400'
-                                              : 'cursor-not-allowed border-zinc-200 text-zinc-300 dark:border-zinc-700 dark:text-zinc-600',
-                                    ]"
-                                    :disabled="
-                                        !isOptionAvailable(option.id, value.id)
-                                    "
-                                    @click="selectOption(option.id, value.id)"
+                                    class="sr-only"
                                 >
                                     {{ value.value }}
-                                </button>
-                            </template>
-                        </div>
+                                </span>
+                                <template v-else>{{ value.value }}</template>
+                            </ToggleGroupItem>
+                        </ToggleGroup>
                     </div>
                 </div>
 
-                <div class="mt-8 flex items-center gap-4">
-                    <div
-                        class="flex items-center rounded-lg border border-zinc-300 dark:border-zinc-600"
-                    >
-                        <button
-                            type="button"
-                            class="px-3 py-2 text-zinc-500 transition hover:text-zinc-900 disabled:opacity-40 dark:hover:text-white"
-                            :disabled="quantity <= 1"
-                            :aria-label="t('shop.product.decrease')"
-                            @click="quantity = Math.max(1, quantity - 1)"
-                        >
-                            <Minus class="size-4" aria-hidden="true" />
-                        </button>
-                        <span
-                            class="min-w-8 text-center text-sm font-medium text-zinc-900 dark:text-white"
-                            >{{ quantity }}</span
-                        >
-                        <button
-                            type="button"
-                            class="px-3 py-2 text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
-                            :aria-label="t('shop.product.increase')"
-                            @click="quantity = Math.min(10, quantity + 1)"
-                        >
-                            <Plus class="size-4" aria-hidden="true" />
-                        </button>
-                    </div>
+                <div class="mt-4 flex flex-wrap items-center gap-3">
+                    <QtyStepper
+                        v-model="quantity"
+                        :disabled="outOfStock"
+                        :max="20"
+                    />
 
                     <Button
                         type="button"
+                        size="lg"
                         class="flex-1"
                         :disabled="
                             adding ||
@@ -345,37 +517,153 @@ function addToCart(): void {
                                   : t('shop.product.add_to_cart')
                         }}
                     </Button>
+
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-lg"
+                        :aria-label="t('shop.product.add_to_wishlist')"
+                        :title="t('shop.nav.wishlist_soon')"
+                    >
+                        <Heart class="size-5" aria-hidden="true" />
+                    </Button>
                 </div>
 
                 <div
-                    v-if="product.description"
-                    class="mt-8 border-t border-zinc-200 pt-8 dark:border-zinc-700"
+                    class="mt-10 grid gap-3 border-t border-rule pt-5 sm:grid-cols-2"
                 >
-                    <h3
-                        class="text-sm font-medium text-zinc-900 dark:text-white"
-                    >
-                        {{ t('shop.product.description') }}
-                    </h3>
                     <div
-                        class="prose prose-sm mt-3 max-w-none prose-zinc dark:prose-invert"
-                        v-html="product.description"
-                    />
+                        v-for="feature in features"
+                        :key="feature.key"
+                        class="flex items-center gap-3 text-sm text-ink-soft"
+                    >
+                        <span
+                            class="grid size-8 shrink-0 place-items-center rounded-full bg-brand-soft text-brand"
+                        >
+                            <component
+                                :is="feature.icon"
+                                class="size-4"
+                                aria-hidden="true"
+                            />
+                        </span>
+                        {{ t(`shop.trust.${feature.key}.title`) }}
+                    </div>
                 </div>
             </div>
         </div>
 
+        <Tabs default-value="specs" class="mt-14 md:mt-20">
+            <TabsList class="w-full justify-start rounded-sm">
+                <TabsTrigger value="specs">
+                    {{ t('shop.product.tabs.specs') }}
+                </TabsTrigger>
+                <TabsTrigger value="description">
+                    {{ t('shop.product.tabs.description') }}
+                </TabsTrigger>
+                <TabsTrigger value="reviews">
+                    {{ t('shop.product.tabs.reviews') }}
+                </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="specs" class="pt-7">
+                <dl
+                    class="overflow-hidden rounded-lg border border-rule bg-paper"
+                >
+                    <div
+                        v-for="(spec, index) in specs"
+                        :key="spec.label"
+                        :class="[
+                            'grid gap-1 px-5 py-3.5 sm:grid-cols-[220px_1fr]',
+                            index % 2 === 1 && 'bg-muted',
+                        ]"
+                    >
+                        <dt
+                            class="font-mono text-xs tracking-[0.08em] text-ink-mute uppercase"
+                        >
+                            {{ spec.label }}
+                        </dt>
+                        <dd class="text-sm text-ink">{{ spec.value }}</dd>
+                    </div>
+                </dl>
+            </TabsContent>
+
+            <TabsContent value="description" class="pt-7">
+                <div
+                    v-if="product.description"
+                    class="prose prose-sm max-w-none prose-zinc"
+                    v-html="product.description"
+                />
+                <p v-else class="text-sm text-ink-mute">
+                    {{ t('shop.product.no_description') }}
+                </p>
+            </TabsContent>
+
+            <TabsContent value="reviews" class="pt-7">
+                <div class="grid gap-7 lg:grid-cols-[240px_1fr]">
+                    <div
+                        class="rounded-lg border border-rule bg-paper p-5 text-center"
+                    >
+                        <p
+                            class="font-heading text-3xl font-extrabold text-ink"
+                        >
+                            {{ averageRating.toFixed(1) }}
+                        </p>
+                        <StarRating
+                            class="mt-2 justify-center"
+                            :rating="averageRating"
+                            size="md"
+                        />
+                        <p class="mt-2 font-mono text-xs text-ink-mute">
+                            {{
+                                t('shop.product.review_count', {
+                                    count: reviews.length,
+                                })
+                            }}
+                        </p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div
+                            v-for="bucket in ratingDistribution"
+                            :key="bucket.score"
+                            class="flex items-center gap-3"
+                        >
+                            <span class="w-10 font-mono text-xs text-ink-mute">
+                                {{ bucket.score }}★
+                            </span>
+                            <Progress
+                                :model-value="bucket.percentage"
+                                class="h-1.5 flex-1"
+                            />
+                            <span
+                                class="w-10 text-right font-mono text-xs text-ink-mute"
+                            >
+                                {{ bucket.count }}
+                            </span>
+                        </div>
+
+                        <p
+                            v-if="!reviews.length"
+                            class="pt-4 text-sm text-ink-mute"
+                        >
+                            {{ t('shop.product.no_reviews') }}
+                        </p>
+                    </div>
+                </div>
+            </TabsContent>
+        </Tabs>
+
         <section
             v-if="product.related_products?.length"
-            class="mt-16 border-t border-zinc-200 pt-12 dark:border-zinc-700"
+            class="mt-14 border-t border-rule pt-14 md:mt-20 md:pt-20"
         >
-            <h2
-                class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-            >
-                {{ t('shop.product.related') }}
-            </h2>
-            <div
-                class="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-6"
-            >
+            <SectionHead
+                :title="t('shop.product.related')"
+                :view-all-href="shop.index.url()"
+                :view-all-label="t('shop.home.featured.view_all')"
+            />
+
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 <ProductCard
                     v-for="related in product.related_products"
                     :key="related.id"

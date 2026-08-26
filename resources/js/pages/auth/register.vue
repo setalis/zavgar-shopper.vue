@@ -35,19 +35,39 @@ defineOptions({
         class="flex flex-col gap-6"
     >
         <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="name">{{ t('auth.register.name') }}</Label>
-                <Input
-                    id="name"
-                    type="text"
-                    required
-                    autofocus
-                    :tabindex="1"
-                    autocomplete="name"
-                    name="name"
-                    :placeholder="t('auth.register.name_placeholder')"
-                />
-                <InputError :message="errors.name" />
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid gap-2">
+                    <Label for="first_name">{{
+                        t('auth.register.first_name')
+                    }}</Label>
+                    <Input
+                        id="first_name"
+                        type="text"
+                        required
+                        autofocus
+                        :tabindex="1"
+                        autocomplete="given-name"
+                        name="first_name"
+                        :placeholder="t('auth.register.first_name_placeholder')"
+                    />
+                    <InputError :message="errors.first_name" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="last_name">{{
+                        t('auth.register.last_name')
+                    }}</Label>
+                    <Input
+                        id="last_name"
+                        type="text"
+                        required
+                        :tabindex="2"
+                        autocomplete="family-name"
+                        name="last_name"
+                        :placeholder="t('auth.register.last_name_placeholder')"
+                    />
+                    <InputError :message="errors.last_name" />
+                </div>
             </div>
 
             <div class="grid gap-2">
@@ -56,7 +76,7 @@ defineOptions({
                     id="email"
                     type="email"
                     required
-                    :tabindex="2"
+                    :tabindex="3"
                     autocomplete="email"
                     name="email"
                     :placeholder="t('auth.register.email_placeholder')"
@@ -69,7 +89,7 @@ defineOptions({
                 <PasswordInput
                     id="password"
                     required
-                    :tabindex="3"
+                    :tabindex="4"
                     autocomplete="new-password"
                     name="password"
                     :placeholder="t('auth.register.password')"
@@ -85,7 +105,7 @@ defineOptions({
                 <PasswordInput
                     id="password_confirmation"
                     required
-                    :tabindex="4"
+                    :tabindex="5"
                     autocomplete="new-password"
                     name="password_confirmation"
                     :placeholder="t('auth.register.confirm_password')"
@@ -97,7 +117,7 @@ defineOptions({
             <Button
                 type="submit"
                 class="mt-2 w-full"
-                tabindex="5"
+                tabindex="6"
                 :disabled="processing"
                 data-test="register-user-button"
             >
@@ -111,7 +131,7 @@ defineOptions({
             <TextLink
                 :href="login()"
                 class="underline underline-offset-4"
-                :tabindex="6"
+                :tabindex="7"
                 >{{ t('auth.register.log_in') }}</TextLink
             >
         </div>

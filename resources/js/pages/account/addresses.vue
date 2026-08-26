@@ -8,6 +8,7 @@ import {
     Truck,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import AddressController from '@/actions/App/Http/Controllers/Account/AddressController';
 import Card from '@/components/shop/card.vue';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -26,9 +27,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import AddressController from '@/actions/App/Http/Controllers/Account/AddressController';
 import { useTrans } from '@/composables/useTrans';
-import { AddressType, type Address } from '@/types/shop';
+import { AddressType } from '@/types/shop';
+import type { Address } from '@/types/shop';
 
 type CountryOption = { id: number; name: string; cca2: string };
 
@@ -45,7 +46,7 @@ type AddressForm = {
     type: AddressType;
 };
 
-const props = defineProps<{
+defineProps<{
     addresses: Address[];
     countries: CountryOption[];
 }>();
@@ -110,7 +111,10 @@ function submit(): void {
 }
 
 function destroy(address: Address): void {
-    if (!window.confirm(t('account.addresses.delete_confirm'))) return;
+    if (!window.confirm(t('account.addresses.delete_confirm'))) {
+        return;
+    }
+
     router.delete(AddressController.destroy.url(address.id), {
         preserveScroll: true,
     });
@@ -137,12 +141,10 @@ function setDefaultBilling(address: Address): void {
     <Head :title="t('account.addresses.title')" />
 
     <div>
-        <h1
-            class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-        >
+        <h1 class="font-heading text-2xl font-bold text-ink">
             {{ t('account.addresses.heading') }}
         </h1>
-        <p class="mt-1 text-sm text-zinc-500">
+        <p class="mt-1 text-sm text-ink-mute">
             {{ t('account.addresses.description') }}
         </p>
     </div>
@@ -167,20 +169,18 @@ function setDefaultBilling(address: Address): void {
             >
                 <div class="flex flex-col gap-4">
                     <div class="flex items-start justify-between gap-2">
-                        <h4
-                            class="font-heading text-sm font-medium text-zinc-900 dark:text-white"
-                        >
+                        <h4 class="font-heading text-sm font-medium text-ink">
                             {{ address.first_name }} {{ address.last_name }}
                         </h4>
                         <span
                             v-if="address.type === AddressType.BILLING"
-                            class="inline-flex shrink-0 items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
+                            class="inline-flex shrink-0 items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-ink-soft"
                             >{{ t('account.addresses.billing') }}</span
                         >
                     </div>
 
                     <address
-                        class="flex flex-col text-sm text-zinc-500 not-italic"
+                        class="flex flex-col text-sm text-ink-mute not-italic"
                     >
                         <span>
                             {{ address.street_address
@@ -199,14 +199,14 @@ function setDefaultBilling(address: Address): void {
                     <div class="space-y-1">
                         <span
                             v-if="address.shipping_default"
-                            class="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
+                            class="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-ink-soft"
                         >
                             <Check class="size-3" aria-hidden="true" />
                             {{ t('account.addresses.default_shipping') }}
                         </span>
                         <span
                             v-if="address.billing_default"
-                            class="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
+                            class="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-ink-soft"
                         >
                             <Check class="size-3" aria-hidden="true" />
                             {{ t('account.addresses.default_billing') }}
@@ -233,7 +233,8 @@ function setDefaultBilling(address: Address): void {
                     </Button>
                     <DropdownMenu
                         v-if="
-                            !address.shipping_default || !address.billing_default
+                            !address.shipping_default ||
+                            !address.billing_default
                         "
                     >
                         <DropdownMenuTrigger as-child>
@@ -250,16 +251,15 @@ function setDefaultBilling(address: Address): void {
                                 @click="setDefaultShipping(address)"
                             >
                                 <Truck class="size-4" aria-hidden="true" />
-                                {{ t('account.addresses.set_default_shipping') }}
+                                {{
+                                    t('account.addresses.set_default_shipping')
+                                }}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 v-if="!address.billing_default"
                                 @click="setDefaultBilling(address)"
                             >
-                                <CreditCard
-                                    class="size-4"
-                                    aria-hidden="true"
-                                />
+                                <CreditCard class="size-4" aria-hidden="true" />
                                 {{ t('account.addresses.set_default_billing') }}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -268,16 +268,14 @@ function setDefaultBilling(address: Address): void {
             </Card>
         </div>
 
-        <p v-else class="text-sm text-zinc-500">
+        <p v-else class="text-sm text-ink-mute">
             {{ t('account.addresses.empty') }}
         </p>
     </div>
 
     <Dialog v-model:open="open">
         <DialogContent class="sm:max-w-2xl">
-            <DialogTitle
-                class="text-lg font-semibold text-zinc-900 dark:text-white"
-            >
+            <DialogTitle class="text-lg font-semibold text-ink">
                 {{
                     editing
                         ? t('account.addresses.form.update_title')
@@ -377,7 +375,9 @@ function setDefaultBilling(address: Address): void {
                         >
                             <SelectTrigger
                                 id="country_id"
-                                :aria-label="t('account.addresses.form.country')"
+                                :aria-label="
+                                    t('account.addresses.form.country')
+                                "
                                 class="w-full"
                             >
                                 <SelectValue
@@ -409,37 +409,32 @@ function setDefaultBilling(address: Address): void {
                         <Label for="phone_number">{{
                             t('account.addresses.form.phone_number')
                         }}</Label>
-                        <Input
-                            id="phone_number"
-                            v-model="form.phone_number"
-                        />
+                        <Input id="phone_number" v-model="form.phone_number" />
                     </div>
                     <fieldset class="space-y-2 sm:col-span-2">
-                        <legend
-                            class="text-sm font-medium text-zinc-900 dark:text-white"
-                        >
+                        <legend class="text-sm font-medium text-ink">
                             {{ t('account.addresses.form.type') }}
                         </legend>
                         <div class="flex flex-wrap items-center gap-6 pt-1">
                             <label
-                                class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"
+                                class="flex items-center gap-2 text-sm text-ink-soft"
                             >
                                 <input
                                     v-model="form.type"
                                     type="radio"
                                     :value="AddressType.SHIPPING"
-                                    class="border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600"
+                                    class="border-rule text-ink focus:ring-brand"
                                 />
                                 {{ t('account.addresses.form.shipping') }}
                             </label>
                             <label
-                                class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"
+                                class="flex items-center gap-2 text-sm text-ink-soft"
                             >
                                 <input
                                     v-model="form.type"
                                     type="radio"
                                     :value="AddressType.BILLING"
-                                    class="border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600"
+                                    class="border-rule text-ink focus:ring-brand"
                                 />
                                 {{ t('account.addresses.form.billing') }}
                             </label>
@@ -447,9 +442,12 @@ function setDefaultBilling(address: Address): void {
                     </fieldset>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <Button type="button" variant="ghost" @click="open = false">{{
-                        t('account.addresses.form.cancel')
-                    }}</Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        @click="open = false"
+                        >{{ t('account.addresses.form.cancel') }}</Button
+                    >
                     <Button type="submit" :disabled="form.processing">{{
                         t('account.addresses.form.save')
                     }}</Button>

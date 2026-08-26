@@ -1,74 +1,132 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { ArrowRight } from 'lucide-vue-next';
-import CategoryCard from '@/components/shop/category-card.vue';
+import { Head } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import BentoHero from '@/components/shop/bento-hero.vue';
+import BrandStrip from '@/components/shop/brand-strip.vue';
+import CategoryTile from '@/components/shop/category-tile.vue';
 import CollectionBanner from '@/components/shop/collection-banner.vue';
+import CompactProductCard from '@/components/shop/compact-product-card.vue';
 import Container from '@/components/shop/container.vue';
+import DiscountBanners from '@/components/shop/discount-banners.vue';
+import NewsletterBanner from '@/components/shop/newsletter-banner.vue';
 import ProductCard from '@/components/shop/product-card.vue';
+import SectionHead from '@/components/shop/section-head.vue';
 import TrustBadges from '@/components/shop/trust-badges.vue';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Category, Collection, Product } from '@/types/shop';
 
-defineProps<{
+const props = defineProps<{
     featuredProducts: Product[];
+    latestProducts: Product[];
     featuredCollections: Collection[];
     categories: Category[];
 }>();
 
 const { t } = useTrans();
+
+type TrendingTab = 'featured' | 'latest';
+
+const activeTab = ref<TrendingTab>(
+    props.featuredProducts.length > 0 ? 'featured' : 'latest',
+);
+
+const tabs = computed(() =>
+    (
+        [
+            { value: 'featured', products: props.featuredProducts },
+            { value: 'latest', products: props.latestProducts },
+        ] as const
+    ).filter((tab) => tab.products.length > 0),
+);
+
+const visibleProducts = computed<Product[]>(() =>
+    (activeTab.value === 'featured'
+        ? props.featuredProducts
+        : props.latestProducts
+    ).slice(0, 10),
+);
+
+const compactProducts = computed<Product[]>(() =>
+    props.latestProducts.slice(0, 4),
+);
 </script>
 
 <template>
     <Head :title="t('shop.home.title')" />
 
-    <section class="relative overflow-hidden bg-zinc-100 dark:bg-zinc-950">
+    <BentoHero />
+
+    <section v-if="tabs.length" class="py-14 md:py-20">
         <Container>
-            <div class="relative py-20 sm:py-28 lg:py-36">
-                <div class="max-w-xl">
-                    <h1
-                        class="font-heading text-5xl font-extrabold tracking-tight text-zinc-900 sm:text-6xl lg:text-7xl dark:text-white"
-                    >
-                        {{ t('shop.home.hero.title') }}
-                    </h1>
-                    <p class="mt-6 text-lg text-zinc-600 dark:text-zinc-400">
-                        {{ t('shop.home.hero.subtitle') }}
-                    </p>
-                    <div class="mt-8 flex items-center gap-4">
-                        <Link
-                            :href="shop.index.url()"
-                            class="inline-flex items-center gap-1.5 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
-                        >
-                            {{ t('shop.home.hero.shop_now') }}
-                            <ArrowRight class="size-4" aria-hidden="true" />
-                        </Link>
-                        <Link
-                            :href="shop.categories.url()"
-                            class="inline-flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-transparent dark:text-white dark:hover:bg-zinc-800"
-                        >
-                            {{ t('shop.home.hero.categories') }}
-                            <ArrowRight class="size-4" aria-hidden="true" />
-                        </Link>
-                    </div>
-                </div>
+            <SectionHead
+                :title="t('shop.home.trending.title')"
+                :view-all-href="shop.index.url()"
+                :view-all-label="t('shop.home.featured.view_all')"
+            />
+
+            <div
+                v-if="tabs.length > 1"
+                class="mb-7 flex gap-7 border-b border-rule"
+                role="tablist"
+                :aria-label="t('shop.home.trending.title')"
+            >
+                <button
+                    v-for="tab in tabs"
+                    :key="tab.value"
+                    type="button"
+                    role="tab"
+                    :aria-selected="activeTab === tab.value"
+                    :class="[
+                        'relative py-3 text-sm font-semibold transition',
+                        activeTab === tab.value
+                            ? 'text-brand after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:rounded-sm after:bg-brand'
+                            : 'text-ink-mute hover:text-ink',
+                    ]"
+                    @click="activeTab = tab.value"
+                >
+                    {{ t(`shop.home.trending.tabs.${tab.value}`) }}
+                </button>
+            </div>
+
+            <div
+                class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+            >
+                <ProductCard
+                    v-for="product in visibleProducts"
+                    :key="product.id"
+                    :product="product"
+                />
             </div>
         </Container>
     </section>
 
-    <Container class="py-10 sm:py-12">
-        <TrustBadges />
-    </Container>
+    <DiscountBanners />
 
-    <section v-if="featuredCollections.length" class="py-12 sm:py-16 lg:pb-24">
+    <section v-if="categories.length" class="py-14 md:py-20">
         <Container>
-            <div class="flex items-center justify-between">
-                <h2
-                    class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-                >
-                    {{ t('shop.home.collections.title') }}
-                </h2>
+            <SectionHead
+                :title="t('shop.home.categories.title')"
+                :description="t('shop.home.categories.subtitle')"
+                :view-all-href="shop.categories.url()"
+                :view-all-label="t('shop.home.categories.view_all')"
+            />
+
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+                <CategoryTile
+                    v-for="category in categories"
+                    :key="category.id"
+                    :category="category"
+                />
             </div>
-            <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        </Container>
+    </section>
+
+    <section v-if="featuredCollections.length" class="pb-14 md:pb-20">
+        <Container>
+            <SectionHead :title="t('shop.home.collections.title')" />
+
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <CollectionBanner
                     v-for="collection in featuredCollections"
                     :key="collection.id"
@@ -78,30 +136,17 @@ const { t } = useTrans();
         </Container>
     </section>
 
-    <section
-        v-if="featuredProducts.length"
-        class="bg-zinc-50 py-12 sm:py-16 lg:py-20 dark:bg-zinc-900/50"
-    >
+    <section v-if="compactProducts.length" class="pb-14 md:pb-20">
         <Container>
-            <div class="flex items-center justify-between">
-                <h2
-                    class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-                >
-                    {{ t('shop.home.featured.title') }}
-                </h2>
-                <Link
-                    :href="shop.index.url()"
-                    class="text-sm font-medium text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                >
-                    {{ t('shop.home.featured.view_all') }}
-                    <span aria-hidden="true">→</span>
-                </Link>
-            </div>
-            <div
-                class="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-6"
-            >
-                <ProductCard
-                    v-for="product in featuredProducts"
+            <SectionHead
+                :title="t('shop.home.just_for_you.title')"
+                :view-all-href="shop.index.url()"
+                :view-all-label="t('shop.home.featured.view_all')"
+            />
+
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <CompactProductCard
+                    v-for="product in compactProducts"
                     :key="product.id"
                     :product="product"
                 />
@@ -109,27 +154,13 @@ const { t } = useTrans();
         </Container>
     </section>
 
-    <section v-if="categories.length" class="py-12 sm:py-16 lg:py-20">
+    <BrandStrip />
+
+    <NewsletterBanner />
+
+    <section class="pb-14 md:pb-20">
         <Container>
-            <div class="text-center">
-                <h2
-                    class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-                >
-                    {{ t('shop.home.categories.title') }}
-                </h2>
-                <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                    {{ t('shop.home.categories.subtitle') }}
-                </p>
-            </div>
-            <div
-                class="mt-8 grid grid-cols-3 gap-6 sm:grid-cols-4 lg:grid-cols-8"
-            >
-                <CategoryCard
-                    v-for="category in categories"
-                    :key="category.id"
-                    :category="category"
-                />
-            </div>
+            <TrustBadges />
         </Container>
     </section>
 </template>

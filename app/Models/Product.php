@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Concerns\InteractsWithStorefrontMedia;
 use App\Concerns\ResolvesStorefrontPrice;
+use App\Concerns\ResolvesStorefrontStock;
 use App\Traits\HasProductPricing;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,6 +19,7 @@ final class Product extends Model
     use HasProductPricing;
     use InteractsWithStorefrontMedia;
     use ResolvesStorefrontPrice;
+    use ResolvesStorefrontStock;
 
     /**
      * @param  Builder<self>  $query

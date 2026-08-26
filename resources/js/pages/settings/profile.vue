@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import PasswordInput from '@/components/password-input.vue';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import PasswordInput from '@/components/password-input.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -71,10 +71,10 @@ function confirmDelete(): void {
     <Head :title="t('settings.profile.title')" />
 
     <div class="space-y-1">
-        <h2 class="text-lg font-medium text-zinc-900 dark:text-white">
+        <h2 class="text-lg font-medium text-ink">
             {{ t('settings.profile.heading') }}
         </h2>
-        <p class="text-sm text-zinc-500">
+        <p class="text-sm text-ink-mute">
             {{ t('settings.profile.description') }}
         </p>
     </div>
@@ -160,20 +160,20 @@ function confirmDelete(): void {
             </p>
 
             <div v-if="hasUnverifiedEmail" class="mt-4">
-                <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                <p class="text-sm text-ink-mute">
                     {{ t('settings.profile.unverified_email') }}
                     <Link
                         :href="verification.send.url()"
                         method="post"
                         as="button"
-                        class="text-zinc-900 underline dark:text-white"
+                        class="text-ink underline"
                     >
                         {{ t('settings.profile.resend_verification') }}
                     </Link>
                 </p>
                 <p
                     v-if="status === 'verification-link-sent'"
-                    class="mt-2 text-sm font-medium text-green-600 dark:text-green-400"
+                    class="mt-2 text-sm font-medium text-green-600"
                 >
                     {{ t('settings.profile.verification_link_sent') }}
                 </p>
@@ -184,17 +184,17 @@ function confirmDelete(): void {
             <Button type="submit" :disabled="form.processing">{{
                 t('settings.profile.save')
             }}</Button>
-            <p v-if="form.recentlySuccessful" class="text-sm text-zinc-500">
+            <p v-if="form.recentlySuccessful" class="text-sm text-ink-mute">
                 {{ t('settings.profile.saved') }}
             </p>
         </div>
     </form>
 
     <div class="mt-10 max-w-lg space-y-3">
-        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">
+        <h3 class="text-sm font-semibold text-ink">
             {{ t('settings.profile.delete.heading') }}
         </h3>
-        <p class="text-sm text-zinc-500">
+        <p class="text-sm text-ink-mute">
             {{ t('settings.profile.delete.description') }}
         </p>
         <Button type="button" variant="destructive" @click="openDelete">{{
@@ -204,12 +204,10 @@ function confirmDelete(): void {
 
     <Dialog v-model:open="deleteOpen">
         <DialogContent class="sm:max-w-lg">
-            <DialogTitle
-                class="text-lg font-semibold text-zinc-900 dark:text-white"
-            >
+            <DialogTitle class="text-lg font-semibold text-ink">
                 {{ t('settings.profile.delete.confirm_title') }}
             </DialogTitle>
-            <p class="mt-2 text-sm text-zinc-500">
+            <p class="mt-2 text-sm text-ink-mute">
                 {{ t('settings.profile.delete.confirm_description') }}
             </p>
             <form class="mt-6 space-y-4" @submit.prevent="confirmDelete">

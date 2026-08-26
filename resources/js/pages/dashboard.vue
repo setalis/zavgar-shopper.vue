@@ -22,7 +22,7 @@ const firstName =
 <template>
     <Head :title="t('dashboard.title')" />
 
-    <h1 class="font-heading text-2xl font-bold text-zinc-900 dark:text-white">
+    <h1 class="font-heading text-2xl font-bold text-ink">
         <template v-if="firstName">
             {{ t('dashboard.welcome_name', { name: firstName }) }}
         </template>
@@ -35,20 +35,15 @@ const firstName =
         <Link :href="accountOrders.url()" class="block">
             <Card class="flex items-center gap-3">
                 <div
-                    class="flex size-10 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800"
+                    class="flex size-10 items-center justify-center rounded-full bg-brand-soft"
                 >
-                    <ShoppingBag
-                        class="size-5 text-zinc-600 dark:text-zinc-400"
-                        aria-hidden="true"
-                    />
+                    <ShoppingBag class="size-5 text-brand" aria-hidden="true" />
                 </div>
                 <div>
-                    <p
-                        class="text-sm font-medium text-zinc-900 dark:text-white"
-                    >
+                    <p class="text-sm font-medium text-ink">
                         {{ t('dashboard.orders.title') }}
                     </p>
-                    <p class="text-xs text-zinc-500">
+                    <p class="text-xs text-ink-mute">
                         {{ t('dashboard.orders.description') }}
                     </p>
                 </div>
@@ -58,20 +53,15 @@ const firstName =
         <Link :href="accountAddresses.url()" class="block">
             <Card class="flex items-center gap-3">
                 <div
-                    class="flex size-10 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800"
+                    class="flex size-10 items-center justify-center rounded-full bg-brand-soft"
                 >
-                    <MapPin
-                        class="size-5 text-zinc-600 dark:text-zinc-400"
-                        aria-hidden="true"
-                    />
+                    <MapPin class="size-5 text-brand" aria-hidden="true" />
                 </div>
                 <div>
-                    <p
-                        class="text-sm font-medium text-zinc-900 dark:text-white"
-                    >
+                    <p class="text-sm font-medium text-ink">
                         {{ t('dashboard.addresses.title') }}
                     </p>
-                    <p class="text-xs text-zinc-500">
+                    <p class="text-xs text-ink-mute">
                         {{ t('dashboard.addresses.description') }}
                     </p>
                 </div>
@@ -81,20 +71,15 @@ const firstName =
         <Link :href="profile.edit.url()" class="block">
             <Card class="flex items-center gap-3">
                 <div
-                    class="flex size-10 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800"
+                    class="flex size-10 items-center justify-center rounded-full bg-brand-soft"
                 >
-                    <User
-                        class="size-5 text-zinc-600 dark:text-zinc-400"
-                        aria-hidden="true"
-                    />
+                    <User class="size-5 text-brand" aria-hidden="true" />
                 </div>
                 <div>
-                    <p
-                        class="text-sm font-medium text-zinc-900 dark:text-white"
-                    >
+                    <p class="text-sm font-medium text-ink">
                         {{ t('dashboard.profile.title') }}
                     </p>
-                    <p class="text-xs text-zinc-500">
+                    <p class="text-xs text-ink-mute">
                         {{ t('dashboard.profile.description') }}
                     </p>
                 </div>

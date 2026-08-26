@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import CategoryTile from '@/components/shop/category-tile.vue';
 import Container from '@/components/shop/container.vue';
+import PageHead from '@/components/shop/page-head.vue';
 import ProductCard from '@/components/shop/product-card.vue';
+import ProductPagination from '@/components/shop/product-pagination.vue';
+import type { PaginatorLink } from '@/components/shop/product-pagination.vue';
 import {
     Select,
     SelectContent,
@@ -22,7 +25,8 @@ type Paginated<T> = {
     data: T[];
     current_page: number;
     last_page: number;
-    links: Array<{ url: string | null; label: string; active: boolean }>;
+    total: number;
+    links: PaginatorLink[];
 };
 
 const props = defineProps<{
@@ -36,6 +40,16 @@ const { t } = useTrans();
 
 const sort = ref<string>(props.filters.sort);
 
+const crumbs = computed(() => [
+    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.categories'), href: shop.categories.url() },
+    { label: props.category.name },
+]);
+
+const description = computed<string>(() =>
+    stripHtml(props.category.description),
+);
+
 watch(sort, (value) => {
     router.get(
         shop.category.url({ category: props.category.slug }),
@@ -48,78 +62,24 @@ watch(sort, (value) => {
 <template>
     <Head :title="category.name" />
 
-    <Container class="py-8 sm:py-12">
-        <nav
-            class="mb-8 flex items-center gap-2 text-sm text-zinc-500"
-            :aria-label="t('shop.category.breadcrumb')"
-        >
-            <Link
-                :href="home.url()"
-                class="transition hover:text-zinc-900 dark:hover:text-white"
-                >{{ t('shop.category.breadcrumb.home') }}</Link
-            >
-            <span>/</span>
-            <Link
-                :href="shop.categories.url()"
-                class="transition hover:text-zinc-900 dark:hover:text-white"
-                >{{ t('shop.category.breadcrumb.categories') }}</Link
-            >
-            <span>/</span>
-            <span class="text-zinc-900 dark:text-white">{{
-                category.name
-            }}</span>
-        </nav>
+    <PageHead
+        :title="category.name"
+        :description="description"
+        :crumbs="crumbs"
+    />
 
-        <div
-            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
-            <div>
-                <h1
-                    class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-                >
-                    {{ category.name }}
-                </h1>
-                <p
-                    v-if="category.description"
-                    class="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
-                >
-                    {{ stripHtml(category.description) }}
-                </p>
-            </div>
-
-            <Select v-if="products.data.length" v-model="sort">
-                <SelectTrigger
-                    class="w-auto"
-                    :aria-label="t('shop.category.sort_aria')"
-                >
-                    <SelectValue
-                        :placeholder="t('shop.category.sort_placeholder')"
-                    />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="latest">{{
-                        t('shop.category.sort.newest')
-                    }}</SelectItem>
-                    <SelectItem value="name">{{
-                        t('shop.category.sort.name')
-                    }}</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
-
+    <Container class="py-10 md:py-14">
         <section
             v-if="children.length"
-            class="mt-8"
+            class="mb-10"
             :aria-label="t('shop.category.children')"
         >
             <h2
-                class="text-sm font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400"
+                class="mb-4 font-mono text-xs tracking-[0.08em] text-ink-faint uppercase"
             >
                 {{ t('shop.category.children') }}
             </h2>
-            <div
-                class="mt-4 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4"
-            >
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
                 <CategoryTile
                     v-for="child in children"
                     :key="child.id"
@@ -128,25 +88,43 @@ watch(sort, (value) => {
             </div>
         </section>
 
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <span class="font-mono text-xs tracking-[0.04em] text-ink-mute">
+                {{ t('shop.index.results_count', { count: products.total }) }}
+            </span>
+
+            <Select v-if="products.data.length" v-model="sort">
+                <SelectTrigger
+                    class="w-auto rounded-sm"
+                    :aria-label="t('shop.category.sort_aria')"
+                >
+                    <SelectValue
+                        :placeholder="t('shop.category.sort_placeholder')"
+                    />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="latest">
+                        {{ t('shop.category.sort.newest') }}
+                    </SelectItem>
+                    <SelectItem value="name">
+                        {{ t('shop.category.sort.name') }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+
         <div
             v-if="!products.data.length"
-            class="mt-16 flex flex-col items-center justify-center text-center"
+            class="flex flex-col items-center justify-center rounded-lg border border-rule bg-paper py-20 text-center"
         >
-            <Search
-                class="size-12 text-zinc-300 dark:text-zinc-600"
-                aria-hidden="true"
-            />
-            <h3
-                class="mt-4 text-sm font-semibold text-zinc-900 dark:text-white"
-            >
+            <Search class="size-10 text-ink-faint" aria-hidden="true" />
+            <h3 class="mt-4 font-heading text-md font-bold text-ink">
                 {{ t('shop.category.empty') }}
             </h3>
         </div>
 
         <template v-else>
-            <div
-                class="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-6"
-            >
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 <ProductCard
                     v-for="product in products.data"
                     :key="product.id"
@@ -154,25 +132,10 @@ watch(sort, (value) => {
                 />
             </div>
 
-            <nav
-                v-if="products.last_page > 1"
-                class="mt-8 flex justify-center gap-1"
-                :aria-label="t('shop.category.pagination')"
-            >
-                <Link
-                    v-for="link in products.links"
-                    :key="link.label"
-                    :href="link.url ?? '#'"
-                    :class="[
-                        'inline-flex h-9 min-w-9 items-center justify-center rounded-md px-3 text-sm transition',
-                        link.active
-                            ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900'
-                            : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800',
-                        link.url === null && 'pointer-events-none opacity-40',
-                    ]"
-                    v-html="link.label"
-                />
-            </nav>
+            <ProductPagination
+                :links="products.links"
+                :label="t('shop.category.pagination')"
+            />
         </template>
     </Container>
 </template>

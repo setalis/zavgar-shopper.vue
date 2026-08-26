@@ -3,6 +3,13 @@ import { MessageCircle, RotateCcw, ShieldCheck, Truck } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useTrans } from '@/composables/useTrans';
 
+withDefaults(
+    defineProps<{
+        layout?: 'grid' | 'stack';
+    }>(),
+    { layout: 'grid' },
+);
+
 const { t } = useTrans();
 
 const badges = computed(() => [
@@ -30,26 +37,31 @@ const badges = computed(() => [
 </script>
 
 <template>
-    <div class="grid grid-cols-2 gap-6 sm:grid-cols-4">
+    <div
+        :class="
+            layout === 'grid'
+                ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4'
+                : 'grid gap-4 sm:grid-cols-2'
+        "
+    >
         <div
             v-for="badge in badges"
             :key="badge.title"
-            class="flex flex-col items-center text-center"
+            class="flex items-start gap-3 rounded-lg border border-rule bg-paper p-4"
         >
-            <div
-                class="flex size-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800"
+            <span
+                class="grid size-10 shrink-0 place-items-center rounded-full bg-brand-soft text-brand"
             >
-                <component
-                    :is="badge.icon"
-                    class="size-6 text-zinc-600 dark:text-zinc-400"
-                />
+                <component :is="badge.icon" class="size-5" aria-hidden="true" />
+            </span>
+            <div>
+                <h3 class="font-heading text-sm font-bold text-ink">
+                    {{ badge.title }}
+                </h3>
+                <p class="mt-0.5 text-xs text-ink-mute">
+                    {{ badge.description }}
+                </p>
             </div>
-            <h3
-                class="mt-3 font-heading text-sm font-medium text-zinc-900 dark:text-white"
-            >
-                {{ badge.title }}
-            </h3>
-            <p class="mt-1 text-xs text-zinc-500">{{ badge.description }}</p>
         </div>
     </div>
 </template>

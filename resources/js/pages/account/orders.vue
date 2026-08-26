@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { ShoppingBag } from 'lucide-vue-next';
 import { computed } from 'vue';
 import OrderStatusBadge from '@/components/account/order-status-badge.vue';
+import ProductPagination from '@/components/shop/product-pagination.vue';
 import { Button } from '@/components/ui/button';
 import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
@@ -78,6 +79,7 @@ function changeTab(value: string): void {
 
 function formatDate(value: string, format: 'short' | 'long' = 'long'): string {
     const date = new Date(value);
+
     return format === 'short'
         ? date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })
         : date.toLocaleDateString('en-US', {
@@ -93,27 +95,33 @@ function itemThumbnail(item: OrderItem): string | null {
 
 function shippingLabel(order: Order): string {
     const date = formatDate(order.updated_at, 'short');
+
     if (order.shipping_status === 'delivered') {
         return t('account.orders.shipping.delivered', { date });
     }
+
     if (
         order.shipping_status === 'shipped' ||
         order.shipping_status === 'partially_shipped'
     ) {
         return t('account.orders.shipping.shipped', { date });
     }
+
     if (
         order.shipping_status === 'returned' ||
         order.shipping_status === 'partially_returned'
     ) {
         return t('account.orders.shipping.returned');
     }
+
     if (order.status === 'cancelled') {
         return t('account.orders.shipping.cancelled');
     }
+
     if (order.status === 'completed') {
         return t('account.orders.shipping.completed', { date });
     }
+
     return t('account.orders.shipping.processing');
 }
 </script>
@@ -122,23 +130,19 @@ function shippingLabel(order: Order): string {
     <Head :title="t('account.orders.title')" />
 
     <div class="flex items-center gap-3">
-        <h1
-            class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-        >
+        <h1 class="font-heading text-2xl font-bold text-ink">
             {{ t('account.orders.heading') }}
         </h1>
         <span
             v-if="orders.total > 0"
-            class="inline-flex items-center justify-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+            class="inline-flex items-center justify-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-ink-mute"
         >
             {{ orders.total }}
         </span>
     </div>
 
     <div class="mt-6 flex items-center justify-between">
-        <div
-            class="flex items-center gap-1 rounded-lg border border-zinc-200 p-1 dark:border-zinc-700"
-        >
+        <div class="flex items-center gap-1 rounded-lg border border-rule p-1">
             <button
                 v-for="tab in tabs"
                 :key="tab.value"
@@ -146,8 +150,8 @@ function shippingLabel(order: Order): string {
                 :class="[
                     'rounded-md px-3 py-1.5 text-sm font-medium transition',
                     activeTab === tab.value
-                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900'
-                        : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white',
+                        ? 'bg-primary text-paper'
+                        : 'text-ink-mute hover:text-ink',
                 ]"
                 @click="changeTab(tab.value)"
             >
@@ -160,14 +164,11 @@ function shippingLabel(order: Order): string {
         v-if="!orders.data.length"
         class="mt-12 flex flex-col items-center justify-center text-center"
     >
-        <ShoppingBag
-            class="size-12 text-zinc-300 dark:text-zinc-600"
-            aria-hidden="true"
-        />
-        <h3 class="mt-4 text-sm font-medium text-zinc-900 dark:text-white">
+        <ShoppingBag class="size-12 text-ink-faint" aria-hidden="true" />
+        <h3 class="mt-4 text-sm font-medium text-ink">
             {{ t('account.orders.empty.title') }}
         </h3>
-        <p class="mt-1 text-sm text-zinc-500">
+        <p class="mt-1 text-sm text-ink-mute">
             {{ t('account.orders.empty.description') }}
         </p>
         <Link :href="shop.index.url()" class="mt-6">
@@ -180,29 +181,25 @@ function shippingLabel(order: Order): string {
             <div
                 v-for="order in orders.data"
                 :key="order.id"
-                class="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700"
+                class="overflow-hidden rounded-xl border border-rule"
             >
                 <div
-                    class="flex flex-wrap items-start justify-between gap-4 border-b border-zinc-200 bg-zinc-50 px-5 py-4 dark:border-zinc-700 dark:bg-zinc-800/50"
+                    class="flex flex-wrap items-start justify-between gap-4 border-b border-rule bg-muted px-5 py-4"
                 >
                     <div class="flex flex-wrap items-center gap-8 text-sm">
                         <div>
-                            <dt class="text-xs text-zinc-500">
+                            <dt class="text-xs text-ink-mute">
                                 {{ t('account.orders.order_placed') }}
                             </dt>
-                            <dd
-                                class="mt-0.5 font-medium text-zinc-900 dark:text-white"
-                            >
+                            <dd class="mt-0.5 font-medium text-ink">
                                 {{ formatDate(order.created_at) }}
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-xs text-zinc-500">
+                            <dt class="text-xs text-ink-mute">
                                 {{ t('account.orders.total') }}
                             </dt>
-                            <dd
-                                class="mt-0.5 font-medium text-zinc-900 dark:text-white"
-                            >
+                            <dd class="mt-0.5 font-medium text-ink">
                                 {{
                                     formatMoney(
                                         order.price_amount,
@@ -212,16 +209,14 @@ function shippingLabel(order: Order): string {
                             </dd>
                         </div>
                         <div v-if="order.shipping_address" class="max-w-xs">
-                            <dt class="text-xs text-zinc-500">
+                            <dt class="text-xs text-ink-mute">
                                 {{ t('account.orders.ship_to') }}
                             </dt>
-                            <dd
-                                class="mt-0.5 font-medium text-zinc-900 dark:text-white"
-                            >
+                            <dd class="mt-0.5 font-medium text-ink">
                                 <span>{{
                                     order.shipping_address.street_address
                                 }}</span>
-                                <span class="text-xs font-normal text-zinc-700">
+                                <span class="text-xs font-normal text-ink-soft">
                                     <span
                                         v-if="
                                             order.shipping_address.postal_code
@@ -247,14 +242,14 @@ function shippingLabel(order: Order): string {
                         </div>
                     </div>
                     <div class="flex flex-col items-end gap-1.5 text-sm">
-                        <span class="font-medium text-zinc-900 dark:text-white">{{
+                        <span class="font-medium text-ink">{{
                             t('account.orders.order_number', {
                                 number: order.number,
                             })
                         }}</span>
                         <Link
                             :href="ordersShow.url(order.id)"
-                            class="text-sm font-medium text-zinc-900 hover:underline dark:text-white"
+                            class="text-sm font-medium text-ink hover:underline"
                         >
                             {{ t('account.orders.view_details') }}
                         </Link>
@@ -264,7 +259,7 @@ function shippingLabel(order: Order): string {
                 <div class="px-5 py-4">
                     <div class="flex flex-wrap items-center gap-3">
                         <h3
-                            class="font-heading text-base font-semibold text-zinc-900 dark:text-white"
+                            class="font-heading text-base font-semibold text-ink"
                         >
                             {{ shippingLabel(order) }}
                         </h3>
@@ -293,7 +288,7 @@ function shippingLabel(order: Order): string {
                             class="flex gap-4"
                         >
                             <div
-                                class="size-24 shrink-0 overflow-hidden rounded-lg bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700"
+                                class="size-24 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-rule"
                             >
                                 <img
                                     v-if="itemThumbnail(item)"
@@ -311,19 +306,19 @@ function shippingLabel(order: Order): string {
                                             product: item.product.slug,
                                         })
                                     "
-                                    class="line-clamp-2 font-heading text-sm font-medium text-zinc-900 hover:underline dark:text-white"
+                                    class="line-clamp-2 font-heading text-sm font-medium text-ink hover:underline"
                                 >
                                     {{ item.name }}
                                 </Link>
                                 <p
                                     v-else
-                                    class="line-clamp-2 font-heading text-sm font-medium text-zinc-900 dark:text-white"
+                                    class="line-clamp-2 font-heading text-sm font-medium text-ink"
                                 >
                                     {{ item.name }}
                                 </p>
                                 <p
                                     v-if="item.sku"
-                                    class="mt-0.5 text-xs text-zinc-500"
+                                    class="mt-0.5 text-xs text-ink-mute"
                                 >
                                     {{
                                         t('account.orders.sku', {
@@ -331,7 +326,7 @@ function shippingLabel(order: Order): string {
                                         })
                                     }}
                                 </p>
-                                <p class="mt-1 text-sm text-zinc-500">
+                                <p class="mt-1 text-sm text-ink-mute">
                                     {{
                                         t('account.orders.quantity_price', {
                                             quantity: item.quantity,
@@ -343,9 +338,7 @@ function shippingLabel(order: Order): string {
                                     }}
                                 </p>
                             </div>
-                            <p
-                                class="shrink-0 text-sm font-medium text-zinc-900 dark:text-white"
-                            >
+                            <p class="shrink-0 text-sm font-medium text-ink">
                                 {{
                                     formatMoney(
                                         item.unit_price_amount * item.quantity,
@@ -359,24 +352,9 @@ function shippingLabel(order: Order): string {
             </div>
         </div>
 
-        <nav
-            v-if="orders.last_page > 1"
-            class="mt-8 flex justify-center gap-1"
-            :aria-label="t('account.orders.pagination')"
-        >
-            <Link
-                v-for="link in orders.links"
-                :key="link.label"
-                :href="link.url ?? '#'"
-                :class="[
-                    'inline-flex h-9 min-w-9 items-center justify-center rounded-md px-3 text-sm transition',
-                    link.active
-                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900'
-                        : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800',
-                    link.url === null && 'pointer-events-none opacity-40',
-                ]"
-                v-html="link.label"
-            />
-        </nav>
+        <ProductPagination
+            :links="orders.links"
+            :label="t('account.orders.pagination')"
+        />
     </template>
 </template>

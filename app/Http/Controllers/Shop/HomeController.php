@@ -8,21 +8,39 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
 
 final class HomeController extends Controller
 {
+    /**
+     * Columns the storefront product card needs: identity, brand, plus the
+     * stock and type flags that drive its availability badge and CTA.
+     *
+     * @var list<string>
+     */
+    private const array CARD_COLUMNS = [
+        'id',
+        'name',
+        'slug',
+        'brand_id',
+        'type',
+        'featured',
+        'security_stock',
+        'allow_backorder',
+    ];
+
     public function __invoke(): Response
     {
         return Inertia::render('shop/home', [
-            'featuredProducts' => fn () => Product::query()
-                ->select('id', 'name', 'slug', 'brand_id')
-                ->with(['media', 'brand.media'])
-                ->withCurrentPrices()
+            'featuredProducts' => fn () => $this->cardQuery()
                 ->where('featured', true)
-                ->scopes('publish')
-                ->limit(8)
+                ->limit(10)
+                ->get(),
+            'latestProducts' => fn () => $this->cardQuery()
+                ->latest()
+                ->limit(10)
                 ->get(),
             'featuredCollections' => fn () => Collection::query()
                 ->has('products')
@@ -35,9 +53,20 @@ final class HomeController extends Controller
                 ->scopes('enabled')
                 ->whereNull('parent_id')
                 ->with('media')
+                ->withCount(['products' => fn ($q) => $q->whereNull(shopper_table('products').'.deleted_at')])
                 ->orderBy('position')
-                ->limit(8)
+                ->limit(10)
                 ->get(),
         ]);
+    }
+
+    private function cardQuery(): Builder
+    {
+        return Product::query()
+            ->select(self::CARD_COLUMNS)
+            ->with(['media', 'brand.media'])
+            ->withCurrentPrices()
+            ->withCurrentStock()
+            ->scopes('publish');
     }
 }

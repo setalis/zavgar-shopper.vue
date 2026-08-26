@@ -27,6 +27,7 @@ final class SearchController extends Controller
                 ->matchingSearch($query)
                 ->with(['media', 'brand.media'])
                 ->withCurrentPrices()
+                ->withCurrentStock()
                 ->paginate(12)
                 ->withQueryString();
 

@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { Search as SearchIcon } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Container from '@/components/shop/container.vue';
+import PageHead from '@/components/shop/page-head.vue';
 import ProductCard from '@/components/shop/product-card.vue';
-import { Input } from '@/components/ui/input';
+import ProductPagination from '@/components/shop/product-pagination.vue';
+import type { PaginatorLink } from '@/components/shop/product-pagination.vue';
 import { useTrans } from '@/composables/useTrans';
+import { home } from '@/routes';
 import { search as searchRoute } from '@/routes/shop';
 import type { Product } from '@/types/shop';
 
@@ -14,7 +17,7 @@ type Paginated<T> = {
     total: number;
     current_page: number;
     last_page: number;
-    links: Array<{ url: string | null; label: string; active: boolean }>;
+    links: PaginatorLink[];
 };
 
 const props = defineProps<{
@@ -26,6 +29,11 @@ const { t } = useTrans();
 
 const search = ref<string>(props.query);
 let debounceId: number | undefined;
+
+const crumbs = computed(() => [
+    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.search.heading') },
+]);
 
 watch(search, (value) => {
     window.clearTimeout(debounceId);
@@ -42,100 +50,70 @@ watch(search, (value) => {
 <template>
     <Head :title="t('shop.search.title')" />
 
-    <Container class="py-8 sm:py-12">
-        <div class="mx-auto max-w-xl text-center">
-            <h1
-                class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-            >
-                {{ t('shop.search.heading') }}
-            </h1>
-            <div class="relative mt-6">
-                <SearchIcon
-                    class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
-                    aria-hidden="true"
-                />
-                <Input
-                    v-model="search"
-                    type="search"
-                    :placeholder="t('shop.search.placeholder')"
-                    autofocus
-                    :aria-label="t('shop.search.heading')"
-                    class="pl-9"
-                />
-            </div>
+    <PageHead :title="t('shop.search.heading')" :crumbs="crumbs">
+        <div class="relative mt-6 max-w-[560px]">
+            <SearchIcon
+                class="pointer-events-none absolute top-1/2 left-5 size-[18px] -translate-y-1/2 text-ink-faint"
+                aria-hidden="true"
+            />
+            <input
+                v-model="search"
+                type="search"
+                autofocus
+                :placeholder="t('shop.search.placeholder')"
+                :aria-label="t('shop.search.heading')"
+                class="w-full rounded-full border border-rule-strong bg-paper py-3.5 pr-5 pl-13 text-base transition placeholder:text-ink-faint focus:border-brand focus:ring-4 focus:ring-brand/12 focus:outline-none"
+            />
+        </div>
+    </PageHead>
+
+    <Container class="py-10 md:py-14">
+        <p
+            v-if="products === null"
+            class="rounded-lg border border-rule bg-paper py-20 text-center text-sm text-ink-mute"
+        >
+            {{ t('shop.search.min_chars') }}
+        </p>
+
+        <div
+            v-else-if="!products.data.length"
+            class="flex flex-col items-center justify-center rounded-lg border border-rule bg-paper py-20 text-center"
+        >
+            <SearchIcon class="size-10 text-ink-faint" aria-hidden="true" />
+            <h3 class="mt-4 font-heading text-md font-bold text-ink">
+                {{ t('shop.search.no_results') }}
+            </h3>
+            <p class="mt-1 text-sm text-ink-mute">
+                {{ t('shop.search.try_different') }}
+            </p>
         </div>
 
-        <div class="mt-10">
-            <p
-                v-if="products === null"
-                class="text-center text-sm text-zinc-500"
-            >
-                {{ t('shop.search.min_chars') }}
+        <template v-else>
+            <p class="mb-5 font-mono text-xs tracking-[0.04em] text-ink-mute">
+                {{
+                    t('shop.search.results_for', {
+                        count: products.total,
+                        results:
+                            products.total === 1
+                                ? t('shop.search.result')
+                                : t('shop.search.results'),
+                        query,
+                    })
+                }}
             </p>
 
-            <div
-                v-else-if="!products.data.length"
-                class="flex flex-col items-center justify-center py-16 text-center"
-            >
-                <SearchIcon
-                    class="size-12 text-zinc-300 dark:text-zinc-600"
-                    aria-hidden="true"
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                <ProductCard
+                    v-for="product in products.data"
+                    :key="product.id"
+                    :product="product"
                 />
-                <h3
-                    class="mt-4 text-sm font-semibold text-zinc-900 dark:text-white"
-                >
-                    {{ t('shop.search.no_results') }}
-                </h3>
-                <p class="mt-1 text-sm text-zinc-500">
-                    {{ t('shop.search.try_different') }}
-                </p>
             </div>
 
-            <template v-else>
-                <p class="mb-6 text-sm text-zinc-500">
-                    {{
-                        t('shop.search.results_for', {
-                            count: products.total,
-                            results:
-                                products.total === 1
-                                    ? t('shop.search.result')
-                                    : t('shop.search.results'),
-                            query,
-                        })
-                    }}
-                </p>
-
-                <div
-                    class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-6"
-                >
-                    <ProductCard
-                        v-for="product in products.data"
-                        :key="product.id"
-                        :product="product"
-                    />
-                </div>
-
-                <nav
-                    v-if="products.last_page > 1"
-                    class="mt-8 flex justify-center gap-1"
-                    :aria-label="t('shop.search.pagination')"
-                >
-                    <Link
-                        v-for="link in products.links"
-                        :key="link.label"
-                        :href="link.url ?? '#'"
-                        :class="[
-                            'inline-flex h-9 min-w-9 items-center justify-center rounded-md px-3 text-sm transition',
-                            link.active
-                                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900'
-                                : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800',
-                            link.url === null &&
-                                'pointer-events-none opacity-40',
-                        ]"
-                        v-html="link.label"
-                    />
-                </nav>
-            </template>
-        </div>
+            <ProductPagination
+                :links="products.links"
+                :label="t('shop.search.pagination')"
+            />
+        </template>
     </Container>
 </template>

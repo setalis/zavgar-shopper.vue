@@ -24,6 +24,7 @@ const items = computed<NavItem[]>(() => [
 
 function isActive(item: NavItem): boolean {
     const path = (page.url ?? '').split('?')[0];
+
     return item.exact ? path === item.href : path.startsWith(item.href);
 }
 </script>
@@ -33,7 +34,7 @@ function isActive(item: NavItem): boolean {
         <div class="grid grid-cols-1 lg:grid-cols-5 lg:gap-x-12">
             <div class="lg:col-span-1">
                 <h2
-                    class="hidden font-heading text-xl leading-6 font-medium text-zinc-900 lg:block dark:text-white"
+                    class="hidden font-heading text-xl leading-6 font-medium text-ink lg:block"
                 >
                     {{ t('account.nav.title') }}
                 </h2>
@@ -49,8 +50,8 @@ function isActive(item: NavItem): boolean {
                         :class="[
                             'inline-block text-sm hover:underline hover:decoration-2',
                             isActive(item)
-                                ? 'font-medium text-zinc-900 dark:text-white'
-                                : 'text-zinc-500',
+                                ? 'font-medium text-ink'
+                                : 'text-ink-mute hover:text-ink',
                         ]"
                     >
                         {{ item.label }}
@@ -68,8 +69,8 @@ function isActive(item: NavItem): boolean {
                         :class="[
                             'inline-block text-sm hover:underline hover:decoration-2',
                             isActive(item)
-                                ? 'font-medium text-zinc-900 dark:text-white'
-                                : 'text-zinc-500',
+                                ? 'font-medium text-ink'
+                                : 'text-ink-mute hover:text-ink',
                         ]"
                     >
                         {{ item.label }}
@@ -78,7 +79,7 @@ function isActive(item: NavItem): boolean {
                     <form method="POST" :action="logout.url()">
                         <button
                             type="submit"
-                            class="text-sm text-red-600 transition hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                            class="text-sm text-destructive transition hover:opacity-80"
                         >
                             {{ t('account.nav.log_out') }}
                         </button>

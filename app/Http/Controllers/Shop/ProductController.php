@@ -20,7 +20,8 @@ final class ProductController extends Controller
         $query = Product::query()
             ->scopes('publish')
             ->with(['media', 'brand.media'])
-            ->withCurrentPrices();
+            ->withCurrentPrices()
+            ->withCurrentStock();
 
         $search = (string) $request->string('search', '');
 
@@ -87,9 +88,9 @@ final class ProductController extends Controller
             'brand.media',
             'media',
             'prices' => $priceConstraint,
+            'relatedProducts' => fn ($q) => $q->withCurrentPrices()->withCurrentStock(),
             'relatedProducts.brand.media',
             'relatedProducts.media',
-            'relatedProducts.prices' => $priceConstraint,
             'relatedProducts.variants' => fn ($q) => $q->select(['id', 'product_id']),
             'relatedProducts.variants.prices' => $priceConstraint,
             'variants.media',

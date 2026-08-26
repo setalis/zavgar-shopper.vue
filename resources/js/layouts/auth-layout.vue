@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import AuthLayout from '@/layouts/auth/auth-simple-layout.vue';
 import { useTrans } from '@/composables/useTrans';
+import AuthLayout from '@/layouts/auth/auth-simple-layout.vue';
 
 const props = defineProps<{
     title?: string;
@@ -21,10 +21,7 @@ const resolvedDescription = computed(() =>
 </script>
 
 <template>
-    <AuthLayout
-        :title="resolvedTitle"
-        :description="resolvedDescription"
-    >
+    <AuthLayout :title="resolvedTitle" :description="resolvedDescription">
         <slot />
     </AuthLayout>
 </template>

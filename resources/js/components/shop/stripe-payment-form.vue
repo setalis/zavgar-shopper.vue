@@ -2,8 +2,8 @@
 import { Lock } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
-import { useStripeElements } from '@/composables/useStripeElements';
 import { useShop } from '@/composables/useShop';
+import { useStripeElements } from '@/composables/useStripeElements';
 import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 
@@ -35,22 +35,24 @@ async function pay(): Promise<void> {
     <div class="space-y-4">
         <div ref="mount" class="min-h-[240px]" />
 
-        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="text-sm text-destructive">{{ error }}</p>
 
-        <div
-            class="flex flex-col gap-3 border-t border-zinc-200 pt-5 dark:border-zinc-700"
-        >
-            <div class="flex items-center justify-between gap-4">
+        <div class="flex flex-col gap-3 border-t border-rule pt-5">
+            <div class="flex flex-wrap items-center justify-between gap-4">
                 <div v-if="total !== undefined" class="flex flex-col">
-                    <span class="text-xs text-zinc-500"
-                        >{{ t('shop.stripe.total') }} {{ taxLabel }}</span
-                    >
-                    <span
-                        class="text-lg font-semibold text-zinc-900 dark:text-white"
-                        >{{ formatMoney(total, currency) }}</span
-                    >
+                    <span class="font-mono text-xs text-ink-mute">
+                        {{ t('shop.stripe.total') }} {{ taxLabel }}
+                    </span>
+                    <span class="font-heading text-xl font-extrabold text-ink">
+                        {{ formatMoney(total, currency) }}
+                    </span>
                 </div>
-                <Button type="button" :disabled="submitting" @click="pay">
+                <Button
+                    type="button"
+                    size="lg"
+                    :disabled="submitting"
+                    @click="pay"
+                >
                     {{
                         submitting
                             ? t('shop.stripe.processing')
@@ -58,7 +60,9 @@ async function pay(): Promise<void> {
                     }}
                 </Button>
             </div>
-            <p class="inline-flex items-center gap-1.5 text-xs text-zinc-500">
+            <p
+                class="inline-flex items-center gap-1.5 font-mono text-xs text-ink-mute"
+            >
                 <Lock class="size-3" aria-hidden="true" />
                 {{ t('shop.stripe.secure') }}
             </p>

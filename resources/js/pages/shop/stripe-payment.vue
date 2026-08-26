@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import { Lock } from 'lucide-vue-next';
 import { ref } from 'vue';
+import Container from '@/components/shop/container.vue';
 import { Button } from '@/components/ui/button';
 import { useStripeElements } from '@/composables/useStripeElements';
 import { useTrans } from '@/composables/useTrans';
@@ -33,30 +35,45 @@ async function pay(): Promise<void> {
 <template>
     <Head :title="t('shop.stripe_payment.title')" />
 
-    <div class="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1
-            class="font-heading text-2xl font-semibold text-zinc-900 dark:text-white"
-        >
-            {{ t('shop.stripe_payment.heading') }}
-        </h1>
-        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-            {{ t('shop.stripe_payment.order') }}
-            <span class="font-mono">{{ order.number }}</span>
-        </p>
+    <Container class="py-14 md:py-20">
+        <div class="mx-auto max-w-2xl">
+            <h1 class="text-2xl">
+                {{ t('shop.stripe_payment.heading') }}
+            </h1>
+            <p class="mt-2 text-sm text-ink-mute">
+                {{ t('shop.stripe_payment.order') }}
+                <span class="font-mono text-ink">{{ order.number }}</span>
+            </p>
 
-        <form class="mt-8 space-y-4" @submit.prevent="pay">
-            <div ref="paymentElementRef" />
-
-            <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-
-            <Button
-                type="submit"
-                :disabled="!ready || submitting"
-                class="w-full"
+            <form
+                class="mt-8 space-y-4 rounded-lg border border-rule bg-paper p-6 md:p-8"
+                @submit.prevent="pay"
             >
-                <span v-if="submitting">{{ t('shop.stripe_payment.processing') }}</span>
-                <span v-else>{{ t('shop.stripe_payment.pay_now') }}</span>
-            </Button>
-        </form>
-    </div>
+                <div ref="paymentElementRef" />
+
+                <p v-if="error" class="text-sm text-destructive">
+                    {{ error }}
+                </p>
+
+                <Button
+                    type="submit"
+                    block
+                    size="lg"
+                    :disabled="!ready || submitting"
+                >
+                    <span v-if="submitting">
+                        {{ t('shop.stripe_payment.processing') }}
+                    </span>
+                    <span v-else>{{ t('shop.stripe_payment.pay_now') }}</span>
+                </Button>
+
+                <p
+                    class="inline-flex items-center gap-1.5 font-mono text-xs text-ink-mute"
+                >
+                    <Lock class="size-3" aria-hidden="true" />
+                    {{ t('shop.checkout.secure_encrypted') }}
+                </p>
+            </form>
+        </div>
+    </Container>
 </template>

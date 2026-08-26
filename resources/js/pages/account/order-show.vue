@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import Card from '@/components/shop/card.vue';
 import OrderStatusBadge from '@/components/account/order-status-badge.vue';
+import Card from '@/components/shop/card.vue';
 import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import { dashboard } from '@/routes';
@@ -83,31 +83,25 @@ function formatDate(value: string): string {
         "
     />
 
-    <nav class="flex items-center gap-2 text-sm text-zinc-500">
-        <Link
-            :href="dashboard.url()"
-            class="hover:text-zinc-900 dark:hover:text-white"
-            >{{ t('account.order_show.breadcrumb.account') }}</Link
-        >
+    <nav class="flex items-center gap-2 text-sm text-ink-mute">
+        <Link :href="dashboard.url()" class="hover:text-ink">{{
+            t('account.order_show.breadcrumb.account')
+        }}</Link>
         <span>/</span>
-        <Link
-            :href="accountOrders.url()"
-            class="hover:text-zinc-900 dark:hover:text-white"
-            >{{ t('account.order_show.breadcrumb.orders') }}</Link
-        >
+        <Link :href="accountOrders.url()" class="hover:text-ink">{{
+            t('account.order_show.breadcrumb.orders')
+        }}</Link>
         <span>/</span>
-        <span class="text-zinc-900 dark:text-white">{{
+        <span class="text-ink">{{
             t('account.order_show.breadcrumb.details')
         }}</span>
     </nav>
 
     <div class="mt-6">
-        <h1
-            class="font-heading text-2xl font-bold text-zinc-900 dark:text-white"
-        >
+        <h1 class="font-heading text-2xl font-bold text-ink">
             {{ t('account.order_show.heading') }}
         </h1>
-        <p class="mt-1 text-sm text-zinc-500">
+        <p class="mt-1 text-sm text-ink-mute">
             {{
                 t('account.order_show.ordered_on', {
                     date: formatDate(order.created_at),
@@ -135,13 +129,11 @@ function formatDate(value: string): string {
     <div class="mt-8 grid gap-6 lg:grid-cols-3">
         <div v-if="order.shipping_address">
             <Card>
-                <h3
-                    class="font-heading text-sm font-semibold text-zinc-900 dark:text-white"
-                >
+                <h3 class="font-heading text-sm font-semibold text-ink">
                     {{ t('account.order_show.shipping_address') }}
                 </h3>
-                <address class="mt-3 text-sm text-zinc-500 not-italic">
-                    <p class="font-medium text-zinc-900 dark:text-white">
+                <address class="mt-3 text-sm text-ink-mute not-italic">
+                    <p class="font-medium text-ink">
                         {{
                             order.shipping_address.full_name ??
                             `${order.shipping_address.first_name ?? ''} ${order.shipping_address.last_name ?? ''}`.trim()
@@ -172,32 +164,30 @@ function formatDate(value: string): string {
 
         <div class="lg:col-span-2">
             <Card>
-                <h3
-                    class="font-heading text-sm font-semibold text-zinc-900 dark:text-white"
-                >
+                <h3 class="font-heading text-sm font-semibold text-ink">
                     {{ t('account.order_show.summary.heading') }}
                 </h3>
                 <dl class="mt-3 space-y-2 text-sm">
                     <div class="flex justify-between">
-                        <dt class="text-zinc-500">
+                        <dt class="text-ink-mute">
                             {{ t('account.order_show.summary.items') }}
                         </dt>
-                        <dd class="text-zinc-900 dark:text-white">
+                        <dd class="text-ink">
                             {{ formatMoney(itemsTotal, order.currency_code) }}
                         </dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-zinc-500">
+                        <dt class="text-ink-mute">
                             {{ t('account.order_show.summary.delivery') }}
                             <span
                                 v-if="order.shipping_option?.carrier?.name"
-                                class="text-zinc-400"
+                                class="text-ink-faint"
                                 >({{
                                     order.shipping_option.carrier.name
                                 }})</span
                             >
                         </dt>
-                        <dd class="text-zinc-900 dark:text-white">
+                        <dd class="text-ink">
                             {{
                                 shippingPrice > 0
                                     ? formatMoney(
@@ -212,10 +202,10 @@ function formatDate(value: string): string {
                         v-if="(order.tax_amount ?? 0) > 0"
                         class="flex justify-between"
                     >
-                        <dt class="text-zinc-500">
+                        <dt class="text-ink-mute">
                             {{ t('account.order_show.summary.tax') }}
                         </dt>
-                        <dd class="text-zinc-900 dark:text-white">
+                        <dd class="text-ink">
                             {{
                                 formatMoney(
                                     order.tax_amount!,
@@ -224,13 +214,11 @@ function formatDate(value: string): string {
                             }}
                         </dd>
                     </div>
-                    <div
-                        class="flex justify-between border-t border-zinc-200 pt-2 dark:border-zinc-700"
-                    >
-                        <dt class="font-semibold text-zinc-900 dark:text-white">
+                    <div class="flex justify-between border-t border-rule pt-2">
+                        <dt class="font-semibold text-ink">
                             {{ t('account.order_show.summary.total') }}
                         </dt>
-                        <dd class="font-semibold text-zinc-900 dark:text-white">
+                        <dd class="font-semibold text-ink">
                             {{
                                 formatMoney(
                                     order.price_amount,
@@ -246,14 +234,14 @@ function formatDate(value: string): string {
 
     <div class="mt-8 overflow-hidden">
         <Card class="!p-0">
-            <div class="divide-y divide-zinc-200 dark:divide-white/10">
+            <div class="divide-y divide-rule">
                 <div
                     v-for="item in order.items"
                     :key="item.id"
                     class="flex gap-4 px-5 py-4"
                 >
                     <div
-                        class="size-24 shrink-0 overflow-hidden rounded-lg bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700"
+                        class="size-24 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-rule"
                     >
                         <img
                             v-if="thumbnail(item)"
@@ -269,24 +257,24 @@ function formatDate(value: string): string {
                             :href="
                                 shop.product.url({ product: item.product.slug })
                             "
-                            class="line-clamp-2 font-heading text-sm font-medium text-zinc-900 hover:underline dark:text-white"
+                            class="line-clamp-2 font-heading text-sm font-medium text-ink hover:underline"
                         >
                             {{ item.name }}
                         </Link>
                         <p
                             v-else
-                            class="line-clamp-2 font-heading text-sm font-medium text-zinc-900 dark:text-white"
+                            class="line-clamp-2 font-heading text-sm font-medium text-ink"
                         >
                             {{ item.name }}
                         </p>
-                        <p v-if="item.sku" class="mt-0.5 text-xs text-zinc-500">
+                        <p v-if="item.sku" class="mt-0.5 text-xs text-ink-mute">
                             {{
                                 t('account.order_show.sku', {
                                     sku: item.sku,
                                 })
                             }}
                         </p>
-                        <p class="mt-1 text-sm text-zinc-500">
+                        <p class="mt-1 text-sm text-ink-mute">
                             {{
                                 t('account.order_show.quantity_price', {
                                     quantity: item.quantity,
@@ -298,9 +286,7 @@ function formatDate(value: string): string {
                             }}
                         </p>
                     </div>
-                    <p
-                        class="shrink-0 text-sm font-medium text-zinc-900 dark:text-white"
-                    >
+                    <p class="shrink-0 text-sm font-medium text-ink">
                         {{
                             formatMoney(
                                 item.unit_price_amount * item.quantity,

@@ -145,7 +145,9 @@ onUnmounted(() => clearTwoFactorAuthData());
 
             <div>
                 <Button v-if="hasSetupData" @click="showSetupModal = true">
-                    <ShieldCheck />{{ t('settings.security.two_factor.continue_setup') }}
+                    <ShieldCheck />{{
+                        t('settings.security.two_factor.continue_setup')
+                    }}
                 </Button>
                 <Form
                     v-else

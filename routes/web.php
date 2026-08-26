@@ -28,6 +28,7 @@ Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->n
 Route::get('collections/{collection:slug}', [CollectionController::class, 'show'])->name('shop.collection');
 Route::get('brands/{brand:slug}', BrandController::class)->name('shop.brand');
 Route::get('search', SearchController::class)->middleware('throttle:30,1')->name('shop.search');
+Route::inertia('contact', 'shop/contact')->name('shop.contact');
 
 // Cart
 Route::get('cart', [CartController::class, 'index'])->name('shop.cart');

@@ -82,7 +82,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:79
+ * @see app/Http/Controllers/Shop/ProductController.php:80
  * @route '/shop/{product}'
  */
 export const product = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ product.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:79
+ * @see app/Http/Controllers/Shop/ProductController.php:80
  * @route '/shop/{product}'
  */
 product.url = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ product.url = (args: { product: string | { slug: string } } | [product: string |
 
 /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:79
+ * @see app/Http/Controllers/Shop/ProductController.php:80
  * @route '/shop/{product}'
  */
 product.get = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -139,7 +139,7 @@ product.get = (args: { product: string | { slug: string } } | [product: string |
 })
 /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:79
+ * @see app/Http/Controllers/Shop/ProductController.php:80
  * @route '/shop/{product}'
  */
 product.head = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -149,7 +149,7 @@ product.head = (args: { product: string | { slug: string } } | [product: string 
 
     /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:79
+ * @see app/Http/Controllers/Shop/ProductController.php:80
  * @route '/shop/{product}'
  */
     const productForm = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -159,7 +159,7 @@ product.head = (args: { product: string | { slug: string } } | [product: string 
 
             /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:79
+ * @see app/Http/Controllers/Shop/ProductController.php:80
  * @route '/shop/{product}'
  */
         productForm.get = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -168,7 +168,7 @@ product.head = (args: { product: string | { slug: string } } | [product: string 
         })
             /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:79
+ * @see app/Http/Controllers/Shop/ProductController.php:80
  * @route '/shop/{product}'
  */
         productForm.head = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -645,6 +645,84 @@ search.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     
     search.form = searchForm
 /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/contact'
+ */
+export const contact = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: contact.url(options),
+    method: 'get',
+})
+
+contact.definition = {
+    methods: ["get","head"],
+    url: '/contact',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/contact'
+ */
+contact.url = (options?: RouteQueryOptions) => {
+    return contact.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/contact'
+ */
+contact.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: contact.url(options),
+    method: 'get',
+})
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/contact'
+ */
+contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: contact.url(options),
+    method: 'head',
+})
+
+    /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/contact'
+ */
+    const contactForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: contact.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/contact'
+ */
+        contactForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: contact.url(options),
+            method: 'get',
+        })
+            /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/contact'
+ */
+        contactForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: contact.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    contact.form = contactForm
+/**
 * @see \App\Http\Controllers\Shop\CartController::cart
  * @see app/Http/Controllers/Shop/CartController.php:22
  * @route '/cart'
@@ -730,6 +808,7 @@ category: Object.assign(category, category),
 collection: Object.assign(collection, collection),
 brand: Object.assign(brand, brand),
 search: Object.assign(search, search),
+contact: Object.assign(contact, contact),
 cart: Object.assign(cart, cartB8cf73),
 zone: Object.assign(zone, zone),
 checkout: Object.assign(checkout, checkout),

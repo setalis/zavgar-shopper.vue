@@ -38,8 +38,11 @@ const label = computed(() =>
             loading="lazy"
             class="h-5 max-w-24 object-contain object-left"
         />
-        <span v-else class="text-xs text-zinc-500 dark:text-zinc-400">{{
-            brand.name
-        }}</span>
+        <span
+            v-else
+            class="font-mono text-[11px] tracking-[0.04em] text-ink-mute"
+        >
+            {{ brand.name }}
+        </span>
     </component>
 </template>

@@ -11,21 +11,32 @@ const props = withDefaults(
     defineProps<{
         price: StorefrontPrice | null;
         size?: Size;
+        showSaveBadge?: boolean;
     }>(),
-    { size: 'sm' },
+    { size: 'sm', showSaveBadge: false },
 );
 
 const { currency, taxLabel } = useShop();
 const { t } = useTrans();
 const { money } = useFormat();
 
-const textSize = computed<string>(() => {
-    return {
-        lg: 'text-2xl',
-        md: 'text-lg',
-        sm: 'text-sm',
-    }[props.size];
-});
+const nowClass = computed<string>(
+    () =>
+        ({
+            lg: 'text-2xl',
+            md: 'text-md',
+            sm: 'text-base',
+        })[props.size],
+);
+
+const wasClass = computed<string>(
+    () =>
+        ({
+            lg: 'text-base',
+            md: 'text-sm',
+            sm: 'text-xs',
+        })[props.size],
+);
 
 const percentage = computed<number | null>(() => {
     if (
@@ -34,46 +45,62 @@ const percentage = computed<number | null>(() => {
     ) {
         return null;
     }
+
     return Math.round(
         ((props.price.compare_amount - props.price.amount) /
             props.price.compare_amount) *
             100,
     );
 });
+
+const saved = computed<number | null>(() => {
+    if (!props.price?.compare_amount) {
+        return null;
+    }
+
+    return props.price.compare_amount - props.price.amount;
+});
 </script>
 
 <template>
-    <div :class="textSize">
-        <template v-if="price">
-            <p class="flex items-center gap-2">
-                <span class="font-semibold text-zinc-900 dark:text-white">
-                    {{
-                        (price.from ? `${t('shop.price.from')} ` : '') +
-                        money(price.amount, currency)
-                    }}
-                </span>
-                <span v-if="taxLabel" class="text-xs text-zinc-500">{{
-                    taxLabel
-                }}</span>
-            </p>
+    <div v-if="price" class="flex flex-wrap items-baseline gap-2">
+        <span :class="['font-heading font-bold text-ink', nowClass]">
+            {{
+                (price.from ? `${t('shop.price.from')} ` : '') +
+                money(price.amount, currency)
+            }}
+        </span>
 
-            <p
-                v-if="percentage"
-                class="mt-0.5 flex items-center gap-1.5 sm:mt-0 sm:inline-flex"
-            >
-                <span class="sr-only">{{ t('shop.price.original_sr') }}</span>
-                <span class="text-zinc-400 line-through">{{
-                    money(price.compare_amount ?? 0, currency)
-                }}</span>
-                <span
-                    class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
-                >
-                    -{{ percentage }}%
-                </span>
-            </p>
-        </template>
-        <p v-else class="font-semibold text-zinc-900 dark:text-white">
-            {{ t('shop.price.unavailable') }}
-        </p>
+        <span
+            v-if="percentage"
+            :class="['font-mono text-ink-faint line-through', wasClass]"
+        >
+            <span class="sr-only">{{ t('shop.price.original_sr') }}</span>
+            {{ money(price.compare_amount ?? 0, currency) }}
+        </span>
+
+        <span
+            v-if="percentage && showSaveBadge"
+            class="inline-flex items-center rounded-sm bg-emerald/12 px-2 py-1 font-mono text-[11px] font-semibold tracking-[0.04em] text-emerald"
+        >
+            {{
+                t('shop.price.save', {
+                    amount: money(saved ?? 0, currency),
+                })
+            }}
+        </span>
+        <span
+            v-else-if="percentage"
+            class="inline-flex items-center rounded-sm bg-rose/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-rose"
+        >
+            -{{ percentage }}%
+        </span>
+
+        <span v-if="taxLabel" class="font-mono text-[11px] text-ink-mute">
+            {{ taxLabel }}
+        </span>
     </div>
+    <p v-else class="font-heading font-bold text-ink-mute">
+        {{ t('shop.price.unavailable') }}
+    </p>
 </template>

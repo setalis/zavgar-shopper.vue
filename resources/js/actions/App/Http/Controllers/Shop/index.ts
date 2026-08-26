@@ -2,6 +2,7 @@ import HomeController from './HomeController'
 import ProductController from './ProductController'
 import CategoryController from './CategoryController'
 import CollectionController from './CollectionController'
+import BrandController from './BrandController'
 import SearchController from './SearchController'
 import CartController from './CartController'
 import ZoneController from './ZoneController'
@@ -13,6 +14,7 @@ const Shop = {
 ProductController: Object.assign(ProductController, ProductController),
 CategoryController: Object.assign(CategoryController, CategoryController),
 CollectionController: Object.assign(CollectionController, CollectionController),
+BrandController: Object.assign(BrandController, BrandController),
 SearchController: Object.assign(SearchController, SearchController),
 CartController: Object.assign(CartController, CartController),
 ZoneController: Object.assign(ZoneController, ZoneController),

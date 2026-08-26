@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { Minus, Plus } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import BrandLink from '@/components/shop/brand-link.vue';
 import Container from '@/components/shop/container.vue';
 import PriceDisplay from '@/components/shop/price-display.vue';
 import ProductCard from '@/components/shop/product-card.vue';
@@ -212,6 +213,8 @@ function addToCart(): void {
                 >
                     {{ product.name }}
                 </h1>
+
+                <BrandLink v-if="product.brand" :brand="product.brand" />
 
                 <p
                     v-if="outOfStock"

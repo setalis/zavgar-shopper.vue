@@ -25,7 +25,7 @@ final class SearchController extends Controller
             : Product::query()
                 ->scopes('publish')
                 ->matchingSearch($query)
-                ->with(['media', 'brand'])
+                ->with(['media', 'brand.media'])
                 ->withCurrentPrices()
                 ->paginate(12)
                 ->withQueryString();

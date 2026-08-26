@@ -33,7 +33,7 @@ final class CategoryController extends Controller
         $query = Product::query()
             ->scopes('publish')
             ->whereHas('categories', fn ($q) => $q->where('id', $category->id))
-            ->with(['media', 'brand'])
+            ->with(['media', 'brand.media'])
             ->withCurrentPrices();
 
         $query = match ($sort) {

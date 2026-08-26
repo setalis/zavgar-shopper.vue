@@ -18,7 +18,7 @@ final class HomeController extends Controller
         return Inertia::render('shop/home', [
             'featuredProducts' => fn () => Product::query()
                 ->select('id', 'name', 'slug', 'brand_id')
-                ->with(['media', 'brand'])
+                ->with(['media', 'brand.media'])
                 ->withCurrentPrices()
                 ->where('featured', true)
                 ->scopes('publish')

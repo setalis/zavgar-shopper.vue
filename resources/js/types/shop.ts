@@ -2,6 +2,7 @@
 
 import type {
   Address,
+  Brand as BaseBrand,
   Cart as BaseCart,
   CartLine as BaseCartLine,
   Category as BaseCategory,
@@ -19,7 +20,6 @@ export { AddressType } from '@shopperlabs/shopper-types';
 
 export type {
   Address,
-  Brand,
   Channel,
   Country,
   Media,
@@ -36,6 +36,8 @@ type WithStorefrontMedia = {
   thumbnail?: string | null;
   images?: Media[];
 };
+
+export type Brand = BaseBrand & WithStorefrontMedia;
 
 export type Category = BaseCategory &
   WithStorefrontMedia & {
@@ -62,8 +64,9 @@ export type StorefrontPrice = {
   from: boolean;
 };
 
-export type Product = BaseProduct &
+export type Product = Omit<BaseProduct, 'brand'> &
   WithStorefrontMedia & {
+    brand?: Brand | null;
     variants?: ProductVariant[];
     related_products?: Product[];
     storefront_price?: StorefrontPrice | null;

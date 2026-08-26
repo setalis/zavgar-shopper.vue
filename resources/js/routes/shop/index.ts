@@ -465,6 +465,108 @@ collection.head = (args: { collection: string | { slug: string } } | [collection
     
     collection.form = collectionForm
 /**
+* @see \App\Http\Controllers\Shop\BrandController::__invoke
+ * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @route '/brands/{brand}'
+ */
+export const brand = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: brand.url(args, options),
+    method: 'get',
+})
+
+brand.definition = {
+    methods: ["get","head"],
+    url: '/brands/{brand}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Shop\BrandController::__invoke
+ * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @route '/brands/{brand}'
+ */
+brand.url = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { brand: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'slug' in args) {
+            args = { brand: args.slug }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    brand: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        brand: typeof args.brand === 'object'
+                ? args.brand.slug
+                : args.brand,
+                }
+
+    return brand.definition.url
+            .replace('{brand}', parsedArgs.brand.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Shop\BrandController::__invoke
+ * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @route '/brands/{brand}'
+ */
+brand.get = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: brand.url(args, options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\Shop\BrandController::__invoke
+ * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @route '/brands/{brand}'
+ */
+brand.head = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: brand.url(args, options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\Shop\BrandController::__invoke
+ * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @route '/brands/{brand}'
+ */
+    const brandForm = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: brand.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Shop\BrandController::__invoke
+ * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @route '/brands/{brand}'
+ */
+        brandForm.get = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: brand.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Shop\BrandController::__invoke
+ * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @route '/brands/{brand}'
+ */
+        brandForm.head = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: brand.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    brand.form = brandForm
+/**
 * @see \App\Http\Controllers\Shop\SearchController::__invoke
  * @see app/Http/Controllers/Shop/SearchController.php:15
  * @route '/search'
@@ -626,6 +728,7 @@ product: Object.assign(product, product),
 categories: Object.assign(categories, categories),
 category: Object.assign(category, category),
 collection: Object.assign(collection, collection),
+brand: Object.assign(brand, brand),
 search: Object.assign(search, search),
 cart: Object.assign(cart, cartB8cf73),
 zone: Object.assign(zone, zone),

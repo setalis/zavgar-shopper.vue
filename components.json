@@ -1,8 +1,8 @@
 {
   "$schema": "https://shadcn-vue.com/schema.json",
-  "style": "new-york-v4",
+  "style": "reka-nova",
   "tailwind": {
-    "config": "tailwind.config.js",
+    "config": "",
     "css": "resources/css/app.css",
     "baseColor": "neutral",
     "cssVariables": true,
@@ -15,5 +15,12 @@
     "ui": "@/components/ui",
     "lib": "@/lib"
   },
-  "iconLibrary": "lucide"
+  "iconLibrary": "hugeicons",
+  "font": "inter",
+  "typescript": true,
+  "rtl": false,
+  "pointer": true,
+  "menuColor": "default",
+  "menuAccent": "subtle",
+  "registries": {}
 }

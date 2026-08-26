@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Account\AddressController;
 use App\Http\Controllers\Account\OrderController as AccountOrderController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\Shop\BrandController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\CategoryController;
 use App\Http\Controllers\Shop\CheckoutController;
@@ -25,6 +26,7 @@ Route::get('shop/{product:slug}', [ProductController::class, 'show'])->name('sho
 Route::get('categories', [CategoryController::class, 'index'])->name('shop.categories');
 Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->name('shop.category');
 Route::get('collections/{collection:slug}', [CollectionController::class, 'show'])->name('shop.collection');
+Route::get('brands/{brand:slug}', BrandController::class)->name('shop.brand');
 Route::get('search', SearchController::class)->middleware('throttle:30,1')->name('shop.search');
 
 // Cart

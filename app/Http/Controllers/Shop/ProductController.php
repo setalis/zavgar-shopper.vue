@@ -19,7 +19,7 @@ final class ProductController extends Controller
     {
         $query = Product::query()
             ->scopes('publish')
-            ->with(['media', 'brand'])
+            ->with(['media', 'brand.media'])
             ->withCurrentPrices();
 
         $search = (string) $request->string('search', '');
@@ -84,10 +84,10 @@ final class ProductController extends Controller
         $priceConstraint = fn ($q) => $q->whereRelation('currency', 'code', $currencyCode);
 
         $product->load([
-            'brand',
+            'brand.media',
             'media',
             'prices' => $priceConstraint,
-            'relatedProducts.brand',
+            'relatedProducts.brand.media',
             'relatedProducts.media',
             'relatedProducts.prices' => $priceConstraint,
             'relatedProducts.variants' => fn ($q) => $q->select(['id', 'product_id']),

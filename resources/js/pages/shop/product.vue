@@ -31,7 +31,21 @@ import { useShop } from '@/composables/useShop';
 import { useTrans } from '@/composables/useTrans';
 import { home, login } from '@/routes';
 import * as shop from '@/routes/shop';
-import type { Product, StorefrontPrice, VariantOptions } from '@/types/shop';
+import type { Product, ProductVariant, StorefrontPrice, VariantOptions } from '@/types/shop';
+
+type SpecSource = Pick<
+    Product | ProductVariant,
+    | 'sku'
+    | 'barcode'
+    | 'weight_value'
+    | 'weight_unit'
+    | 'width_value'
+    | 'width_unit'
+    | 'height_value'
+    | 'depth_value'
+    | 'volume_value'
+    | 'volume_unit'
+>;
 
 type ProductReview = {
     id: number;
@@ -270,29 +284,54 @@ const ratingDistribution = computed(() =>
     }),
 );
 
+const specSource = computed<SpecSource>(() => selectedVariant.value ?? props.product);
+
+function formatWeight(source: SpecSource): string | null {
+    if (!source.weight_value) {
+        return null;
+    }
+
+    return `${source.weight_value} ${source.weight_unit ?? ''}`.trim();
+}
+
+function formatDimensions(source: SpecSource): string | null {
+    if (!source.width_value || !source.height_value) {
+        return null;
+    }
+
+    return `${source.width_value} × ${source.height_value} × ${source.depth_value ?? 0} ${source.width_unit ?? ''}`.trim();
+}
+
+function formatVolume(source: SpecSource): string | null {
+    if (!source.volume_value) {
+        return null;
+    }
+
+    return `${source.volume_value} ${source.volume_unit ?? ''}`.trim();
+}
+
 const specs = computed(() =>
     [
-        { label: t('shop.product.specs.sku'), value: props.product.sku },
+        { label: t('shop.product.specs.sku'), value: specSource.value.sku },
         {
             label: t('shop.product.specs.brand'),
             value: props.product.brand?.name,
         },
         {
             label: t('shop.product.specs.barcode'),
-            value: props.product.barcode,
+            value: specSource.value.barcode,
         },
         {
             label: t('shop.product.specs.weight'),
-            value: props.product.weight_value
-                ? `${props.product.weight_value} ${props.product.weight_unit ?? ''}`.trim()
-                : null,
+            value: formatWeight(specSource.value),
+        },
+        {
+            label: t('shop.product.specs.volume'),
+            value: formatVolume(specSource.value),
         },
         {
             label: t('shop.product.specs.dimensions'),
-            value:
-                props.product.width_value && props.product.height_value
-                    ? `${props.product.width_value} × ${props.product.height_value} × ${props.product.depth_value ?? 0} ${props.product.width_unit ?? ''}`.trim()
-                    : null,
+            value: formatDimensions(specSource.value),
         },
         {
             label: t('shop.product.specs.availability'),

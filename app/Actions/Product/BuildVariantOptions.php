@@ -7,6 +7,7 @@ namespace App\Actions\Product;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Shopper\Core\Enum\FieldType;
 
 final class BuildVariantOptions
@@ -49,7 +50,7 @@ final class BuildVariantOptions
      */
     private function buildVariantMap(Product $product): array
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, ProductVariant> $variants */
+        /** @var Collection<int, ProductVariant> $variants */
         $variants = $product->variants;
 
         return $variants->map(fn (ProductVariant $variant): array => [
@@ -93,7 +94,6 @@ final class BuildVariantOptions
     private function buildProductOptions(Product $product): array
     {
         $grouped = collect();
-        $thumbnailCollection = config('shopper.media.storage.thumbnail_collection');
 
         foreach ($product->variants as $variant) {
             foreach ($variant->values as $value) {
@@ -115,7 +115,7 @@ final class BuildVariantOptions
                     $image = null;
 
                     if ($value->attribute->type === FieldType::ColorPicker) {
-                        $image = $variant->getFirstMediaUrl($thumbnailCollection) ?: null;
+                        $image = $variant->thumbnail;
                     }
 
                     $attr['values']->push([

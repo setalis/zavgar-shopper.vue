@@ -58,6 +58,14 @@ function lineName(purchasable: Cart['lines'][number]['purchasable']): string {
     return (purchasable as { name?: string }).name ?? '';
 }
 
+function purchasableImage(
+    purchasable: Cart['lines'][number]['purchasable'],
+): string | null {
+    return (
+        purchasable.thumbnail ?? purchasable.images?.[0]?.url ?? null
+    );
+}
+
 function confirmClear(): void {
     if (window.confirm(t('shop.cart.clear_confirm'))) {
         cartActions.clear();
@@ -107,8 +115,8 @@ function confirmClear(): void {
                             class="size-20 shrink-0 overflow-hidden rounded-sm bg-muted"
                         >
                             <img
-                                v-if="line.purchasable.thumbnail"
-                                :src="line.purchasable.thumbnail"
+                                v-if="purchasableImage(line.purchasable)"
+                                :src="purchasableImage(line.purchasable)!"
                                 :alt="lineName(line.purchasable)"
                                 class="size-full object-cover object-center"
                             />

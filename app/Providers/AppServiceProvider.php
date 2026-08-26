@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Livewire\Shopper\Components\Products\Form\Variants as ProductVariantsForm;
 use App\Livewire\Shopper\Pages\Order\Detail as OrderDetail;
 use App\Livewire\Shopper\Pages\Product\Index as ProductIndex;
 use App\Livewire\Shopper\Pages\Settings\General as GeneralSettings;
@@ -30,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
             config([
                 'shopper.components.order.pages.order-detail' => OrderDetail::class,
                 'shopper.components.product.pages.product-index' => ProductIndex::class,
+                'shopper.components.product.components' => array_merge(
+                    config('shopper.components.product.components', []),
+                    ['products.form.variants' => ProductVariantsForm::class],
+                ),
                 'shopper.components.setting.pages.general' => GeneralSettings::class,
             ]);
         });

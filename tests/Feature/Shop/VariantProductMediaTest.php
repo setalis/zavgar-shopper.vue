@@ -9,6 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Shopper\Core\Models\Currency;
+use Shopper\Core\Models\Inventory;
 use Shopper\Core\Models\Price;
 use Shopper\Core\Models\Setting;
 
@@ -83,6 +84,51 @@ test('product page includes variant thumbnail and images for storefront media', 
         );
 });
 
+test('variant thumbnail falls back to the first gallery image when no thumbnail is set', function (): void {
+    $product = Product::factory()->variant()->create([
+        'name' => 'Gallery only variant',
+        'slug' => 'gallery-only-variant',
+    ]);
+
+    $variant = ProductVariant::factory()->create([
+        'product_id' => $product->id,
+        'name' => 'Blue',
+        'position' => 1,
+    ]);
+
+    Price::query()->create([
+        'priceable_type' => 'variant',
+        'priceable_id' => $variant->id,
+        'amount' => 25000,
+        'compare_amount' => null,
+        'cost_amount' => null,
+        'currency_id' => $this->currency->id,
+    ]);
+
+    $first = UploadedFile::fake()->image('variant-first.jpg');
+    $second = UploadedFile::fake()->image('variant-second.jpg');
+
+    $variant
+        ->addMedia($first->getRealPath())
+        ->usingFileName('variant-first.jpg')
+        ->toMediaCollection('uploads', 'public');
+
+    $variant
+        ->addMedia($second->getRealPath())
+        ->usingFileName('variant-second.jpg')
+        ->toMediaCollection('uploads', 'public');
+
+    $this->get(route('shop.product', $product))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('shop/product')
+            ->has('product.variants', 1)
+            ->where('product.variants.0.thumbnail', fn ($url): bool => is_string($url) && str_contains($url, 'variant-first'))
+            ->has('product.variants.0.images', 1)
+            ->where('product.variants.0.images.0.url', fn ($url): bool => is_string($url) && str_contains($url, 'variant-second'))
+        );
+});
+
 test('product gallery images omit uploads that duplicate the thumbnail file name', function (): void {
     $product = Product::factory()->standard()->create([
         'name' => 'Duplicated cover',
@@ -153,5 +199,55 @@ test('product gallery images omit uploads that share the thumbnail original name
             ->where('product.thumbnail', fn ($url): bool => is_string($url) && str_contains($url, '01THUMBHASH'))
             ->has('product.images', 1)
             ->where('product.images.0.url', fn ($url): bool => is_string($url) && str_contains($url, '01DETAILHASH'))
+        );
+});
+
+test('cart line uses the first gallery image when a variant has no thumbnail', function (): void {
+    $product = Product::factory()->variant()->create([
+        'name' => 'Cart gallery variant',
+        'slug' => 'cart-gallery-variant',
+    ]);
+
+    $variant = ProductVariant::factory()->create([
+        'product_id' => $product->id,
+        'name' => 'Green',
+        'position' => 1,
+    ]);
+
+    Price::query()->create([
+        'priceable_type' => 'variant',
+        'priceable_id' => $variant->id,
+        'amount' => 25000,
+        'compare_amount' => null,
+        'cost_amount' => null,
+        'currency_id' => $this->currency->id,
+    ]);
+
+    $inventory = Inventory::factory()->create([
+        'is_default' => true,
+        'code' => 'cart-gallery-wh',
+    ]);
+
+    $variant->mutateStock($inventory->id, 5);
+
+    $gallery = UploadedFile::fake()->image('cart-variant-gallery.jpg');
+
+    $variant
+        ->addMedia($gallery->getRealPath())
+        ->usingFileName('cart-variant-gallery.jpg')
+        ->toMediaCollection('uploads', 'public');
+
+    $this->post(route('shop.cart.add'), [
+        'product_id' => $product->id,
+        'variant_id' => $variant->id,
+        'quantity' => 1,
+    ])->assertRedirect();
+
+    $this->get(route('shop.cart'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('shop/cart')
+            ->has('cart.lines', 1)
+            ->where('cart.lines.0.purchasable.thumbnail', fn ($url): bool => is_string($url) && str_contains($url, 'cart-variant-gallery'))
         );
 });

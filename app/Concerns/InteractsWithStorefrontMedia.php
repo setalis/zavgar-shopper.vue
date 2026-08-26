@@ -16,26 +16,20 @@ trait InteractsWithStorefrontMedia
 
     protected function thumbnail(): Attribute
     {
-        return Attribute::get(function (): ?string {
-            $media = $this->getFirstMedia(
-                (string) config('shopper.media.storage.thumbnail_collection', 'thumbnail'),
-            );
-
-            return $media?->getUrl();
-        });
+        return Attribute::get(fn (): ?string => $this->resolveThumbnailMedia()?->getUrl());
     }
 
     /** @return Attribute<array<int, array{id: int|string, url: string, name: ?string, extension: ?string}>, never> */
     protected function images(): Attribute
     {
         return Attribute::get(function (): array {
-            $thumbnailCollection = (string) config('shopper.media.storage.thumbnail_collection', 'thumbnail');
             $uploadsCollection = (string) config('shopper.media.storage.collection_name', 'uploads');
-            $thumbnail = $this->getFirstMedia($thumbnailCollection);
+            $thumbnail = $this->resolveThumbnailMedia();
 
             return $this->getMedia($uploadsCollection)
                 ->reject(fn (Media $media): bool => $thumbnail !== null && (
-                    $media->file_name === $thumbnail->file_name
+                    $media->id === $thumbnail->id
+                    || $media->file_name === $thumbnail->file_name
                     || $media->name === $thumbnail->name
                     || $media->getUrl() === $thumbnail->getUrl()
                 ))
@@ -48,5 +42,14 @@ trait InteractsWithStorefrontMedia
                 ->values()
                 ->all();
         });
+    }
+
+    protected function resolveThumbnailMedia(): ?Media
+    {
+        $thumbnailCollection = (string) config('shopper.media.storage.thumbnail_collection', 'thumbnail');
+        $uploadsCollection = (string) config('shopper.media.storage.collection_name', 'uploads');
+
+        return $this->getFirstMedia($thumbnailCollection)
+            ?? $this->getFirstMedia($uploadsCollection);
     }
 }

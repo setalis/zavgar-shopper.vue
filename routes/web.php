@@ -13,6 +13,7 @@ use App\Http\Controllers\Shop\CheckoutSuccessController;
 use App\Http\Controllers\Shop\CollectionController;
 use App\Http\Controllers\Shop\HomeController;
 use App\Http\Controllers\Shop\ProductController;
+use App\Http\Controllers\Shop\ProductReviewController;
 use App\Http\Controllers\Shop\SearchController;
 use App\Http\Controllers\Shop\StripePaymentController;
 use App\Http\Controllers\Shop\ZoneController;
@@ -23,6 +24,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('shop', [ProductController::class, 'index'])->name('shop.index');
 Route::get('shop/{product:slug}', [ProductController::class, 'show'])->name('shop.product');
+Route::middleware(['auth', 'verified', 'throttle:10,1'])->group(function (): void {
+    Route::post('shop/{product:slug}/reviews', [ProductReviewController::class, 'store'])
+        ->name('shop.product.reviews.store');
+});
 Route::get('categories', [CategoryController::class, 'index'])->name('shop.categories');
 Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->name('shop.category');
 Route::get('collections/{collection:slug}', [CollectionController::class, 'show'])->name('shop.collection');

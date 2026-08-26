@@ -1,4 +1,5 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
+import productD87513 from './product'
 import cartB8cf73 from './cart'
 import zone from './zone'
 import checkout from './checkout'
@@ -802,7 +803,7 @@ cart.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     cart.form = cartForm
 const shop = {
     index: Object.assign(index, index),
-product: Object.assign(product, product),
+product: Object.assign(product, productD87513),
 categories: Object.assign(categories, categories),
 category: Object.assign(category, category),
 collection: Object.assign(collection, collection),

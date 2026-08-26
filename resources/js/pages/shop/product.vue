@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import ProductReviewController from '@/actions/App/Http/Controllers/Shop/ProductReviewController';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import {
     Heart,
     MessageCircle,
     RotateCcw,
     ShieldCheck,
+    Star,
     Truck,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import InputError from '@/components/input-error.vue';
 import BrandLink from '@/components/shop/brand-link.vue';
 import Container from '@/components/shop/container.vue';
 import ProductCard from '@/components/shop/product-card.vue';
@@ -15,22 +18,48 @@ import QtyStepper from '@/components/shop/qty-stepper.vue';
 import SectionHead from '@/components/shop/section-head.vue';
 import StarRating from '@/components/shop/star-rating.vue';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useCart } from '@/composables/useCart';
 import { useFormat } from '@/composables/useFormat';
 import { useShop } from '@/composables/useShop';
 import { useTrans } from '@/composables/useTrans';
-import { home } from '@/routes';
+import { home, login } from '@/routes';
 import * as shop from '@/routes/shop';
 import type { Product, StorefrontPrice, VariantOptions } from '@/types/shop';
+
+type ProductReview = {
+    id: number;
+    rating: number;
+    title: string | null;
+    content: string | null;
+    is_recommended: boolean;
+    created_at: string;
+    author?: {
+        first_name?: string | null;
+        last_name?: string | null;
+    } | null;
+};
+
+type ReviewForm = {
+    rating: number;
+    title: string;
+    content: string;
+    is_recommended: boolean;
+};
 
 const props = defineProps<{
     product: Product;
     variantOptions: VariantOptions | null;
+    canReview: boolean;
 }>();
 
+const page = usePage();
 const cart = useCart();
 const { t } = useTrans();
 const { currency, taxLabel } = useShop();
@@ -198,7 +227,20 @@ const outOfStock = computed<boolean>(() => {
     return stock <= 0 && !props.product.allow_backorder;
 });
 
-const reviews = computed(() => props.product.reviews ?? []);
+const reviews = computed<ProductReview[]>(
+    () => (props.product.reviews as ProductReview[] | undefined) ?? [],
+);
+
+const reviewForm = useForm<ReviewForm>({
+    rating: 5,
+    title: '',
+    content: '',
+    is_recommended: false,
+});
+
+const ratingStars = computed<number[]>(() => [1, 2, 3, 4, 5]);
+
+const isAuthenticated = computed<boolean>(() => Boolean(page.props.auth.user));
 
 const averageRating = computed<number>(() => {
     if (reviews.value.length === 0) {
@@ -280,6 +322,38 @@ function addToCart(): void {
         quantity: quantity.value,
     });
     setTimeout(() => (adding.value = false), 800);
+}
+
+function reviewAuthorName(review: ProductReview): string {
+    const author = review.author;
+    const name = [author?.first_name, author?.last_name]
+        .filter(Boolean)
+        .join(' ');
+
+    return name || t('shop.product.review_form.anonymous');
+}
+
+function formatReviewDate(value: string): string {
+    return new Intl.DateTimeFormat(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    }).format(new Date(value));
+}
+
+function setReviewRating(rating: number): void {
+    reviewForm.rating = rating;
+}
+
+function submitReview(): void {
+    reviewForm.post(ProductReviewController.store.url(props.product), {
+        preserveScroll: true,
+        onSuccess: () => {
+            reviewForm.reset();
+            reviewForm.rating = 5;
+            reviewForm.is_recommended = false;
+        },
+    });
 }
 </script>
 
@@ -599,55 +673,248 @@ function addToCart(): void {
             </TabsContent>
 
             <TabsContent value="reviews" class="pt-7">
-                <div class="grid gap-7 lg:grid-cols-[240px_1fr]">
-                    <div
-                        class="rounded-lg border border-rule bg-paper p-5 text-center"
-                    >
-                        <p
-                            class="font-heading text-3xl font-extrabold text-ink"
-                        >
-                            {{ averageRating.toFixed(1) }}
-                        </p>
-                        <StarRating
-                            class="mt-2 justify-center"
-                            :rating="averageRating"
-                            size="md"
-                        />
-                        <p class="mt-2 font-mono text-xs text-ink-mute">
-                            {{
-                                t('shop.product.review_count', {
-                                    count: reviews.length,
-                                })
-                            }}
-                        </p>
-                    </div>
-
-                    <div class="space-y-2">
+                <div class="space-y-10">
+                    <div class="grid gap-7 lg:grid-cols-[240px_1fr]">
                         <div
-                            v-for="bucket in ratingDistribution"
-                            :key="bucket.score"
-                            class="flex items-center gap-3"
+                            class="rounded-lg border border-rule bg-paper p-5 text-center"
                         >
-                            <span class="w-10 font-mono text-xs text-ink-mute">
-                                {{ bucket.score }}★
-                            </span>
-                            <Progress
-                                :model-value="bucket.percentage"
-                                class="h-1.5 flex-1"
-                            />
-                            <span
-                                class="w-10 text-right font-mono text-xs text-ink-mute"
+                            <p
+                                class="font-heading text-3xl font-extrabold text-ink"
                             >
-                                {{ bucket.count }}
-                            </span>
+                                {{ averageRating.toFixed(1) }}
+                            </p>
+                            <StarRating
+                                class="mt-2 justify-center"
+                                :rating="averageRating"
+                                size="md"
+                            />
+                            <p class="mt-2 font-mono text-xs text-ink-mute">
+                                {{
+                                    t('shop.product.review_count', {
+                                        count: reviews.length,
+                                    })
+                                }}
+                            </p>
                         </div>
 
+                        <div class="space-y-2">
+                            <div
+                                v-for="bucket in ratingDistribution"
+                                :key="bucket.score"
+                                class="flex items-center gap-3"
+                            >
+                                <span
+                                    class="w-10 font-mono text-xs text-ink-mute"
+                                >
+                                    {{ bucket.score }}★
+                                </span>
+                                <Progress
+                                    :model-value="bucket.percentage"
+                                    class="h-1.5 flex-1"
+                                />
+                                <span
+                                    class="w-10 text-right font-mono text-xs text-ink-mute"
+                                >
+                                    {{ bucket.count }}
+                                </span>
+                            </div>
+
+                            <p
+                                v-if="!reviews.length"
+                                class="pt-4 text-sm text-ink-mute"
+                            >
+                                {{ t('shop.product.no_reviews') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-rule pt-7">
                         <p
-                            v-if="!reviews.length"
-                            class="pt-4 text-sm text-ink-mute"
+                            v-if="!isAuthenticated"
+                            class="text-sm text-ink-soft"
                         >
-                            {{ t('shop.product.no_reviews') }}
+                            {{ t('shop.product.review_form.sign_in') }}
+                            <Link
+                                :href="login.url()"
+                                class="font-semibold text-brand transition hover:text-brand-dark"
+                            >
+                                {{ t('shop.nav.sign_in') }}
+                            </Link>
                         </p>
+
+                        <p
+                            v-else-if="!canReview"
+                            class="text-sm text-ink-soft"
+                        >
+                            {{
+                                t(
+                                    'shop.product.review_form.already_submitted',
+                                )
+                            }}
+                        </p>
+
+                        <form
+                            v-else
+                            class="max-w-2xl space-y-5"
+                            @submit.prevent="submitReview"
+                        >
+                            <h3 class="font-heading text-lg font-bold text-ink">
+                                {{ t('shop.product.review_form.title') }}
+                            </h3>
+
+                            <div class="space-y-2">
+                                <Label>{{
+                                    t('shop.product.review_form.rating')
+                                }}</Label>
+                                <div
+                                    class="flex items-center gap-1"
+                                    role="radiogroup"
+                                    :aria-label="
+                                        t('shop.product.review_form.rating')
+                                    "
+                                >
+                                    <button
+                                        v-for="star in ratingStars"
+                                        :key="star"
+                                        type="button"
+                                        class="rounded-sm p-0.5 text-amber transition hover:scale-110"
+                                        :aria-label="
+                                            t(
+                                                'shop.product.review_form.rating_sr',
+                                                { rating: star },
+                                            )
+                                        "
+                                        :aria-checked="
+                                            reviewForm.rating === star
+                                        "
+                                        role="radio"
+                                        @click="setReviewRating(star)"
+                                    >
+                                        <Star
+                                            :class="[
+                                                'size-6',
+                                                star <= reviewForm.rating
+                                                    ? 'fill-current'
+                                                    : 'text-rule-strong',
+                                            ]"
+                                            aria-hidden="true"
+                                        />
+                                    </button>
+                                </div>
+                                <InputError :message="reviewForm.errors.rating" />
+                            </div>
+
+                            <div class="space-y-2">
+                                <Label for="review-title">{{
+                                    t('shop.product.review_form.title_label')
+                                }}</Label>
+                                <Input
+                                    id="review-title"
+                                    v-model="reviewForm.title"
+                                    type="text"
+                                    autocomplete="off"
+                                />
+                                <InputError :message="reviewForm.errors.title" />
+                            </div>
+
+                            <div class="space-y-2">
+                                <Label for="review-content">{{
+                                    t('shop.product.review_form.content_label')
+                                }}</Label>
+                                <Textarea
+                                    id="review-content"
+                                    v-model="reviewForm.content"
+                                    rows="5"
+                                />
+                                <InputError
+                                    :message="reviewForm.errors.content"
+                                />
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <Checkbox
+                                    id="review-recommended"
+                                    :checked="reviewForm.is_recommended"
+                                    @update:checked="
+                                        (value) =>
+                                            (reviewForm.is_recommended =
+                                                value === true)
+                                    "
+                                />
+                                <Label
+                                    for="review-recommended"
+                                    class="cursor-pointer font-normal"
+                                >
+                                    {{
+                                        t('shop.product.review_form.recommend')
+                                    }}
+                                </Label>
+                            </div>
+
+                            <InputError :message="reviewForm.errors.review" />
+
+                            <Button
+                                type="submit"
+                                :disabled="reviewForm.processing"
+                            >
+                                {{ t('shop.product.review_form.submit') }}
+                            </Button>
+                        </form>
+                    </div>
+
+                    <div
+                        v-if="reviews.length"
+                        class="space-y-5 border-t border-rule pt-7"
+                    >
+                        <article
+                            v-for="review in reviews"
+                            :key="review.id"
+                            class="rounded-lg border border-rule bg-paper p-5"
+                        >
+                            <div
+                                class="flex flex-wrap items-start justify-between gap-3"
+                            >
+                                <div>
+                                    <p class="font-semibold text-ink">
+                                        {{ reviewAuthorName(review) }}
+                                    </p>
+                                    <p class="font-mono text-xs text-ink-mute">
+                                        {{ formatReviewDate(review.created_at) }}
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <StarRating
+                                        :rating="review.rating"
+                                        size="md"
+                                    />
+                                    <span
+                                        v-if="review.is_recommended"
+                                        class="rounded-[4px] bg-brand-soft px-2 py-1 font-mono text-[11px] font-semibold text-brand"
+                                    >
+                                        {{
+                                            t(
+                                                'shop.product.review_form.recommended_badge',
+                                            )
+                                        }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <h4
+                                v-if="review.title"
+                                class="mt-4 font-heading text-md font-bold text-ink"
+                            >
+                                {{ review.title }}
+                            </h4>
+
+                            <p
+                                v-if="review.content"
+                                class="mt-2 text-sm leading-relaxed text-ink-soft"
+                            >
+                                {{ review.content }}
+                            </p>
+                        </article>
                     </div>
                 </div>
             </TabsContent>

@@ -17,6 +17,10 @@ return [
         'insufficient_stock' => 'Insufficient stock available.',
         'added' => 'Product added to cart!',
     ],
+    'reviews' => [
+        'submitted' => 'Your review has been submitted and is awaiting moderation.',
+        'already_submitted' => 'You have already reviewed this product.',
+    ],
     'checkout' => [
         'option_unavailable' => 'Selected option is no longer available.',
         'payment_prepare_failed' => 'Unable to prepare payment. Please try again.',

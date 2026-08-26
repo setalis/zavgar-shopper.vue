@@ -96,7 +96,14 @@ final class ProductController extends Controller
             'variants.media',
             'variants.values.attribute',
             'variants.prices' => $priceConstraint,
+            'ratings' => fn ($q) => $q
+                ->where('approved', true)
+                ->with(['author:id,first_name,last_name'])
+                ->latest(),
         ]);
+
+        $product->setRelation('reviews', $product->ratings);
+        $product->unsetRelation('ratings');
 
         $variantOptions = null;
 
@@ -119,6 +126,21 @@ final class ProductController extends Controller
         return Inertia::render('shop/product', [
             'product' => $product,
             'variantOptions' => $variantOptions,
+            'canReview' => $this->canReview($product),
         ]);
+    }
+
+    private function canReview(Product $product): bool
+    {
+        $user = auth()->user();
+
+        if ($user === null) {
+            return false;
+        }
+
+        return ! $product->ratings()
+            ->where('author_id', $user->id)
+            ->where('author_type', $user->getMorphClass())
+            ->exists();
     }
 }

@@ -67,6 +67,7 @@ final class HomeController extends Controller
             ->with(['media', 'brand.media'])
             ->withCurrentPrices()
             ->withCurrentStock()
+            ->withApprovedReviewSummary()
             ->scopes('publish');
     }
 }

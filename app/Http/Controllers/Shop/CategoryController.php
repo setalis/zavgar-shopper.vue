@@ -35,7 +35,8 @@ final class CategoryController extends Controller
             ->whereHas('categories', fn ($q) => $q->where('id', $category->id))
             ->with(['media', 'brand.media'])
             ->withCurrentPrices()
-            ->withCurrentStock();
+            ->withCurrentStock()
+            ->withApprovedReviewSummary();
 
         $query = match ($sort) {
             'name' => $query->orderBy('name'),

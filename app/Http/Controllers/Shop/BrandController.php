@@ -22,7 +22,8 @@ final class BrandController extends Controller
             ->scopes('publish')
             ->with(['media', 'brand.media'])
             ->withCurrentPrices()
-            ->withCurrentStock();
+            ->withCurrentStock()
+            ->withApprovedReviewSummary();
 
         $query = match ($sort) {
             'name' => $query->orderBy('name'),

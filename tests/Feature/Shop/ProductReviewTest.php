@@ -148,7 +148,9 @@ test('product page only includes approved reviews', function (): void {
         'title' => 'Hidden review',
     ]);
 
-    $this->get(route('shop.product', $product))
+    $response = $this->get(route('shop.product', $product));
+
+    $response
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('shop/product')
@@ -159,7 +161,40 @@ test('product page only includes approved reviews', function (): void {
         );
 });
 
-test('authenticated users who have not reviewed yet can review the product', function (): void {
+test('shop index exposes approved review summary on product cards', function (): void {
+    $product = createPublishedProduct([
+        'name' => 'Rated Headphones',
+        'slug' => 'rated-headphones',
+    ]);
+    $author = User::factory()->create();
+
+    createProductReview($product, $author, [
+        'approved' => true,
+        'rating' => 4,
+    ]);
+
+    createProductReview($product, User::factory()->create(), [
+        'approved' => true,
+        'rating' => 5,
+    ]);
+
+    createProductReview($product, User::factory()->create(), [
+        'approved' => false,
+        'rating' => 1,
+    ]);
+
+    $this->get(route('shop.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('shop/index')
+            ->has('products.data', 1)
+            ->where('products.data.0.id', $product->id)
+            ->where('products.data.0.storefront_reviews_count', 2)
+            ->where('products.data.0.storefront_average_rating', 4.5)
+        );
+});
+
+test('product page sets canReview to true for authenticated users without a review', function (): void {
     $product = createPublishedProduct();
     $user = User::factory()->create();
 

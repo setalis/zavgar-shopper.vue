@@ -36,7 +36,7 @@ const smallCards = [
 </script>
 
 <template>
-    <section class="bg-paper pt-10 pb-14">
+    <section class="bg-paper pt-6 pb-14">
         <Container>
             <div
                 class="grid gap-4 lg:grid-cols-[2.2fr_1fr] lg:grid-rows-[1fr_1fr_auto]"
@@ -44,6 +44,16 @@ const smallCards = [
                 <article
                     class="bento-surface relative flex min-h-[420px] flex-col justify-between rounded-xl bg-linear-to-br from-card-blue to-card-blue-2 p-8 text-paper transition duration-300 ease-brand hover:-translate-y-1 hover:shadow-lg lg:col-start-1 lg:row-span-2 lg:min-h-[540px] lg:p-14"
                 >
+                    <img
+                        src="/storage/slider/closeup-auto-repairman-checking-car-oil-workshop-1.jpg"
+                        alt=""
+                        class="pointer-events-none absolute inset-0 size-full object-cover object-[72%_center]"
+                    />
+                    <div
+                        class="pointer-events-none absolute inset-0 bg-linear-to-r from-card-blue from-[12%] via-card-blue/80 via-45% to-card-blue/20"
+                        aria-hidden="true"
+                    />
+
                     <div class="relative z-2 lg:max-w-[50%]">
                         <span
                             class="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] uppercase opacity-82"
@@ -82,15 +92,21 @@ const smallCards = [
                     </div>
 
                     <img
-                        src="https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=900&q=80&auto=format&fit=crop"
+                        src="/storage/slider/opstelling_6_trans_reflectie_verkleind-1024x799.png?w=900&q=80&auto=format&fit=crop"
                         alt=""
-                        class="pointer-events-none absolute -right-8 -bottom-5 w-1/2 max-w-[440px] rounded-xl drop-shadow-2xl"
+                        class="pointer-events-none absolute -right-6 -bottom-5 w-1/2 max-w-[440px] rounded-xl drop-shadow-2xl"
                     />
                 </article>
 
                 <article
                     class="bento-surface relative flex min-h-[260px] flex-col justify-between rounded-xl bg-linear-to-br from-card-purple to-card-purple-2 p-8 text-paper transition duration-300 ease-brand hover:-translate-y-1 hover:shadow-lg lg:col-start-2 lg:row-start-1"
                 >
+                    
+                    <img
+                        src="/storage/slider/slider-2.jpg"
+                        alt=""
+                        class="pointer-events-none absolute inset-0 size-full object-cover object-[72%_center]"
+                    />
                     <span
                         class="relative z-2 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] uppercase opacity-82"
                     >
@@ -106,17 +122,23 @@ const smallCards = [
                         {{ t('shop.hero.shop_now') }}
                         <ArrowRight class="size-4" aria-hidden="true" />
                     </Link>
-
+                    <!--
                     <img
-                        src="https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=420&q=80&auto=format&fit=crop"
+                        src="/storage/slider/slider-2.jpg"
                         alt=""
                         class="pointer-events-none absolute -right-2.5 -bottom-2.5 w-[60%] max-w-[200px] rounded-lg drop-shadow-xl"
                     />
+                    -->
                 </article>
 
                 <article
                     class="bento-surface relative flex min-h-[260px] flex-col justify-between rounded-xl bg-linear-to-br from-card-teal to-card-teal-2 p-8 text-paper transition duration-300 ease-brand hover:-translate-y-1 hover:shadow-lg lg:col-start-2 lg:row-start-2"
                 >
+                    <img
+                        src="/storage/slider/slider-3.jpg"
+                        alt=""
+                        class="pointer-events-none absolute inset-0 size-full object-cover object-[72%_center]"
+                    />
                     <span
                         class="relative z-2 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] uppercase opacity-82"
                     >
@@ -132,12 +154,12 @@ const smallCards = [
                         {{ t('shop.hero.support.cta') }}
                         <ArrowRight class="size-4" aria-hidden="true" />
                     </Link>
-
+                    <!--
                     <img
                         src="https://images.unsplash.com/photo-1484704849700-f032a568e944?w=420&q=80&auto=format&fit=crop"
                         alt=""
                         class="pointer-events-none absolute -right-2.5 -bottom-2.5 w-[62%] max-w-[220px] rounded-lg drop-shadow-xl"
-                    />
+                    /> -->
                 </article>
 
                 <div

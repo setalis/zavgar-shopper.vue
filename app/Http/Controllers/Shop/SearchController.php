@@ -28,6 +28,7 @@ final class SearchController extends Controller
                 ->with(['media', 'brand.media'])
                 ->withCurrentPrices()
                 ->withCurrentStock()
+                ->withApprovedReviewSummary()
                 ->paginate(12)
                 ->withQueryString();
 

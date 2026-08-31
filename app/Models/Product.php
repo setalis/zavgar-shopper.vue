@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Concerns\InteractsWithStorefrontMedia;
 use App\Concerns\ResolvesStorefrontPrice;
+use App\Concerns\ResolvesStorefrontReviews;
 use App\Concerns\ResolvesStorefrontStock;
 use App\Traits\HasProductPricing;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -19,6 +20,7 @@ final class Product extends Model
     use HasProductPricing;
     use InteractsWithStorefrontMedia;
     use ResolvesStorefrontPrice;
+    use ResolvesStorefrontReviews;
     use ResolvesStorefrontStock;
 
     /**

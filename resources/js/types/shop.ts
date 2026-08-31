@@ -72,6 +72,8 @@ export type Product = Omit<BaseProduct, 'brand' | 'variants'> &
         related_products?: Product[];
         storefront_price?: StorefrontPrice | null;
         storefront_stock?: number;
+        storefront_reviews_count?: number;
+        storefront_average_rating?: number | null;
     };
 
 export type ProductPrice = StorefrontPrice;

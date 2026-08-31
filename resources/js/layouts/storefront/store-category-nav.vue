@@ -98,7 +98,7 @@ onBeforeUnmount(() => {
                 {{ t('shop.nav.all_categories') }}
             </Link>
 
-            <div class="mr-auto flex gap-10">
+            <div class="mr-auto flex gap-10 uppercase">
                 <Link
                     v-for="link in links"
                     :key="link.href"

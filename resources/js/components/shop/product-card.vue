@@ -40,9 +40,18 @@ const inStock = computed<boolean>(() => {
     return (props.product.storefront_stock ?? 0) > 0;
 });
 
-const reviewCount = computed<number>(() => props.product.reviews?.length ?? 0);
+const reviewCount = computed<number>(
+    () =>
+        props.product.storefront_reviews_count ??
+        props.product.reviews?.length ??
+        0,
+);
 
 const averageRating = computed<number>(() => {
+    if (props.product.storefront_average_rating != null) {
+        return props.product.storefront_average_rating;
+    }
+
     const reviews = props.product.reviews ?? [];
 
     if (reviews.length === 0) {

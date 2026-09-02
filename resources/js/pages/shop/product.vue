@@ -31,7 +31,13 @@ import { useShop } from '@/composables/useShop';
 import { useTrans } from '@/composables/useTrans';
 import { home, login } from '@/routes';
 import * as shop from '@/routes/shop';
-import type { Product, ProductVariant, StorefrontPrice, VariantOptions } from '@/types/shop';
+import type {
+    Product,
+    ProductAttribute,
+    ProductVariant,
+    StorefrontPrice,
+    VariantOptions,
+} from '@/types/shop';
 
 type SpecSource = Pick<
     Product | ProductVariant,
@@ -70,6 +76,7 @@ type ReviewForm = {
 const props = defineProps<{
     product: Product;
     variantOptions: VariantOptions | null;
+    productAttributes: ProductAttribute[];
     canReview: boolean;
 }>();
 
@@ -312,6 +319,11 @@ function formatVolume(source: SpecSource): string | null {
 
 const specs = computed(() =>
     [
+        ...props.productAttributes.map((attribute) => ({
+            label: attribute.name,
+            value: attribute.value,
+            html: attribute.type === 'richtext',
+        })),
         { label: t('shop.product.specs.sku'), value: specSource.value.sku },
         {
             label: t('shop.product.specs.brand'),
@@ -415,16 +427,16 @@ function submitReview(): void {
             <span aria-current="page" class="text-ink">{{ product.name }}</span>
         </nav>
 
-        <div class="grid gap-10 lg:grid-cols-2 lg:gap-14">
+        <div class="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
             <div
                 :class="[
-                    'grid gap-4',
+                    'grid items-start gap-4',
                     gallery.length > 1 ? 'md:grid-cols-[80px_1fr]' : '',
                 ]"
             >
                 <div
                     v-if="gallery.length > 1"
-                    class="order-2 grid grid-cols-4 gap-2 md:order-1 md:grid-cols-1"
+                    class="order-2 grid grid-cols-4 content-start gap-2 md:order-1 md:grid-cols-1 md:self-start"
                 >
                     <button
                         v-for="url in gallery.slice(0, 5)"
@@ -684,7 +696,7 @@ function submitReview(): void {
                 >
                     <div
                         v-for="(spec, index) in specs"
-                        :key="spec.label"
+                        :key="`${spec.label}-${index}`"
                         :class="[
                             'grid gap-1 px-5 py-3.5 sm:grid-cols-[220px_1fr]',
                             index % 2 === 1 && 'bg-muted',
@@ -695,7 +707,12 @@ function submitReview(): void {
                         >
                             {{ spec.label }}
                         </dt>
-                        <dd class="text-sm text-ink">{{ spec.value }}</dd>
+                        <dd
+                            v-if="spec.html"
+                            class="prose prose-sm max-w-none prose-zinc text-sm text-ink"
+                            v-html="spec.value"
+                        />
+                        <dd v-else class="text-sm text-ink">{{ spec.value }}</dd>
                     </div>
                 </dl>
             </TabsContent>

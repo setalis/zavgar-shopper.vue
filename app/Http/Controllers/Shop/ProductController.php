@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Shop;
 
+use App\Actions\Product\BuildProductAttributes;
 use App\Actions\Product\BuildVariantOptions;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -46,12 +47,13 @@ final class ProductController extends Controller
                     fn ($q) => $q->where('id', $selectedCategory->id),
                 );
 
-                $children = $selectedCategory->children()
-                    ->scopes('enabled')
-                    ->with('media')
-                    ->withCount(['products' => fn ($q) => $q->whereNull(shopper_table('products').'.deleted_at')])
-                    ->orderBy('position')
-                    ->get();
+                $children = Category::hydrateBranchProductsCount(
+                    $selectedCategory->children()
+                        ->scopes('enabled')
+                        ->with('media')
+                        ->orderBy('position')
+                        ->get(),
+                );
             }
         }
 
@@ -78,7 +80,7 @@ final class ProductController extends Controller
         ]);
     }
 
-    public function show(Product $product): Response
+    public function show(Product $product, BuildProductAttributes $buildProductAttributes): Response
     {
         abort_unless($product->isPublished(), 404);
 
@@ -127,6 +129,7 @@ final class ProductController extends Controller
         return Inertia::render('shop/product', [
             'product' => $product,
             'variantOptions' => $variantOptions,
+            'productAttributes' => $buildProductAttributes->handle($product),
             'canReview' => $this->canReview($product),
         ]);
     }

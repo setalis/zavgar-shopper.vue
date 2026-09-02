@@ -78,6 +78,14 @@ export type Product = Omit<BaseProduct, 'brand' | 'variants'> &
 
 export type ProductPrice = StorefrontPrice;
 
+export type ProductAttribute = {
+    id: number;
+    name: string;
+    slug: string;
+    type: string;
+    value: string;
+};
+
 export type VariantOptions = {
     productOptions: Array<{
         id: number;

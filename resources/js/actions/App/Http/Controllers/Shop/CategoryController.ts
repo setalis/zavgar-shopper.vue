@@ -79,7 +79,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\Shop\CategoryController::show
- * @see app/Http/Controllers/Shop/CategoryController.php:29
+ * @see app/Http/Controllers/Shop/CategoryController.php:30
  * @route '/categories/{category}'
  */
 export const show = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -94,7 +94,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\CategoryController::show
- * @see app/Http/Controllers/Shop/CategoryController.php:29
+ * @see app/Http/Controllers/Shop/CategoryController.php:30
  * @route '/categories/{category}'
  */
 show.url = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions) => {
@@ -127,7 +127,7 @@ show.url = (args: { category: string | { slug: string } } | [category: string | 
 
 /**
 * @see \App\Http\Controllers\Shop\CategoryController::show
- * @see app/Http/Controllers/Shop/CategoryController.php:29
+ * @see app/Http/Controllers/Shop/CategoryController.php:30
  * @route '/categories/{category}'
  */
 show.get = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -136,7 +136,7 @@ show.get = (args: { category: string | { slug: string } } | [category: string | 
 })
 /**
 * @see \App\Http\Controllers\Shop\CategoryController::show
- * @see app/Http/Controllers/Shop/CategoryController.php:29
+ * @see app/Http/Controllers/Shop/CategoryController.php:30
  * @route '/categories/{category}'
  */
 show.head = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -146,7 +146,7 @@ show.head = (args: { category: string | { slug: string } } | [category: string |
 
     /**
 * @see \App\Http\Controllers\Shop\CategoryController::show
- * @see app/Http/Controllers/Shop/CategoryController.php:29
+ * @see app/Http/Controllers/Shop/CategoryController.php:30
  * @route '/categories/{category}'
  */
     const showForm = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -156,7 +156,7 @@ show.head = (args: { category: string | { slug: string } } | [category: string |
 
             /**
 * @see \App\Http\Controllers\Shop\CategoryController::show
- * @see app/Http/Controllers/Shop/CategoryController.php:29
+ * @see app/Http/Controllers/Shop/CategoryController.php:30
  * @route '/categories/{category}'
  */
         showForm.get = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -165,7 +165,7 @@ show.head = (args: { category: string | { slug: string } } | [category: string |
         })
             /**
 * @see \App\Http\Controllers\Shop\CategoryController::show
- * @see app/Http/Controllers/Shop/CategoryController.php:29
+ * @see app/Http/Controllers/Shop/CategoryController.php:30
  * @route '/categories/{category}'
  */
         showForm.head = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

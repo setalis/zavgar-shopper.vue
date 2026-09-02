@@ -49,14 +49,15 @@ final class HomeController extends Controller
                 ->orderByDesc('products_count')
                 ->limit(6)
                 ->get(),
-            'categories' => fn () => Category::query()
-                ->scopes('enabled')
-                ->whereNull('parent_id')
-                ->with('media')
-                ->withCount(['products' => fn ($q) => $q->whereNull(shopper_table('products').'.deleted_at')])
-                ->orderBy('position')
-                ->limit(10)
-                ->get(),
+            'categories' => fn () => Category::hydrateBranchProductsCount(
+                Category::query()
+                    ->scopes('enabled')
+                    ->whereNull('parent_id')
+                    ->with('media')
+                    ->orderBy('position')
+                    ->limit(10)
+                    ->get(),
+            ),
         ]);
     }
 

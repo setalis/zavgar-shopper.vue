@@ -29,6 +29,7 @@ import { useCart } from '@/composables/useCart';
 import { useFormat } from '@/composables/useFormat';
 import { useShop } from '@/composables/useShop';
 import { useTrans } from '@/composables/useTrans';
+import { useWishlist } from '@/composables/useWishlist';
 import { home, login } from '@/routes';
 import * as shop from '@/routes/shop';
 import type {
@@ -82,6 +83,7 @@ const props = defineProps<{
 
 const page = usePage();
 const cart = useCart();
+const { has, toggle } = useWishlist();
 const { t } = useTrans();
 const { currency, taxLabel } = useShop();
 const { money } = useFormat();
@@ -375,6 +377,12 @@ function addToCart(): void {
     setTimeout(() => (adding.value = false), 800);
 }
 
+const wishlisted = computed<boolean>(() => has(props.product.id));
+
+function toggleWishlist(): void {
+    toggle(props.product.id);
+}
+
 function reviewAuthorName(review: ProductReview): string {
     const author = review.author;
     const name = [author?.first_name, author?.last_name]
@@ -647,10 +655,19 @@ function submitReview(): void {
                         type="button"
                         variant="outline"
                         size="icon-lg"
-                        :aria-label="t('shop.product.add_to_wishlist')"
-                        :title="t('shop.nav.wishlist_soon')"
+                        :class="wishlisted ? 'text-rose border-rose/30' : ''"
+                        :aria-label="
+                            wishlisted
+                                ? t('shop.product.remove_from_wishlist')
+                                : t('shop.product.add_to_wishlist')
+                        "
+                        @click="toggleWishlist"
                     >
-                        <Heart class="size-5" aria-hidden="true" />
+                        <Heart
+                            class="size-5"
+                            :fill="wishlisted ? 'currentColor' : 'none'"
+                            aria-hidden="true"
+                        />
                     </Button>
                 </div>
 

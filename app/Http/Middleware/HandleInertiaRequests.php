@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Actions\FlushStorefrontCategoryCache;
 use App\Actions\GetCountriesByZone;
+use App\Actions\Wishlist\WishlistManager;
 use App\Actions\ZoneSessionManager;
 use App\Models\Category;
 use App\Models\Channel;
@@ -73,9 +74,12 @@ class HandleInertiaRequests extends Middleware
     {
         $cart = resolve(CartSessionManager::class)->current();
         $zone = ZoneSessionManager::ensureDefaultSession();
+        $wishlistIds = resolve(WishlistManager::class)->ids();
 
         return [
             'cart_count' => $cart?->lines->sum('quantity') ?? 0,
+            'wishlist_count' => count($wishlistIds),
+            'wishlist_ids' => $wishlistIds,
             'zone' => $zone ? [
                 'country_code' => $zone->countryCode,
                 'country_name' => $zone->countryName,

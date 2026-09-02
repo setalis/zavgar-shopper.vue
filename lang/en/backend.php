@@ -17,6 +17,10 @@ return [
         'insufficient_stock' => 'Insufficient stock available.',
         'added' => 'Product added to cart!',
     ],
+    'wishlist' => [
+        'added' => 'Added to your wishlist.',
+        'removed' => 'Removed from your wishlist.',
+    ],
     'reviews' => [
         'submitted' => 'Your review has been submitted and is awaiting moderation.',
         'already_submitted' => 'You have already reviewed this product.',

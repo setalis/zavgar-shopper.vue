@@ -17,6 +17,7 @@ use App\Http\Controllers\Shop\ProductReviewController;
 use App\Http\Controllers\Shop\SearchController;
 use App\Http\Controllers\Shop\SearchSuggestController;
 use App\Http\Controllers\Shop\StripePaymentController;
+use App\Http\Controllers\Shop\WishlistController;
 use App\Http\Controllers\Shop\ZoneController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,13 @@ Route::middleware('throttle:60,1')->group(function (): void {
     Route::patch('cart/{line}', [CartController::class, 'update'])->name('shop.cart.update');
     Route::delete('cart/{line}', [CartController::class, 'destroy'])->name('shop.cart.destroy');
     Route::delete('cart', [CartController::class, 'clear'])->name('shop.cart.clear');
+});
+
+// Wishlist
+Route::get('wishlist', [WishlistController::class, 'index'])->name('shop.wishlist');
+Route::middleware('throttle:60,1')->group(function (): void {
+    Route::post('wishlist', [WishlistController::class, 'store'])->name('shop.wishlist.store');
+    Route::delete('wishlist/{product}', [WishlistController::class, 'destroy'])->name('shop.wishlist.destroy');
 });
 
 // Zone

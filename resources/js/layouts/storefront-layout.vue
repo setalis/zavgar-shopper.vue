@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { Toaster } from '@/components/ui/sonner';
 import { useTrans } from '@/composables/useTrans';
 import StoreCategoryNav from '@/layouts/storefront/store-category-nav.vue';
 import StoreFooter from '@/layouts/storefront/store-footer.vue';
@@ -31,5 +32,6 @@ const drawerOpen = ref<boolean>(false);
         </main>
 
         <StoreFooter />
+        <Toaster />
     </div>
 </template>

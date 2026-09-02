@@ -12,7 +12,7 @@ import * as shop from '@/routes/shop';
 const emit = defineEmits<{ openMenu: [] }>();
 
 const page = usePage();
-const { cartCount } = useShop();
+const { cartCount, wishlistCount } = useShop();
 const { t } = useTrans();
 </script>
 
@@ -62,13 +62,19 @@ const { t } = useTrans();
                     <User class="size-5" aria-hidden="true" />
                 </Link>
 
-                <span
-                    class="hidden size-11 place-items-center rounded-full bg-muted text-ink-faint md:grid"
+                <Link
+                    :href="shop.wishlist.url()"
+                    class="relative hidden size-11 place-items-center rounded-full bg-muted text-ink transition hover:bg-brand-soft hover:text-brand md:grid"
                     :aria-label="t('shop.nav.wishlist')"
-                    :title="t('shop.nav.wishlist_soon')"
                 >
                     <Heart class="size-5" aria-hidden="true" />
-                </span>
+                    <span
+                        v-if="wishlistCount > 0"
+                        class="absolute top-1 right-1 grid h-[18px] min-w-[18px] place-items-center rounded-full border-2 border-paper bg-primary px-1 font-mono text-[10px] font-semibold text-paper"
+                    >
+                        {{ wishlistCount }}
+                    </span>
+                </Link>
 
                 <Link
                     :href="shop.cart.url()"

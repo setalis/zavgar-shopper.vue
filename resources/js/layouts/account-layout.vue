@@ -9,6 +9,7 @@ import {
     orders as accountOrders,
 } from '@/routes/account';
 import * as profile from '@/routes/profile';
+import * as shop from '@/routes/shop';
 
 type NavItem = { href: string; label: string; exact?: boolean };
 
@@ -18,6 +19,7 @@ const { t } = useTrans();
 const items = computed<NavItem[]>(() => [
     { href: dashboard.url(), label: t('account.nav.overview'), exact: true },
     { href: accountOrders.url(), label: t('account.nav.orders') },
+    { href: shop.wishlist.url(), label: t('account.nav.wishlist') },
     { href: accountAddresses.url(), label: t('account.nav.addresses') },
     { href: profile.edit.url(), label: t('account.nav.profile') },
 ]);

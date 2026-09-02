@@ -7,6 +7,7 @@ import BrandController from './BrandController'
 import SearchController from './SearchController'
 import SearchSuggestController from './SearchSuggestController'
 import CartController from './CartController'
+import WishlistController from './WishlistController'
 import ZoneController from './ZoneController'
 import CheckoutController from './CheckoutController'
 import StripePaymentController from './StripePaymentController'
@@ -21,6 +22,7 @@ BrandController: Object.assign(BrandController, BrandController),
 SearchController: Object.assign(SearchController, SearchController),
 SearchSuggestController: Object.assign(SearchSuggestController, SearchSuggestController),
 CartController: Object.assign(CartController, CartController),
+WishlistController: Object.assign(WishlistController, WishlistController),
 ZoneController: Object.assign(ZoneController, ZoneController),
 CheckoutController: Object.assign(CheckoutController, CheckoutController),
 StripePaymentController: Object.assign(StripePaymentController, StripePaymentController),

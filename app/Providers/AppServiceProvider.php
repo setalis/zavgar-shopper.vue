@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Listeners\MergeGuestWishlist;
 use App\Livewire\Shopper\Components\Products\Form\Variants as ProductVariantsForm;
 use App\Livewire\Shopper\Pages\Order\Detail as OrderDetail;
 use App\Livewire\Shopper\Pages\Product\Index as ProductIndex;
@@ -11,6 +12,7 @@ use App\Livewire\Shopper\Pages\Settings\General as GeneralSettings;
 use App\Livewire\Shopper\SlideOvers\AttributeForm;
 use App\Sidebar\PendingProductImportsSidebar;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -48,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerShopperLivewireAliases();
         $this->registerShopperSidebar();
         $this->configureDefaults();
+        $this->app['events']->listen(Login::class, MergeGuestWishlist::class);
     }
 
     protected function registerShopperLivewireAliases(): void

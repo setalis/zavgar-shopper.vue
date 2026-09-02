@@ -7,6 +7,7 @@ import StarRating from '@/components/shop/star-rating.vue';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/composables/useCart';
 import { useTrans } from '@/composables/useTrans';
+import { useWishlist } from '@/composables/useWishlist';
 import * as shop from '@/routes/shop';
 import { ProductType } from '@/types/shop';
 import type { Product } from '@/types/shop';
@@ -15,6 +16,7 @@ const props = defineProps<{ product: Product }>();
 
 const { t } = useTrans();
 const { add } = useCart();
+const { has, toggle } = useWishlist();
 
 const href = computed<string>(() =>
     shop.product.url({ product: props.product.slug }),
@@ -73,6 +75,14 @@ const onSale = computed<boolean>(
 function addToCart(): void {
     add({ product_id: props.product.id, quantity: 1 });
 }
+
+const wishlisted = computed<boolean>(() => has(props.product.id));
+
+function toggleWishlist(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    toggle(props.product.id);
+}
 </script>
 
 <template>
@@ -105,11 +115,24 @@ function addToCart(): void {
 
             <button
                 type="button"
-                class="absolute top-2.5 right-2.5 z-10 grid size-8 place-items-center rounded-full bg-paper text-ink opacity-0 shadow-sm transition group-hover:opacity-100 hover:text-rose focus-visible:opacity-100"
-                :aria-label="t('shop.product.add_to_wishlist')"
-                :title="t('shop.nav.wishlist_soon')"
+                class="absolute top-2.5 right-2.5 z-10 grid size-8 place-items-center rounded-full bg-paper shadow-sm transition hover:text-rose focus-visible:opacity-100"
+                :class="
+                    wishlisted
+                        ? 'text-rose opacity-100'
+                        : 'text-ink opacity-0 group-hover:opacity-100'
+                "
+                :aria-label="
+                    wishlisted
+                        ? t('shop.product.remove_from_wishlist')
+                        : t('shop.product.add_to_wishlist')
+                "
+                @click="toggleWishlist"
             >
-                <Heart class="size-4" aria-hidden="true" />
+                <Heart
+                    class="size-4"
+                    :fill="wishlisted ? 'currentColor' : 'none'"
+                    aria-hidden="true"
+                />
             </button>
         </div>
 

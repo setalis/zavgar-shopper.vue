@@ -13,6 +13,8 @@ export function useShop() {
 
     const shop = computed<ShopSharedProps>(() => page.props.shop);
     const cartCount = computed<number>(() => shop.value.cart_count);
+    const wishlistCount = computed<number>(() => shop.value.wishlist_count);
+    const wishlistIds = computed<number[]>(() => shop.value.wishlist_ids ?? []);
     const currency = computed<string>(() => shop.value.currency);
     const currentZone = computed(() => shop.value.zone);
     const channels = computed(() => shop.value.channels);
@@ -30,6 +32,8 @@ export function useShop() {
     return {
         shop,
         cartCount,
+        wishlistCount,
+        wishlistIds,
         currency,
         zone: currentZone,
         channels,

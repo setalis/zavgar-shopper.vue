@@ -2,6 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 import productD87513 from './product'
 import searchD2f59a from './search'
 import cartB8cf73 from './cart'
+import wishlistE18b57 from './wishlist'
 import zone from './zone'
 import checkout from './checkout'
 /**
@@ -802,6 +803,84 @@ cart.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
     
     cart.form = cartForm
+/**
+* @see \App\Http\Controllers\Shop\WishlistController::wishlist
+ * @see app/Http/Controllers/Shop/WishlistController.php:35
+ * @route '/wishlist'
+ */
+export const wishlist = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: wishlist.url(options),
+    method: 'get',
+})
+
+wishlist.definition = {
+    methods: ["get","head"],
+    url: '/wishlist',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Shop\WishlistController::wishlist
+ * @see app/Http/Controllers/Shop/WishlistController.php:35
+ * @route '/wishlist'
+ */
+wishlist.url = (options?: RouteQueryOptions) => {
+    return wishlist.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Shop\WishlistController::wishlist
+ * @see app/Http/Controllers/Shop/WishlistController.php:35
+ * @route '/wishlist'
+ */
+wishlist.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: wishlist.url(options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\Shop\WishlistController::wishlist
+ * @see app/Http/Controllers/Shop/WishlistController.php:35
+ * @route '/wishlist'
+ */
+wishlist.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: wishlist.url(options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\Shop\WishlistController::wishlist
+ * @see app/Http/Controllers/Shop/WishlistController.php:35
+ * @route '/wishlist'
+ */
+    const wishlistForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: wishlist.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Shop\WishlistController::wishlist
+ * @see app/Http/Controllers/Shop/WishlistController.php:35
+ * @route '/wishlist'
+ */
+        wishlistForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: wishlist.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Shop\WishlistController::wishlist
+ * @see app/Http/Controllers/Shop/WishlistController.php:35
+ * @route '/wishlist'
+ */
+        wishlistForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: wishlist.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    wishlist.form = wishlistForm
 const shop = {
     index: Object.assign(index, index),
 product: Object.assign(product, productD87513),
@@ -812,6 +891,7 @@ brand: Object.assign(brand, brand),
 search: Object.assign(search, searchD2f59a),
 contact: Object.assign(contact, contact),
 cart: Object.assign(cart, cartB8cf73),
+wishlist: Object.assign(wishlist, wishlistE18b57),
 zone: Object.assign(zone, zone),
 checkout: Object.assign(checkout, checkout),
 }

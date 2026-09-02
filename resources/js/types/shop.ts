@@ -159,6 +159,8 @@ export type ZoneSession = {
 
 export type ShopSharedProps = {
     cart_count: number;
+    wishlist_count: number;
+    wishlist_ids: number[];
     zone: ZoneSession | null;
     currency: string;
     channels: Channel[];

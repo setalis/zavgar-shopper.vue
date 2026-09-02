@@ -30,6 +30,7 @@ const links = computed(() => [
     { href: home.url(), label: t('shop.nav.home') },
     { href: shop.index.url(), label: t('shop.nav.shop') },
     { href: shop.categories.url(), label: t('shop.nav.categories') },
+    { href: shop.wishlist.url(), label: t('shop.nav.wishlist') },
     { href: shop.cart.url(), label: t('shop.nav.cart') },
     { href: shop.contact.url(), label: t('shop.nav.contact') },
 ]);

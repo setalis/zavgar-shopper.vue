@@ -1,5 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 import productD87513 from './product'
+import searchD2f59a from './search'
 import cartB8cf73 from './cart'
 import zone from './zone'
 import checkout from './checkout'
@@ -808,7 +809,7 @@ categories: Object.assign(categories, categories),
 category: Object.assign(category, category),
 collection: Object.assign(collection, collection),
 brand: Object.assign(brand, brand),
-search: Object.assign(search, search),
+search: Object.assign(search, searchD2f59a),
 contact: Object.assign(contact, contact),
 cart: Object.assign(cart, cartB8cf73),
 zone: Object.assign(zone, zone),

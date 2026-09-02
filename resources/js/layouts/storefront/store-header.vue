@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { Heart, Menu, Search, ShoppingBag, User } from 'lucide-vue-next';
-import { ref } from 'vue';
 import BrandIcon from '@/components/shop/brand-icon.vue';
 import Container from '@/components/shop/container.vue';
+import HeaderSearch from '@/components/shop/header-search.vue';
 import { useShop } from '@/composables/useShop';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard, home, login } from '@/routes';
@@ -14,23 +14,11 @@ const emit = defineEmits<{ openMenu: [] }>();
 const page = usePage();
 const { cartCount } = useShop();
 const { t } = useTrans();
-
-const term = ref<string>('');
-
-function submitSearch(): void {
-    const query = term.value.trim();
-
-    if (query.length === 0) {
-        return;
-    }
-
-    router.get(shop.search.url(), { q: query }, { preserveState: false });
-}
 </script>
 
 <template>
     <header
-        class="sticky top-0 z-60 border-b border-rule bg-paper"
+        class="sticky top-0 z-60 overflow-visible border-b border-rule bg-paper"
         :style="{ height: 'var(--header-h)' }"
     >
         <Container
@@ -46,26 +34,7 @@ function submitSearch(): void {
                 </span>
             </Link>
 
-            <form
-                role="search"
-                class="relative mx-auto hidden w-full max-w-[560px] md:block"
-                @submit.prevent="submitSearch"
-            >
-                <input
-                    v-model="term"
-                    type="search"
-                    :placeholder="t('shop.search.placeholder')"
-                    :aria-label="t('shop.search.aria_label')"
-                    class="w-full rounded-full border border-rule-strong bg-muted py-3.5 pr-14 pl-5 text-base transition placeholder:text-ink-faint focus:border-brand focus:bg-paper focus:ring-4 focus:ring-brand/12 focus:outline-none"
-                />
-                <button
-                    type="submit"
-                    class="absolute top-1/2 right-[5px] grid size-[42px] -translate-y-1/2 place-items-center rounded-full bg-primary text-paper transition hover:bg-brand-deep"
-                    :aria-label="t('shop.nav.search')"
-                >
-                    <Search class="size-[18px]" aria-hidden="true" />
-                </button>
-            </form>
+            <HeaderSearch />
 
             <div class="inline-flex items-center justify-end gap-2">
                 <Link

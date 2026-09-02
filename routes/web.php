@@ -15,6 +15,7 @@ use App\Http\Controllers\Shop\HomeController;
 use App\Http\Controllers\Shop\ProductController;
 use App\Http\Controllers\Shop\ProductReviewController;
 use App\Http\Controllers\Shop\SearchController;
+use App\Http\Controllers\Shop\SearchSuggestController;
 use App\Http\Controllers\Shop\StripePaymentController;
 use App\Http\Controllers\Shop\ZoneController;
 use App\Http\Controllers\StripeWebhookController;
@@ -33,6 +34,7 @@ Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->n
 Route::get('collections/{collection:slug}', [CollectionController::class, 'show'])->name('shop.collection');
 Route::get('brands/{brand:slug}', BrandController::class)->name('shop.brand');
 Route::get('search', SearchController::class)->middleware('throttle:30,1')->name('shop.search');
+Route::get('search/suggest', SearchSuggestController::class)->middleware('throttle:30,1')->name('shop.search.suggest');
 Route::inertia('contact', 'shop/contact')->name('shop.contact');
 
 // Cart

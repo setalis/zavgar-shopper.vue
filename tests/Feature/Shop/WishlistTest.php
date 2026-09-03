@@ -47,7 +47,7 @@ test('guests can add and remove products from the session wishlist', function ()
     $this->get(route('shop.wishlist'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('shop/wishlist')
+            ->component('account/wishlist')
             ->has('products.data', 1)
             ->where('products.data.0.id', $product->id)
             ->where('shop.wishlist_count', 1)
@@ -61,7 +61,7 @@ test('guests can add and remove products from the session wishlist', function ()
     $this->get(route('shop.wishlist'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('shop/wishlist')
+            ->component('account/wishlist')
             ->has('products.data', 0)
             ->where('shop.wishlist_count', 0)
         );
@@ -202,7 +202,7 @@ test('a user cannot see another users wishlist', function (): void {
         ->get(route('shop.wishlist'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('shop/wishlist')
+            ->component('account/wishlist')
             ->has('products.data', 0)
             ->where('shop.wishlist_count', 0)
         );

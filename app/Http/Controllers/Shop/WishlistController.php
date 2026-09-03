@@ -58,7 +58,7 @@ final class WishlistController extends Controller
             ],
         );
 
-        return Inertia::render('shop/wishlist', [
+        return Inertia::render('account/wishlist', [
             'products' => $paginator,
         ]);
     }

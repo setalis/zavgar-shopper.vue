@@ -78,7 +78,11 @@ function isActive(item: NavItem): boolean {
                         {{ item.label }}
                     </Link>
 
-                    <form method="POST" :action="logout.url()">
+                    <form
+                        v-if="page.props.auth.user"
+                        method="POST"
+                        :action="logout.url()"
+                    >
                         <button
                             type="submit"
                             class="text-sm text-destructive transition hover:opacity-80"

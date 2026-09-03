@@ -57,7 +57,7 @@ const compactProducts = computed<Product[]>(() =>
 
     <BentoHero />
 
-    <section v-if="tabs.length" class="py-14 md:py-20">
+    <section v-if="tabs.length" class="py-3 md:pb-20 md:pb-0">
         <Container>
             <SectionHead
                 :title="t('shop.home.trending.title')"

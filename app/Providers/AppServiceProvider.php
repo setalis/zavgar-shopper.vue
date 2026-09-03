@@ -10,6 +10,7 @@ use App\Livewire\Shopper\Pages\Order\Detail as OrderDetail;
 use App\Livewire\Shopper\Pages\Product\Index as ProductIndex;
 use App\Livewire\Shopper\Pages\Settings\General as GeneralSettings;
 use App\Livewire\Shopper\SlideOvers\AttributeForm;
+use App\Sidebar\HomepageBannersSidebar;
 use App\Sidebar\PendingProductImportsSidebar;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
@@ -62,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
     protected function registerShopperSidebar(): void
     {
         $this->app['events']->listen(SidebarBuilder::class, PendingProductImportsSidebar::class);
+        $this->app['events']->listen(SidebarBuilder::class, HomepageBannersSidebar::class);
     }
 
     /**

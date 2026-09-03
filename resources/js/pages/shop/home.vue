@@ -14,9 +14,10 @@ import SectionHead from '@/components/shop/section-head.vue';
 import TrustBadges from '@/components/shop/trust-badges.vue';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
-import type { Category, Collection, Product } from '@/types/shop';
+import type { Category, Collection, HomepageBanner, Product } from '@/types/shop';
 
 const props = defineProps<{
+    bentoBanners: HomepageBanner[];
     featuredProducts: Product[];
     latestProducts: Product[];
     featuredCollections: Collection[];
@@ -55,7 +56,7 @@ const compactProducts = computed<Product[]>(() =>
 <template>
     <Head :title="t('shop.home.title')" />
 
-    <BentoHero />
+    <BentoHero :banners="bentoBanners" />
 
     <section v-if="tabs.length" class="py-3 md:pb-20 md:pb-0">
         <Container>

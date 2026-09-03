@@ -38,6 +38,27 @@ type WithStorefrontMedia = {
     images?: Media[];
 };
 
+export type HomepageBannerTint = {
+    token: string;
+    from: string;
+    to: string;
+};
+
+export type HomepageBanner = {
+    id: number;
+    size: 'large' | 'medium' | 'small';
+    eyebrow: string | null;
+    title: string;
+    description: string | null;
+    button_text: string | null;
+    href: string | null;
+    background_type: 'gradient' | 'image';
+    gradient: HomepageBannerTint | null;
+    overlay_gradient: HomepageBannerTint | null;
+    background_image: string | null;
+    accent_image: string | null;
+};
+
 export type Brand = BaseBrand & WithStorefrontMedia;
 
 export type Category = BaseCategory &

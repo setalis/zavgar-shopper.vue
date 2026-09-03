@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Collection;
+use App\Models\HomepageBanner;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
@@ -34,6 +35,14 @@ final class HomeController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('shop/home', [
+            'bentoBanners' => fn () => HomepageBanner::query()
+                ->enabled()
+                ->with(['media', 'category', 'product', 'collection', 'brand'])
+                ->orderBy('position')
+                ->get()
+                ->map(fn (HomepageBanner $banner): array => $banner->toStorefrontArray())
+                ->values()
+                ->all(),
             'featuredProducts' => fn () => $this->cardQuery()
                 ->where('featured', true)
                 ->limit(10)

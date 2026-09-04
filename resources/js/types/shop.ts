@@ -107,6 +107,19 @@ export type ProductAttribute = {
     value: string;
 };
 
+export type AttributeFilterValue = {
+    key: string;
+    label: string;
+};
+
+export type AttributeFilter = {
+    id: number;
+    name: string;
+    slug: string;
+    type: string;
+    values: AttributeFilterValue[];
+};
+
 export type VariantOptions = {
     productOptions: Array<{
         id: number;

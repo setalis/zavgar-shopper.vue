@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Shop;
 
+use App\Actions\Product\ApplyCategoryAttributeFilters;
+use App\Actions\Product\BuildCategoryAttributeFilters;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Shop\ShowCategoryRequest;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,9 +29,15 @@ final class CategoryController extends Controller
         ]);
     }
 
-    public function show(Request $request, Category $category): Response
-    {
-        $sort = (string) $request->string('sort', 'latest');
+    public function show(
+        ShowCategoryRequest $request,
+        Category $category,
+        BuildCategoryAttributeFilters $buildCategoryAttributeFilters,
+        ApplyCategoryAttributeFilters $applyCategoryAttributeFilters,
+    ): Response {
+        $sort = $request->sort();
+        $selectedAttrs = $request->selectedAttrs();
+        $attributeFilters = $buildCategoryAttributeFilters->handle($category);
 
         $query = Product::query()
             ->scopes('publish')
@@ -38,6 +46,8 @@ final class CategoryController extends Controller
             ->withCurrentPrices()
             ->withCurrentStock()
             ->withApprovedReviewSummary();
+
+        $query = $applyCategoryAttributeFilters->handle($query, $selectedAttrs, $attributeFilters);
 
         $query = match ($sort) {
             'name' => $query->orderBy('name'),
@@ -54,7 +64,11 @@ final class CategoryController extends Controller
                     ->get(),
             ),
             'products' => $query->paginate(12)->withQueryString(),
-            'filters' => ['sort' => $sort],
+            'attributeFilters' => $attributeFilters,
+            'filters' => [
+                'sort' => $sort,
+                'attrs' => (object) $selectedAttrs,
+            ],
         ]);
     }
 }

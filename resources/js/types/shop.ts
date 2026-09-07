@@ -60,7 +60,10 @@ export type HomepageBanner = {
     accent_image: string | null;
 };
 
-export type Brand = BaseBrand & WithStorefrontMedia;
+export type Brand = BaseBrand &
+    WithStorefrontMedia & {
+        products_count?: number;
+    };
 
 export type Category = BaseCategory &
     WithStorefrontMedia & {

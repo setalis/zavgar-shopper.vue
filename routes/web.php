@@ -33,7 +33,8 @@ Route::middleware(['auth', 'verified', 'throttle:10,1'])->group(function (): voi
 Route::get('categories', [CategoryController::class, 'index'])->name('shop.categories');
 Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->name('shop.category');
 Route::get('collections/{collection:slug}', [CollectionController::class, 'show'])->name('shop.collection');
-Route::get('brands/{brand:slug}', BrandController::class)->name('shop.brand');
+Route::get('brands', [BrandController::class, 'index'])->name('shop.brands');
+Route::get('brands/{brand:slug}', [BrandController::class, 'show'])->name('shop.brand');
 Route::get('search', SearchController::class)->middleware('throttle:30,1')->name('shop.search');
 Route::get('search/suggest', SearchSuggestController::class)->middleware('throttle:30,1')->name('shop.search.suggest');
 Route::inertia('contact', 'shop/contact')->name('shop.contact');

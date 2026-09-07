@@ -58,7 +58,7 @@ const filtersOpen = ref<boolean>(false);
 
 const crumbs = computed(() => [
     { label: t('shop.nav.home'), href: home.url() },
-    { label: t('shop.nav.shop'), href: shop.index.url() },
+    { label: t('shop.brands.heading'), href: shop.brands.url() },
     { label: props.brand.name },
 ]);
 

@@ -159,16 +159,22 @@ test('home page shares enabled menu items with nested children', function (): vo
         'position' => 1,
     ]);
 
+    MenuItem::factory()->create([
+        'title' => 'Contact',
+        'url' => '/contact',
+        'position' => 2,
+    ]);
+
     MenuItem::factory()->disabled()->create([
         'title' => 'Hidden',
         'url' => '/hidden',
-        'position' => 2,
+        'position' => 3,
     ]);
 
     $this->get(route('home'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->has('shop.nav_menu', 1)
+            ->has('shop.nav_menu', 2)
             ->where('shop.nav_menu.0.id', $root->id)
             ->where('shop.nav_menu.0.title', 'Catalog')
             ->where('shop.nav_menu.0.href', '/shop')
@@ -177,6 +183,9 @@ test('home page shares enabled menu items with nested children', function (): vo
             ->has('shop.nav_menu.0.children.0.children', 1)
             ->where('shop.nav_menu.0.children.0.children.0.title', 'Gaming')
             ->where('shop.nav_menu.0.children.0.children.0.href', '/categories/gaming')
+            ->has('shop.nav_menu.0.children.0.children.0.children', 0)
+            ->where('shop.nav_menu.1.title', 'Contact')
+            ->has('shop.nav_menu.1.children', 0)
         );
 });
 

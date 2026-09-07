@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid } from 'lucide-vue-next';
+import { ChevronRight, LayoutGrid } from 'lucide-vue-next';
 import { computed } from 'vue';
 import BrandIcon from '@/components/shop/brand-icon.vue';
 import LocaleSwitcher from '@/components/shop/locale-switcher.vue';
@@ -37,6 +37,10 @@ function close(): void {
 function isExternal(href: string): boolean {
     return href.startsWith('http://') || href.startsWith('https://');
 }
+
+function hasChildren(item: Pick<NavMenuItem, 'children'>): boolean {
+    return item.children.length > 0;
+}
 </script>
 
 <template>
@@ -67,22 +71,32 @@ function isExternal(href: string): boolean {
                             v-if="isExternal(item.href)"
                             :href="item.href"
                             rel="noopener noreferrer"
-                            class="font-heading text-md font-semibold text-ink transition hover:text-brand"
+                            class="flex items-center justify-between gap-2 font-heading text-md font-semibold text-ink transition hover:text-brand"
                             @click="close"
                         >
-                            {{ item.title }}
+                            <span>{{ item.title }}</span>
+                            <ChevronRight
+                                v-if="hasChildren(item)"
+                                class="size-4 shrink-0 text-ink-faint"
+                                aria-hidden="true"
+                            />
                         </a>
                         <Link
                             v-else
                             :href="item.href"
-                            class="font-heading text-md font-semibold text-ink transition hover:text-brand"
+                            class="flex items-center justify-between gap-2 font-heading text-md font-semibold text-ink transition hover:text-brand"
                             @click="close"
                         >
-                            {{ item.title }}
+                            <span>{{ item.title }}</span>
+                            <ChevronRight
+                                v-if="hasChildren(item)"
+                                class="size-4 shrink-0 text-ink-faint"
+                                aria-hidden="true"
+                            />
                         </Link>
 
                         <div
-                            v-if="item.children.length"
+                            v-if="hasChildren(item)"
                             class="mt-2 space-y-1.5"
                         >
                             <div
@@ -93,18 +107,28 @@ function isExternal(href: string): boolean {
                                     v-if="isExternal(child.href)"
                                     :href="child.href"
                                     rel="noopener noreferrer"
-                                    class="block pl-4 text-sm font-medium text-ink-soft transition hover:text-brand"
+                                    class="flex items-center justify-between gap-2 pl-4 text-sm font-medium text-ink-soft transition hover:text-brand"
                                     @click="close"
                                 >
-                                    {{ child.title }}
+                                    <span>{{ child.title }}</span>
+                                    <ChevronRight
+                                        v-if="hasChildren(child)"
+                                        class="size-3.5 shrink-0 text-ink-faint"
+                                        aria-hidden="true"
+                                    />
                                 </a>
                                 <Link
                                     v-else
                                     :href="child.href"
-                                    class="block pl-4 text-sm font-medium text-ink-soft transition hover:text-brand"
+                                    class="flex items-center justify-between gap-2 pl-4 text-sm font-medium text-ink-soft transition hover:text-brand"
                                     @click="close"
                                 >
-                                    {{ child.title }}
+                                    <span>{{ child.title }}</span>
+                                    <ChevronRight
+                                        v-if="hasChildren(child)"
+                                        class="size-3.5 shrink-0 text-ink-faint"
+                                        aria-hidden="true"
+                                    />
                                 </Link>
 
                                 <div
@@ -169,7 +193,14 @@ function isExternal(href: string): boolean {
                                 class="size-4 shrink-0 text-ink-faint"
                                 aria-hidden="true"
                             />
-                            {{ category.name }}
+                            <span class="min-w-0 flex-1">{{
+                                category.name
+                            }}</span>
+                            <ChevronRight
+                                v-if="category.children?.length"
+                                class="size-3.5 shrink-0 text-ink-faint"
+                                aria-hidden="true"
+                            />
                         </Link>
                         <Link
                             v-for="child in category.children ?? []"

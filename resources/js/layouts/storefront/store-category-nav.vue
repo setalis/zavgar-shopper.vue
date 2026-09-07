@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Menu } from 'lucide-vue-next';
+import { ChevronDown, ChevronRight, LayoutGrid, Menu } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import Container from '@/components/shop/container.vue';
 import { useTrans } from '@/composables/useTrans';
@@ -76,6 +76,10 @@ function isExternal(href: string): boolean {
     return href.startsWith('http://') || href.startsWith('https://');
 }
 
+function hasChildren(item: Pick<NavMenuItem, 'children'>): boolean {
+    return item.children.length > 0;
+}
+
 onBeforeUnmount(() => {
     clearCloseTimer();
 });
@@ -119,18 +123,28 @@ onBeforeUnmount(() => {
                         @focus="openMenuMega(item)"
                     >
                         {{ item.title }}
+                        <ChevronDown
+                            v-if="hasChildren(item)"
+                            :class="
+                                cn(
+                                    'size-3.5 shrink-0 transition duration-200',
+                                    menuMegaId === item.id && 'rotate-180',
+                                )
+                            "
+                            aria-hidden="true"
+                        />
                     </a>
                     <Link
                         v-else
                         :href="item.href"
                         :aria-current="isActive(item.href) ? 'page' : undefined"
                         :aria-expanded="
-                            item.children.length > 0
+                            hasChildren(item)
                                 ? menuMegaId === item.id
                                 : undefined
                         "
                         :aria-controls="
-                            item.children.length > 0
+                            hasChildren(item)
                                 ? `storefront-menu-mega-${item.id}`
                                 : undefined
                         "
@@ -147,6 +161,16 @@ onBeforeUnmount(() => {
                         @click="closeMega"
                     >
                         {{ item.title }}
+                        <ChevronDown
+                            v-if="hasChildren(item)"
+                            :class="
+                                cn(
+                                    'size-3.5 shrink-0 transition duration-200',
+                                    menuMegaId === item.id && 'rotate-180',
+                                )
+                            "
+                            aria-hidden="true"
+                        />
                     </Link>
                 </template>
             </div>
@@ -203,7 +227,14 @@ onBeforeUnmount(() => {
                                     class="size-4 shrink-0 text-ink-faint"
                                     aria-hidden="true"
                                 />
-                                <span>{{ category.name }}</span>
+                                <span class="min-w-0 flex-1">{{
+                                    category.name
+                                }}</span>
+                                <ChevronRight
+                                    v-if="category.children?.length"
+                                    class="size-3.5 shrink-0 text-ink-faint"
+                                    aria-hidden="true"
+                                />
                             </Link>
 
                             <ul
@@ -276,24 +307,34 @@ onBeforeUnmount(() => {
                                 v-if="isExternal(child.href)"
                                 :href="child.href"
                                 rel="noopener noreferrer"
-                                class="block rounded-md p-2 font-heading text-sm font-semibold transition-colors hover:bg-brand-soft hover:text-brand-deep"
+                                class="flex items-center justify-between gap-2 rounded-md p-2 font-heading text-sm font-semibold transition-colors hover:bg-brand-soft hover:text-brand-deep"
                                 @click="closeMega"
                             >
-                                {{ child.title }}
+                                <span>{{ child.title }}</span>
+                                <ChevronRight
+                                    v-if="hasChildren(child)"
+                                    class="size-3.5 shrink-0 text-ink-faint"
+                                    aria-hidden="true"
+                                />
                             </a>
                             <Link
                                 v-else
                                 :href="child.href"
                                 :class="
                                     cn(
-                                        'block rounded-md p-2 font-heading text-sm font-semibold transition-colors hover:bg-brand-soft hover:text-brand-deep',
+                                        'flex items-center justify-between gap-2 rounded-md p-2 font-heading text-sm font-semibold transition-colors hover:bg-brand-soft hover:text-brand-deep',
                                         isActive(child.href) &&
                                             'bg-brand-soft text-brand-deep',
                                     )
                                 "
                                 @click="closeMega"
                             >
-                                {{ child.title }}
+                                <span>{{ child.title }}</span>
+                                <ChevronRight
+                                    v-if="hasChildren(child)"
+                                    class="size-3.5 shrink-0 text-ink-faint"
+                                    aria-hidden="true"
+                                />
                             </Link>
 
                             <ul

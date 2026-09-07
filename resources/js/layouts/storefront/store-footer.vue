@@ -53,6 +53,10 @@ const resourceLinks = computed(() => [
         href: shop.categories.url(),
         label: t('shop.footer.resources.categories'),
     },
+    {
+        href: shop.brands.url(),
+        label: t('shop.footer.resources.brands'),
+    },
     { href: shop.search.url(), label: t('shop.footer.resources.search') },
     { href: shop.cart.url(), label: t('shop.footer.resources.cart') },
 ]);

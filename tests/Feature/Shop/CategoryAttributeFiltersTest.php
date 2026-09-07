@@ -49,6 +49,9 @@ test('empty category has no attribute filters', function (): void {
             ->has('attributeFilters', 0)
             ->where('filters.sort', 'latest')
             ->where('filters.attrs', [])
+            ->where('filters.price_min', null)
+            ->where('filters.price_max', null)
+            ->where('priceRange', null)
         );
 });
 

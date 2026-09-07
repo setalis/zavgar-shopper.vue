@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs } from 'vue';
+import PriceRangeFilter from '@/components/shop/price-range-filter.vue';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Slider } from '@/components/ui/slider';
 import { useTrans } from '@/composables/useTrans';
 import { cn } from '@/lib/utils';
-import type { Category } from '@/types/shop';
+import type { Category, PriceRange } from '@/types/shop';
 
 defineOptions({ inheritAttrs: false });
 
@@ -18,9 +18,15 @@ export type FilterCategory = Pick<Category, 'id' | 'name' | 'slug'> & {
 const props = defineProps<{
     categories: FilterCategory[];
     activeCategory: number | null;
+    priceRange: PriceRange | null;
+    priceMin: number | null;
+    priceMax: number | null;
 }>();
 
-const emit = defineEmits<{ selectCategory: [value: number | null] }>();
+const emit = defineEmits<{
+    selectCategory: [value: number | null];
+    changePrice: [min: number | null, max: number | null];
+}>();
 
 const { t } = useTrans();
 
@@ -32,12 +38,6 @@ const rootClass = computed<string>(() =>
     ),
 );
 
-/**
- * Price, rating and availability come from the Sprylo template but the
- * catalogue endpoint only understands search / category / sort, so these
- * groups stay presentational until the backend gains the matching filters.
- */
-const priceRange = ref<number[]>([20, 70]);
 const rating = ref<string>('any');
 const availability = ref<string>('any');
 
@@ -114,16 +114,13 @@ function toggleCategory(id: number): void {
             </div>
         </div>
 
-        <div class="border-b border-rule py-5">
-            <h3
-                class="mb-3 font-heading text-sm font-bold tracking-[0.06em] text-ink uppercase"
-            >
-                {{ t('shop.filters.price_range') }}
-            </h3>
-            <Slider v-model="priceRange" :min="0" :max="100" :step="1" />
-            <p class="mt-3 font-mono text-[11px] text-ink-mute">
-                {{ priceRange[0] }}% — {{ priceRange[1] }}%
-            </p>
+        <div v-if="priceRange" class="border-b border-rule py-5">
+            <PriceRangeFilter
+                :bounds="priceRange"
+                :price-min="priceMin"
+                :price-max="priceMax"
+                @change="(min, max) => emit('changePrice', min, max)"
+            />
         </div>
 
         <div class="border-b border-rule py-5">

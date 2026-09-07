@@ -120,6 +120,11 @@ export type AttributeFilter = {
     values: AttributeFilterValue[];
 };
 
+export type PriceRange = {
+    min: number;
+    max: number;
+};
+
 export type VariantOptions = {
     productOptions: Array<{
         id: number;

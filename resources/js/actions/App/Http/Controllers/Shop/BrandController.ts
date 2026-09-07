@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @see app/Http/Controllers/Shop/BrandController.php:17
  * @route '/brands/{brand}'
  */
 const BrandController = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ BrandController.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @see app/Http/Controllers/Shop/BrandController.php:17
  * @route '/brands/{brand}'
  */
 BrandController.url = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ BrandController.url = (args: { brand: string | { slug: string } } | [brand: stri
 
 /**
 * @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @see app/Http/Controllers/Shop/BrandController.php:17
  * @route '/brands/{brand}'
  */
 BrandController.get = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -58,7 +58,7 @@ BrandController.get = (args: { brand: string | { slug: string } } | [brand: stri
 })
 /**
 * @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @see app/Http/Controllers/Shop/BrandController.php:17
  * @route '/brands/{brand}'
  */
 BrandController.head = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -68,7 +68,7 @@ BrandController.head = (args: { brand: string | { slug: string } } | [brand: str
 
     /**
 * @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @see app/Http/Controllers/Shop/BrandController.php:17
  * @route '/brands/{brand}'
  */
     const BrandControllerForm = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -78,7 +78,7 @@ BrandController.head = (args: { brand: string | { slug: string } } | [brand: str
 
             /**
 * @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @see app/Http/Controllers/Shop/BrandController.php:17
  * @route '/brands/{brand}'
  */
         BrandControllerForm.get = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -87,7 +87,7 @@ BrandController.head = (args: { brand: string | { slug: string } } | [brand: str
         })
             /**
 * @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:15
+ * @see app/Http/Controllers/Shop/BrandController.php:17
  * @route '/brands/{brand}'
  */
         BrandControllerForm.head = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

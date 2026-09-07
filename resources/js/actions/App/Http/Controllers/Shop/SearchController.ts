@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Shop\SearchController::__invoke
- * @see app/Http/Controllers/Shop/SearchController.php:15
+ * @see app/Http/Controllers/Shop/SearchController.php:17
  * @route '/search'
  */
 const SearchController = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ SearchController.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\SearchController::__invoke
- * @see app/Http/Controllers/Shop/SearchController.php:15
+ * @see app/Http/Controllers/Shop/SearchController.php:17
  * @route '/search'
  */
 SearchController.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ SearchController.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Shop\SearchController::__invoke
- * @see app/Http/Controllers/Shop/SearchController.php:15
+ * @see app/Http/Controllers/Shop/SearchController.php:17
  * @route '/search'
  */
 SearchController.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ SearchController.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => 
 })
 /**
 * @see \App\Http\Controllers\Shop\SearchController::__invoke
- * @see app/Http/Controllers/Shop/SearchController.php:15
+ * @see app/Http/Controllers/Shop/SearchController.php:17
  * @route '/search'
  */
 SearchController.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ SearchController.head = (options?: RouteQueryOptions): RouteDefinition<'head'> =
 
     /**
 * @see \App\Http\Controllers\Shop\SearchController::__invoke
- * @see app/Http/Controllers/Shop/SearchController.php:15
+ * @see app/Http/Controllers/Shop/SearchController.php:17
  * @route '/search'
  */
     const SearchControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -54,7 +54,7 @@ SearchController.head = (options?: RouteQueryOptions): RouteDefinition<'head'> =
 
             /**
 * @see \App\Http\Controllers\Shop\SearchController::__invoke
- * @see app/Http/Controllers/Shop/SearchController.php:15
+ * @see app/Http/Controllers/Shop/SearchController.php:17
  * @route '/search'
  */
         SearchControllerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -63,7 +63,7 @@ SearchController.head = (options?: RouteQueryOptions): RouteDefinition<'head'> =
         })
             /**
 * @see \App\Http\Controllers\Shop\SearchController::__invoke
- * @see app/Http/Controllers/Shop/SearchController.php:15
+ * @see app/Http/Controllers/Shop/SearchController.php:17
  * @route '/search'
  */
         SearchControllerForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

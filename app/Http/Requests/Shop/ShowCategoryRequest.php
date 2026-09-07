@@ -24,7 +24,16 @@ final class ShowCategoryRequest extends FormRequest
             'attrs' => ['sometimes', 'array'],
             'attrs.*' => ['array'],
             'attrs.*.*' => ['string', 'max:255'],
+            ...StorefrontPriceFilter::rules(),
         ];
+    }
+
+    /**
+     * @return array{min: int|null, max: int|null}
+     */
+    public function priceRange(): array
+    {
+        return StorefrontPriceFilter::normalized($this->validated());
     }
 
     /**

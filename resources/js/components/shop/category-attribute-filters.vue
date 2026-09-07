@@ -1,19 +1,31 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
+import PriceRangeFilter from '@/components/shop/price-range-filter.vue';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTrans } from '@/composables/useTrans';
 import { cn } from '@/lib/utils';
-import type { AttributeFilter } from '@/types/shop';
+import type { AttributeFilter, PriceRange } from '@/types/shop';
 
 defineOptions({ inheritAttrs: false });
 
-const props = defineProps<{
-    attributes: AttributeFilter[];
-    selected: Record<string, string[]>;
-}>();
+const props = withDefaults(
+    defineProps<{
+        attributes: AttributeFilter[];
+        selected: Record<string, string[]>;
+        priceRange?: PriceRange | null;
+        priceMin?: number | null;
+        priceMax?: number | null;
+    }>(),
+    {
+        priceRange: null,
+        priceMin: null,
+        priceMax: null,
+    },
+);
 
 const emit = defineEmits<{
     toggle: [slug: string, key: string];
+    changePrice: [min: number | null, max: number | null];
     clear: [];
 }>();
 
@@ -27,8 +39,11 @@ const rootClass = computed<string>(() =>
     ),
 );
 
-const hasSelection = computed<boolean>(() =>
-    Object.values(props.selected).some((keys) => keys.length > 0),
+const hasSelection = computed<boolean>(
+    () =>
+        Object.values(props.selected).some((keys) => keys.length > 0) ||
+        props.priceMin != null ||
+        props.priceMax != null,
 );
 
 function isSelected(slug: string, key: string): boolean {
@@ -60,6 +75,15 @@ function isSelected(slug: string, key: string): boolean {
         </div>
 
         <div class="divide-y divide-rule">
+            <div v-if="priceRange" class="py-5 first:pt-0 last:pb-0">
+                <PriceRangeFilter
+                    :bounds="priceRange"
+                    :price-min="priceMin"
+                    :price-max="priceMax"
+                    @change="(min, max) => emit('changePrice', min, max)"
+                />
+            </div>
+
             <div
                 v-for="attribute in attributes"
                 :key="attribute.id"

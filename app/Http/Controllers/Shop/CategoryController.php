@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Shop;
 
 use App\Actions\Product\ApplyCategoryAttributeFilters;
 use App\Actions\Product\BuildCategoryAttributeFilters;
+use App\Actions\Product\FilterByStorefrontPrice;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Shop\ShowCategoryRequest;
 use App\Models\Category;
@@ -34,20 +35,25 @@ final class CategoryController extends Controller
         Category $category,
         BuildCategoryAttributeFilters $buildCategoryAttributeFilters,
         ApplyCategoryAttributeFilters $applyCategoryAttributeFilters,
+        FilterByStorefrontPrice $filterByStorefrontPrice,
     ): Response {
         $sort = $request->sort();
         $selectedAttrs = $request->selectedAttrs();
+        $price = $request->priceRange();
         $attributeFilters = $buildCategoryAttributeFilters->handle($category);
 
         $query = Product::query()
             ->scopes('publish')
-            ->whereHas('categories', fn ($q) => $q->where('id', $category->id))
+            ->whereHas('categories', fn ($q) => $q->where('id', $category->id));
+
+        $query = $applyCategoryAttributeFilters->handle($query, $selectedAttrs, $attributeFilters);
+
+        $priceRange = $filterByStorefrontPrice->bounds($query);
+        $query = $filterByStorefrontPrice->apply($query, $price['min'], $price['max'])
             ->with(['media', 'brand.media'])
             ->withCurrentPrices()
             ->withCurrentStock()
             ->withApprovedReviewSummary();
-
-        $query = $applyCategoryAttributeFilters->handle($query, $selectedAttrs, $attributeFilters);
 
         $query = match ($sort) {
             'name' => $query->orderBy('name'),
@@ -65,9 +71,12 @@ final class CategoryController extends Controller
             ),
             'products' => $query->paginate(12)->withQueryString(),
             'attributeFilters' => $attributeFilters,
+            'priceRange' => $priceRange,
             'filters' => [
                 'sort' => $sort,
                 'attrs' => (object) $selectedAttrs,
+                'price_min' => $price['min'],
+                'price_max' => $price['max'],
             ],
         ]);
     }

@@ -80,6 +80,9 @@ test('shop index still paginates published products with filters', function (): 
             ->where('filters.search', '')
             ->where('filters.category', null)
             ->where('filters.sort', 'latest')
+            ->where('filters.price_min', null)
+            ->where('filters.price_max', null)
+            ->where('priceRange', null)
         );
 });
 
@@ -144,6 +147,9 @@ test('category page lists published products with sort filters', function (): vo
             ->has('products.data', 1)
             ->where('products.data.0.id', $product->id)
             ->where('filters.sort', 'latest')
+            ->where('filters.price_min', null)
+            ->where('filters.price_max', null)
+            ->where('priceRange', null)
             ->has('shop.cart_count')
         );
 });
@@ -171,6 +177,9 @@ test('collection page lists attached published products with sort filters', func
             ->has('products.data', 1)
             ->where('products.data.0.id', $product->id)
             ->where('filters.sort', 'latest')
+            ->where('filters.price_min', null)
+            ->where('filters.price_max', null)
+            ->where('priceRange', null)
             ->has('shop.cart_count')
         );
 });
@@ -206,6 +215,9 @@ test('brand page still lists published brand products', function (): void {
             ->where('brand.id', $brand->id)
             ->has('products.data', 1)
             ->where('products.data.0.id', $product->id)
+            ->where('filters.price_min', null)
+            ->where('filters.price_max', null)
+            ->where('priceRange', null)
             ->has('shop.cart_count')
         );
 });
@@ -224,6 +236,9 @@ test('search page keeps query and matching products', function (): void {
             ->where('query', 'Microphone')
             ->has('products.data', 1)
             ->where('products.data.0.id', $product->id)
+            ->where('filters.price_min', null)
+            ->where('filters.price_max', null)
+            ->where('priceRange', null)
             ->has('shop.cart_count')
         );
 });

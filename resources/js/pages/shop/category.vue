@@ -26,9 +26,10 @@ import {
 } from '@/components/ui/sheet';
 import { useTrans } from '@/composables/useTrans';
 import { stripHtml } from '@/lib/format';
+import { withPriceParams } from '@/lib/price-filter';
 import { home } from '@/routes';
 import * as shop from '@/routes/shop';
-import type { AttributeFilter, Category, Product } from '@/types/shop';
+import type { AttributeFilter, Category, PriceRange, Product } from '@/types/shop';
 
 type Paginated<T> = {
     data: T[];
@@ -41,6 +42,8 @@ type Paginated<T> = {
 type Filters = {
     sort: string;
     attrs: Record<string, string[]>;
+    price_min: number | null;
+    price_max: number | null;
 };
 
 const props = defineProps<{
@@ -48,6 +51,7 @@ const props = defineProps<{
     children: Category[];
     products: Paginated<Product>;
     attributeFilters: AttributeFilter[];
+    priceRange: PriceRange | null;
     filters: Filters;
 }>();
 
@@ -70,6 +74,10 @@ const hasAttributeFilters = computed<boolean>(
     () => props.attributeFilters.length > 0,
 );
 
+const hasSidebarFilters = computed<boolean>(
+    () => hasAttributeFilters.value || props.priceRange !== null,
+);
+
 const selectedAttrs = computed<Record<string, string[]>>(
     () => props.filters.attrs ?? {},
 );
@@ -77,12 +85,14 @@ const selectedAttrs = computed<Record<string, string[]>>(
 function visit(
     attrs: Record<string, string[]>,
     nextSort: string = sort.value,
+    priceMin: number | null = props.filters.price_min,
+    priceMax: number | null = props.filters.price_max,
 ): void {
     filtersOpen.value = false;
 
     router.get(
         shop.category.url({ category: props.category.slug }),
-        { sort: nextSort, attrs },
+        withPriceParams({ sort: nextSort, attrs }, priceMin, priceMax),
         { preserveState: true, preserveScroll: true, replace: true },
     );
 }
@@ -107,8 +117,12 @@ function toggleAttr(slug: string, key: string): void {
     visit(next);
 }
 
-function clearAttrs(): void {
-    visit({});
+function changePrice(min: number | null, max: number | null): void {
+    visit(selectedAttrs.value, sort.value, min, max);
+}
+
+function clearFilters(): void {
+    visit({}, sort.value, null, null);
 }
 
 watch(sort, (value) => {
@@ -147,18 +161,22 @@ watch(sort, (value) => {
 
         <div
             :class="
-                hasAttributeFilters
+                hasSidebarFilters
                     ? 'grid gap-10 lg:grid-cols-[260px_1fr]'
                     : undefined
             "
         >
             <CategoryAttributeFilters
-                v-if="hasAttributeFilters"
+                v-if="hasSidebarFilters"
                 class="hidden lg:block"
                 :attributes="attributeFilters"
                 :selected="selectedAttrs"
+                :price-range="priceRange"
+                :price-min="filters.price_min"
+                :price-max="filters.price_max"
                 @toggle="toggleAttr"
-                @clear="clearAttrs"
+                @change-price="changePrice"
+                @clear="clearFilters"
             />
 
             <div>
@@ -198,7 +216,7 @@ watch(sort, (value) => {
                         </Select>
 
                         <Button
-                            v-if="hasAttributeFilters"
+                            v-if="hasSidebarFilters"
                             variant="outline"
                             size="sm"
                             class="rounded-sm lg:hidden"
@@ -226,7 +244,7 @@ watch(sort, (value) => {
                 <template v-else>
                     <div
                         :class="
-                            hasAttributeFilters
+                            hasSidebarFilters
                                 ? 'grid grid-cols-2 gap-4 lg:grid-cols-3'
                                 : 'grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4'
                         "
@@ -247,7 +265,7 @@ watch(sort, (value) => {
         </div>
     </Container>
 
-    <Sheet v-if="hasAttributeFilters" v-model:open="filtersOpen">
+    <Sheet v-if="hasSidebarFilters" v-model:open="filtersOpen">
         <SheetContent side="left" class="w-[88vw] gap-0 sm:max-w-sm">
             <SheetHeader class="border-b border-rule p-5">
                 <SheetTitle class="font-heading text-md font-bold">
@@ -263,8 +281,12 @@ watch(sort, (value) => {
                     class="border-0 p-0"
                     :attributes="attributeFilters"
                     :selected="selectedAttrs"
+                    :price-range="priceRange"
+                    :price-min="filters.price_min"
+                    :price-max="filters.price_max"
                     @toggle="toggleAttr"
-                    @clear="clearAttrs"
+                    @change-price="changePrice"
+                    @clear="clearFilters"
                 />
             </div>
         </SheetContent>

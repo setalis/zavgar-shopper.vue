@@ -6,7 +6,9 @@ namespace App\Http\Controllers\Shop;
 
 use App\Actions\Product\BuildProductAttributes;
 use App\Actions\Product\BuildVariantOptions;
+use App\Actions\Product\FilterByStorefrontPrice;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Shop\StorefrontPriceFilter;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -16,14 +18,11 @@ use Inertia\Response;
 
 final class ProductController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, FilterByStorefrontPrice $filterByStorefrontPrice): Response
     {
-        $query = Product::query()
-            ->scopes('publish')
-            ->with(['media', 'brand.media'])
-            ->withCurrentPrices()
-            ->withCurrentStock()
-            ->withApprovedReviewSummary();
+        $price = StorefrontPriceFilter::fromRequest($request);
+
+        $query = Product::query()->scopes('publish');
 
         $search = (string) $request->string('search', '');
 
@@ -57,6 +56,13 @@ final class ProductController extends Controller
             }
         }
 
+        $priceRange = $filterByStorefrontPrice->bounds($query);
+        $query = $filterByStorefrontPrice->apply($query, $price['min'], $price['max'])
+            ->with(['media', 'brand.media'])
+            ->withCurrentPrices()
+            ->withCurrentStock()
+            ->withApprovedReviewSummary();
+
         $sort = (string) $request->string('sort', 'latest');
         $query = match ($sort) {
             'name' => $query->orderBy('name'),
@@ -72,10 +78,13 @@ final class ProductController extends Controller
                 ->orderBy('position')
                 ->get(['id', 'name', 'slug']),
             'children' => $children,
+            'priceRange' => $priceRange,
             'filters' => [
                 'search' => $search,
                 'category' => $selectedCategory?->id,
                 'sort' => $sort,
+                'price_min' => $price['min'],
+                'price_max' => $price['max'],
             ],
         ]);
     }

@@ -26,9 +26,10 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { useTrans } from '@/composables/useTrans';
+import { withPriceParams } from '@/lib/price-filter';
 import { home } from '@/routes';
 import * as shop from '@/routes/shop';
-import type { Category, Product } from '@/types/shop';
+import type { Category, PriceRange, Product } from '@/types/shop';
 
 const { t } = useTrans();
 
@@ -44,6 +45,8 @@ type Filters = {
     search: string;
     category: number | null;
     sort: string;
+    price_min: number | null;
+    price_max: number | null;
 };
 
 type ShopCategory = Pick<Category, 'id' | 'name' | 'slug'> & {
@@ -54,6 +57,7 @@ const props = defineProps<{
     products: Paginated<Product>;
     categories: ShopCategory[];
     children: Category[];
+    priceRange: PriceRange | null;
     filters: Filters;
 }>();
 
@@ -68,12 +72,26 @@ const crumbs = computed(() => [
     { label: t('shop.index.title') },
 ]);
 
-watch(sort, (value) => {
+function visit(overrides: Partial<Filters> = {}): void {
+    const next = { ...props.filters, ...overrides };
+
     router.get(
         shop.index.url(),
-        { ...props.filters, sort: value },
+        withPriceParams(
+            {
+                search: next.search,
+                category: next.category,
+                sort: next.sort,
+            },
+            next.price_min,
+            next.price_max,
+        ),
         { preserveState: true, preserveScroll: true, replace: true },
     );
+}
+
+watch(sort, (value) => {
+    visit({ sort: value });
 });
 
 watch(search, (value) => {
@@ -82,27 +100,30 @@ watch(search, (value) => {
     }
 
     searchTimer = setTimeout(() => {
-        router.get(
-            shop.index.url(),
-            { ...props.filters, search: value },
-            { preserveState: true, preserveScroll: true, replace: true },
-        );
+        visit({ search: value });
     }, 300);
 });
 
 function filterByCategory(categoryId: number | null): void {
     filtersOpen.value = false;
+    visit({ category: categoryId });
+}
 
-    router.get(
-        shop.index.url(),
-        { ...props.filters, category: categoryId },
-        { preserveState: true, preserveScroll: true, replace: true },
-    );
+function changePrice(min: number | null, max: number | null): void {
+    visit({ price_min: min, price_max: max });
 }
 
 function categoryFilterUrl(categoryId: number): string {
     return shop.index.url({
-        query: { ...props.filters, category: categoryId },
+        query: withPriceParams(
+            {
+                search: props.filters.search,
+                category: categoryId,
+                sort: props.filters.sort,
+            },
+            props.filters.price_min,
+            props.filters.price_max,
+        ),
     });
 }
 </script>
@@ -122,7 +143,11 @@ function categoryFilterUrl(categoryId: number): string {
                 class="hidden lg:block"
                 :categories="categories"
                 :active-category="filters.category"
+                :price-range="priceRange"
+                :price-min="filters.price_min"
+                :price-max="filters.price_max"
                 @select-category="filterByCategory"
+                @change-price="changePrice"
             />
 
             <div>
@@ -262,7 +287,11 @@ function categoryFilterUrl(categoryId: number): string {
                     class="border-0 p-0"
                     :categories="categories"
                     :active-category="filters.category"
+                    :price-range="priceRange"
+                    :price-min="filters.price_min"
+                    :price-max="filters.price_max"
                     @select-category="filterByCategory"
+                    @change-price="changePrice"
                 />
             </div>
         </SheetContent>

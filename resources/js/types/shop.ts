@@ -74,6 +74,13 @@ export type NavCategory = Pick<BaseCategory, 'id' | 'name' | 'slug'> & {
     children?: NavCategoryChild[];
 };
 
+export type NavMenuItem = {
+    id: number;
+    title: string;
+    href: string;
+    children: NavMenuItem[];
+};
+
 export type Collection = BaseCollection &
     WithStorefrontMedia & {
         products_count?: number;
@@ -208,6 +215,7 @@ export type ShopSharedProps = {
     tax_label: string;
     logo: string | null;
     nav_categories: NavCategory[];
+    nav_menu: NavMenuItem[];
     footer_categories: NavCategory[];
 };
 

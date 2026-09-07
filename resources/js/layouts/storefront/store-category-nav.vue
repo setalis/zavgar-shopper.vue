@@ -5,73 +5,79 @@ import { computed, onBeforeUnmount, ref } from 'vue';
 import Container from '@/components/shop/container.vue';
 import { useTrans } from '@/composables/useTrans';
 import { cn } from '@/lib/utils';
-import { home } from '@/routes';
 import * as shop from '@/routes/shop';
-import type { NavCategory } from '@/types/shop';
+import type { NavCategory, NavMenuItem } from '@/types/shop';
 
 const page = usePage();
 const { t } = useTrans();
 
 const megaOpen = ref<boolean>(false);
+const menuMegaId = ref<number | null>(null);
 const currentPath = computed<string>(() => (page.url ?? '').split('?')[0]);
 
 const navCategories = computed<NavCategory[]>(
     () => page.props.shop?.nav_categories ?? [],
 );
 
-const links = computed(() => [
-    { href: home.url(), label: t('shop.nav.home'), exact: true },
-    { href: shop.index.url(), label: t('shop.nav.shop') },
-    { href: shop.categories.url(), label: t('shop.nav.categories') },
-    { href: shop.cart.url(), label: t('shop.nav.cart') },
-    { href: shop.contact.url(), label: t('shop.nav.contact') },
-]);
+const navMenu = computed<NavMenuItem[]>(
+    () => page.props.shop?.nav_menu ?? [],
+);
+
+const megaMenuItems = computed<NavMenuItem[]>(() =>
+    navMenu.value.filter((item) => item.children.length > 0),
+);
 
 let closeTimer: ReturnType<typeof setTimeout> | null = null;
 
-function openMega(): void {
+function clearCloseTimer(): void {
     if (closeTimer !== null) {
         clearTimeout(closeTimer);
         closeTimer = null;
     }
+}
 
+function openCategoriesMega(): void {
+    clearCloseTimer();
+    menuMegaId.value = null;
     megaOpen.value = true;
 }
 
+function openMenuMega(item: NavMenuItem): void {
+    clearCloseTimer();
+    megaOpen.value = false;
+    menuMegaId.value = item.children.length > 0 ? item.id : null;
+}
+
 function scheduleCloseMega(): void {
-    if (closeTimer !== null) {
-        clearTimeout(closeTimer);
-    }
+    clearCloseTimer();
 
     closeTimer = setTimeout(() => {
         megaOpen.value = false;
+        menuMegaId.value = null;
         closeTimer = null;
     }, 120);
 }
 
 function closeMega(): void {
-    if (closeTimer !== null) {
-        clearTimeout(closeTimer);
-        closeTimer = null;
-    }
-
+    clearCloseTimer();
     megaOpen.value = false;
+    menuMegaId.value = null;
 }
 
-function isActive(href: string, exact = false): boolean {
-    return exact
-        ? currentPath.value === href
-        : currentPath.value.startsWith(href);
+function isActive(href: string): boolean {
+    return currentPath.value === href || currentPath.value.startsWith(`${href}/`);
 }
 
 function isCategoryActive(slug: string): boolean {
     return currentPath.value.startsWith(`/categories/${slug}`);
 }
 
+function isExternal(href: string): boolean {
+    return href.startsWith('http://') || href.startsWith('https://');
+}
+
 onBeforeUnmount(() => {
-    if (closeTimer !== null) {
-        clearTimeout(closeTimer);
-    }
+    clearCloseTimer();
 });
 </script>
 
@@ -90,33 +96,59 @@ onBeforeUnmount(() => {
                 class="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-paper transition hover:bg-brand-deep"
                 :aria-expanded="megaOpen"
                 aria-controls="storefront-categories-mega-menu"
-                @mouseenter="openMega"
-                @focus="openMega"
+                @mouseenter="openCategoriesMega"
+                @focus="openCategoriesMega"
                 @click="closeMega"
             >
                 <Menu class="size-4" aria-hidden="true" />
                 {{ t('shop.nav.all_categories') }}
             </Link>
 
-            <div class="mr-auto flex gap-10 uppercase">
-                <Link
-                    v-for="link in links"
-                    :key="link.href"
-                    :href="link.href"
-                    :aria-current="
-                        isActive(link.href, link.exact) ? 'page' : undefined
-                    "
-                    :class="
-                        cn(
-                            'inline-flex items-center gap-1 py-1.5 text-sm font-medium transition hover:text-brand',
-                            isActive(link.href, link.exact)
-                                ? 'text-brand'
-                                : 'text-ink-soft',
-                        )
-                    "
-                >
-                    {{ link.label }}
-                </Link>
+            <div class="mr-auto flex gap-10 uppercase" :aria-label="t('shop.nav.menu')">
+                <template v-for="item in navMenu" :key="item.id">
+                    <a
+                        v-if="isExternal(item.href)"
+                        :href="item.href"
+                        rel="noopener noreferrer"
+                        :class="
+                            cn(
+                                'inline-flex items-center gap-1 py-1.5 text-sm font-medium text-ink-soft transition hover:text-brand',
+                            )
+                        "
+                        @mouseenter="openMenuMega(item)"
+                        @focus="openMenuMega(item)"
+                    >
+                        {{ item.title }}
+                    </a>
+                    <Link
+                        v-else
+                        :href="item.href"
+                        :aria-current="isActive(item.href) ? 'page' : undefined"
+                        :aria-expanded="
+                            item.children.length > 0
+                                ? menuMegaId === item.id
+                                : undefined
+                        "
+                        :aria-controls="
+                            item.children.length > 0
+                                ? `storefront-menu-mega-${item.id}`
+                                : undefined
+                        "
+                        :class="
+                            cn(
+                                'inline-flex items-center gap-1 py-1.5 text-sm font-medium transition hover:text-brand',
+                                isActive(item.href)
+                                    ? 'text-brand'
+                                    : 'text-ink-soft',
+                            )
+                        "
+                        @mouseenter="openMenuMega(item)"
+                        @focus="openMenuMega(item)"
+                        @click="closeMega"
+                    >
+                        {{ item.title }}
+                    </Link>
+                </template>
             </div>
 
             <span
@@ -133,7 +165,7 @@ onBeforeUnmount(() => {
                 v-show="megaOpen && navCategories.length > 0"
                 id="storefront-categories-mega-menu"
                 class="absolute inset-x-0 top-full z-50 pt-1.5"
-                @mouseenter="openMega"
+                @mouseenter="openCategoriesMega"
             >
                 <div
                     class="overflow-hidden rounded-xl border border-rule bg-popover shadow-lg"
@@ -218,6 +250,87 @@ onBeforeUnmount(() => {
                             </span>
                         </Link>
                     </div>
+                </div>
+            </div>
+
+            <div
+                v-for="item in megaMenuItems"
+                v-show="menuMegaId === item.id"
+                :id="`storefront-menu-mega-${item.id}`"
+                :key="`mega-${item.id}`"
+                class="absolute inset-x-0 top-full z-50 pt-1.5"
+                @mouseenter="openMenuMega(item)"
+            >
+                <div
+                    class="overflow-hidden rounded-xl border border-rule bg-popover shadow-lg"
+                    :aria-label="item.title"
+                >
+                    <ul
+                        class="grid w-full grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-6 p-5"
+                    >
+                        <li
+                            v-for="child in item.children"
+                            :key="child.id"
+                        >
+                            <a
+                                v-if="isExternal(child.href)"
+                                :href="child.href"
+                                rel="noopener noreferrer"
+                                class="block rounded-md p-2 font-heading text-sm font-semibold transition-colors hover:bg-brand-soft hover:text-brand-deep"
+                                @click="closeMega"
+                            >
+                                {{ child.title }}
+                            </a>
+                            <Link
+                                v-else
+                                :href="child.href"
+                                :class="
+                                    cn(
+                                        'block rounded-md p-2 font-heading text-sm font-semibold transition-colors hover:bg-brand-soft hover:text-brand-deep',
+                                        isActive(child.href) &&
+                                            'bg-brand-soft text-brand-deep',
+                                    )
+                                "
+                                @click="closeMega"
+                            >
+                                {{ child.title }}
+                            </Link>
+
+                            <ul
+                                v-if="child.children.length"
+                                class="mt-1 space-y-0.5"
+                            >
+                                <li
+                                    v-for="grandchild in child.children"
+                                    :key="grandchild.id"
+                                >
+                                    <a
+                                        v-if="isExternal(grandchild.href)"
+                                        :href="grandchild.href"
+                                        rel="noopener noreferrer"
+                                        class="block rounded-md p-2 text-sm text-ink-mute transition-colors hover:bg-brand-soft hover:text-brand-deep"
+                                        @click="closeMega"
+                                    >
+                                        {{ grandchild.title }}
+                                    </a>
+                                    <Link
+                                        v-else
+                                        :href="grandchild.href"
+                                        :class="
+                                            cn(
+                                                'block rounded-md p-2 text-sm text-ink-mute transition-colors hover:bg-brand-soft hover:text-brand-deep',
+                                                isActive(grandchild.href) &&
+                                                    'bg-brand-soft text-brand-deep',
+                                            )
+                                        "
+                                        @click="closeMega"
+                                    >
+                                        {{ grandchild.title }}
+                                    </Link>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </Container>

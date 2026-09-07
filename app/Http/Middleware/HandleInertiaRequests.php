@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Actions\FlushStorefrontCategoryCache;
+use App\Actions\FlushStorefrontMenuCache;
 use App\Actions\GetCountriesByZone;
 use App\Actions\Wishlist\WishlistManager;
 use App\Actions\ZoneSessionManager;
 use App\Models\Category;
 use App\Models\Channel;
+use App\Models\MenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
@@ -96,6 +98,7 @@ class HandleInertiaRequests extends Middleware
             'tax_label' => current_tax_label(),
             'logo' => storefront_logo_url(),
             'nav_categories' => $this->navCategories(),
+            'nav_menu' => $this->navMenu(),
             'footer_categories' => $this->topCategories(FlushStorefrontCategoryCache::FOOTER_LIMIT, 'footer'),
         ];
     }
@@ -137,6 +140,43 @@ class HandleInertiaRequests extends Middleware
                         ->all(),
                 ])
                 ->all(),
+        );
+    }
+
+    /**
+     * @return list<array{id: int, title: string, href: string, children: list<mixed>}>
+     */
+    private function navMenu(): array
+    {
+        return Cache::remember(
+            FlushStorefrontMenuCache::navKey(app()->getLocale()),
+            FlushStorefrontMenuCache::CACHE_TTL,
+            function (): array {
+                $targets = ['brand', 'category', 'product', 'collection'];
+
+                return MenuItem::query()
+                    ->scopes('enabled')
+                    ->roots()
+                    ->with([
+                        ...$targets,
+                        'children' => fn ($query) => $query
+                            ->scopes('enabled')
+                            ->orderBy('position')
+                            ->with([
+                                ...$targets,
+                                'children' => fn ($query) => $query
+                                    ->scopes('enabled')
+                                    ->orderBy('position')
+                                    ->with($targets),
+                            ]),
+                    ])
+                    ->orderBy('position')
+                    ->get()
+                    ->map(fn (MenuItem $item): ?array => $item->toNavArray())
+                    ->filter()
+                    ->values()
+                    ->all();
+            },
         );
     }
 

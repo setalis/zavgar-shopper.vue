@@ -13,9 +13,9 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { useTrans } from '@/composables/useTrans';
-import { dashboard, home, login, logout, register } from '@/routes';
+import { dashboard, login, logout, register } from '@/routes';
 import * as shop from '@/routes/shop';
-import type { NavCategory } from '@/types/shop';
+import type { NavCategory, NavMenuItem } from '@/types/shop';
 
 const open = defineModel<boolean>('open', { required: true });
 
@@ -26,17 +26,16 @@ const navCategories = computed<NavCategory[]>(
     () => page.props.shop?.nav_categories ?? [],
 );
 
-const links = computed(() => [
-    { href: home.url(), label: t('shop.nav.home') },
-    { href: shop.index.url(), label: t('shop.nav.shop') },
-    { href: shop.categories.url(), label: t('shop.nav.categories') },
-    { href: shop.wishlist.url(), label: t('shop.nav.wishlist') },
-    { href: shop.cart.url(), label: t('shop.nav.cart') },
-    { href: shop.contact.url(), label: t('shop.nav.contact') },
-]);
+const navMenu = computed<NavMenuItem[]>(
+    () => page.props.shop?.nav_menu ?? [],
+);
 
 function close(): void {
     open.value = false;
+}
+
+function isExternal(href: string): boolean {
+    return href.startsWith('http://') || href.startsWith('https://');
 }
 </script>
 
@@ -58,16 +57,86 @@ function close(): void {
             </SheetHeader>
 
             <div class="flex-1 overflow-y-auto p-5">
-                <div class="flex flex-col">
-                    <Link
-                        v-for="link in links"
-                        :key="link.href"
-                        :href="link.href"
-                        class="border-b border-rule py-3.5 font-heading text-md font-semibold text-ink transition hover:text-brand"
-                        @click="close"
+                <div v-if="navMenu.length > 0" class="flex flex-col">
+                    <div
+                        v-for="item in navMenu"
+                        :key="item.id"
+                        class="border-b border-rule py-3.5"
                     >
-                        {{ link.label }}
-                    </Link>
+                        <a
+                            v-if="isExternal(item.href)"
+                            :href="item.href"
+                            rel="noopener noreferrer"
+                            class="font-heading text-md font-semibold text-ink transition hover:text-brand"
+                            @click="close"
+                        >
+                            {{ item.title }}
+                        </a>
+                        <Link
+                            v-else
+                            :href="item.href"
+                            class="font-heading text-md font-semibold text-ink transition hover:text-brand"
+                            @click="close"
+                        >
+                            {{ item.title }}
+                        </Link>
+
+                        <div
+                            v-if="item.children.length"
+                            class="mt-2 space-y-1.5"
+                        >
+                            <div
+                                v-for="child in item.children"
+                                :key="child.id"
+                            >
+                                <a
+                                    v-if="isExternal(child.href)"
+                                    :href="child.href"
+                                    rel="noopener noreferrer"
+                                    class="block pl-4 text-sm font-medium text-ink-soft transition hover:text-brand"
+                                    @click="close"
+                                >
+                                    {{ child.title }}
+                                </a>
+                                <Link
+                                    v-else
+                                    :href="child.href"
+                                    class="block pl-4 text-sm font-medium text-ink-soft transition hover:text-brand"
+                                    @click="close"
+                                >
+                                    {{ child.title }}
+                                </Link>
+
+                                <div
+                                    v-if="child.children.length"
+                                    class="mt-1 space-y-1"
+                                >
+                                    <template
+                                        v-for="grandchild in child.children"
+                                        :key="grandchild.id"
+                                    >
+                                        <a
+                                            v-if="isExternal(grandchild.href)"
+                                            :href="grandchild.href"
+                                            rel="noopener noreferrer"
+                                            class="block pl-8 text-sm text-ink-mute transition hover:text-brand"
+                                            @click="close"
+                                        >
+                                            {{ grandchild.title }}
+                                        </a>
+                                        <Link
+                                            v-else
+                                            :href="grandchild.href"
+                                            class="block pl-8 text-sm text-ink-mute transition hover:text-brand"
+                                            @click="close"
+                                        >
+                                            {{ grandchild.title }}
+                                        </Link>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div v-if="navCategories.length > 0" class="mt-6 space-y-4">

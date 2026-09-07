@@ -33,6 +33,14 @@ final class HomepageBannersSidebar extends AbstractAdminSidebar
                 $item->route('shopper.promo-banners.index');
                 $item->setIcon('phosphor-rectangle');
             });
+
+            $group->item(__('backend.menu.menu'), function (Item $item): void {
+                $item->weight(3);
+                $item->setAuthorized($this->canBrowseMenuItems());
+                $item->useSpa();
+                $item->route('shopper.menu.index');
+                $item->setIcon('phosphor-list');
+            });
         });
 
         return $menu;
@@ -40,12 +48,22 @@ final class HomepageBannersSidebar extends AbstractAdminSidebar
 
     private function canBrowseHomepageBanners(): bool
     {
+        return $this->hasPermissionName('browse_homepage_banners');
+    }
+
+    private function canBrowseMenuItems(): bool
+    {
+        return $this->hasPermissionName('browse_menu_items');
+    }
+
+    private function hasPermissionName(string $name): bool
+    {
         if ($this->user === null || ! method_exists($this->user, 'getAllPermissions')) {
             return false;
         }
 
         return (bool) $this->user->getAllPermissions()->contains(
-            fn (object $permission): bool => $permission->name === 'browse_homepage_banners',
+            fn (object $permission): bool => $permission->name === $name,
         );
     }
 }

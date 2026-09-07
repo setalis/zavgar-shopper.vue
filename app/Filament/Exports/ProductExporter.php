@@ -57,6 +57,9 @@ final class ProductExporter extends Exporter
             ExportColumn::make('attributes')
                 ->label(__('backend.product_imports.attributes'))
                 ->state(fn (Product $record): string => app(FormatsVariantAttributes::class)->forProduct($record)),
+            ExportColumn::make('variant_attributes')
+                ->label(__('backend.product_imports.variant_attributes'))
+                ->state(fn (): string => ''),
             ExportColumn::make('published_at')
                 ->label(__('shopper::forms.label.published_at')),
         ];
@@ -80,11 +83,11 @@ final class ProductExporter extends Exporter
     }
 
     /**
-     * @return list<list<mixed>>
+     * @return list<list<string>>
      */
     public function rowsFor(Product $record): array
     {
-        $rows = [($this)($record)];
+        $rows = [$this->stringifyRow(($this)($record))];
 
         if (! $record->isVariant() || $record->variants->isEmpty()) {
             return $rows;
@@ -100,7 +103,7 @@ final class ProductExporter extends Exporter
     }
 
     /**
-     * @return list<mixed>
+     * @return list<string>
      */
     public function rowForVariant(Product $product, ProductVariant $variant): array
     {
@@ -119,18 +122,30 @@ final class ProductExporter extends Exporter
             'categories' => app(FormatsVariantAttributes::class)->forCategories($product),
             'price' => $variant->getPrice()?->amount,
             'stock' => $variant->stock,
-            'attributes' => app(FormatsVariantAttributes::class)->forVariant($variant),
+            'attributes' => app(FormatsVariantAttributes::class)->forProduct($product),
+            'variant_attributes' => app(FormatsVariantAttributes::class)->forVariantDimensions($variant),
             'published_at' => $product->published_at?->toDateTimeString() ?? '',
         ];
 
         $data = [];
 
         foreach (array_keys($this->columnMap) as $column) {
-            $value = $values[$column] ?? '';
-            $data[] = $value === null ? '' : (string) $value;
+            $data[] = $values[$column] ?? '';
         }
 
-        return $data;
+        return $this->stringifyRow($data);
+    }
+
+    /**
+     * @param  list<mixed>  $row
+     * @return list<string>
+     */
+    private function stringifyRow(array $row): array
+    {
+        return array_map(
+            fn (mixed $value): string => $value === null ? '' : (string) $value,
+            $row,
+        );
     }
 
     public static function getCsvDelimiter(): string

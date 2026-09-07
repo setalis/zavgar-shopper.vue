@@ -36,6 +36,7 @@ final class DetectsCsvDelimiter
         'stock',
         'parent_sku',
         'attributes',
+        'variant_attributes',
         'categories',
         'published_at',
         'is_visible',

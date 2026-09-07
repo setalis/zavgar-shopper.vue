@@ -7,6 +7,7 @@ namespace App\Support;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Shopper\Core\Models\AttributeProduct;
+use Shopper\Core\Models\AttributeValue;
 
 final class FormatsVariantAttributes
 {
@@ -59,11 +60,22 @@ final class FormatsVariantAttributes
 
     public function forProduct(Product $product): string
     {
-        $product->loadMissing('attributeProducts.attribute', 'attributeProducts.value');
+        $product->loadMissing([
+            'attributeProducts.attribute',
+            'attributeProducts.value',
+            'variants.values',
+        ]);
+
+        $dimensionIds = $product->variants
+            ->flatMap(fn (ProductVariant $variant): array => $variant->values->pluck('attribute_id')->all())
+            ->map(intval(...))
+            ->unique()
+            ->all();
 
         return $this->joinPairs(
             $product->attributeProducts
                 ->filter(fn (AttributeProduct $row): bool => $row->attribute !== null && filled($row->real_value))
+                ->reject(fn (AttributeProduct $row): bool => in_array((int) $row->attribute_id, $dimensionIds, true))
                 ->map(fn (AttributeProduct $row): string => $row->attribute->name.'='.$row->real_value)
                 ->all(),
         );
@@ -71,41 +83,26 @@ final class FormatsVariantAttributes
 
     public function forVariant(ProductVariant $variant): string
     {
-        $variant->loadMissing([
-            'values.attribute',
-            'product.attributeProducts.attribute',
-            'product.attributeProducts.value',
-        ]);
+        $variant->loadMissing('product');
 
-        $variantAttributeIds = $variant->values->pluck('attribute_id')->all();
-        $pairs = [];
+        return $this->forProduct($variant->product);
+    }
 
-        foreach ($variant->product->attributeProducts as $row) {
-            if ($row->attribute === null || blank($row->real_value)) {
-                continue;
-            }
+    public function forVariantDimensions(ProductVariant $variant): string
+    {
+        $variant->loadMissing('values.attribute');
 
-            if (in_array($row->attribute_id, $variantAttributeIds, true)) {
-                continue;
-            }
-
-            $pairs[] = $row->attribute->name.'='.$row->real_value;
-        }
-
-        foreach ($variant->values as $value) {
-            if ($value->attribute === null) {
-                continue;
-            }
-
-            $pairs[] = $value->attribute->name.'='.$value->value;
-        }
-
-        return $this->joinPairs($pairs);
+        return $this->joinPairs(
+            $variant->values
+                ->filter(fn (AttributeValue $value): bool => $value->attribute !== null)
+                ->map(fn (AttributeValue $value): string => $value->attribute->name.'='.$value->value)
+                ->all(),
+        );
     }
 
     public function toString(ProductVariant $variant): string
     {
-        return $this->forVariant($variant);
+        return $this->forVariantDimensions($variant);
     }
 
     /**

@@ -371,6 +371,7 @@ test('product exporter writes a row for each variant', function (): void {
         'name' => 'name',
         'price' => 'price',
         'attributes' => 'attributes',
+        'variant_attributes' => 'variant_attributes',
     ], []);
 
     $rows = $exporter->rowsFor($product);
@@ -379,8 +380,9 @@ test('product exporter writes a row for each variant', function (): void {
         ->and($rows[0][0])->toBe('SKU-PARENT')
         ->and($rows[0][1])->toBeEmpty()
         ->and($rows[0][2])->toBe('Shirt')
-        ->and($rows[0][4])->toBe('Color=Red')
-        ->and($rows[1])->toBe(['SKU-RED', 'SKU-PARENT', 'Shirt Red', '2500', 'Color=Red']);
+        ->and($rows[0][4])->toBeEmpty()
+        ->and($rows[0][5])->toBeEmpty()
+        ->and($rows[1])->toBe(['SKU-RED', 'SKU-PARENT', 'Shirt Red', '2500', '', 'Color=Red']);
 });
 
 test('importing an existing variant sku updates the variant', function (): void {
@@ -584,13 +586,14 @@ test('product exporter includes all product attributes and categories', function
         'sku' => 'sku',
         'categories' => 'categories',
         'attributes' => 'attributes',
+        'variant_attributes' => 'variant_attributes',
     ], []);
 
     $rows = $exporter->rowsFor($product);
 
     expect($rows)->toHaveCount(2)
-        ->and($rows[0])->toBe(['SKU-WINE', 'Wine', 'Material=Glass | Origin=Ukraine | Volume=1L'])
-        ->and($rows[1])->toBe(['SKU-WINE-1L', 'Wine', 'Material=Glass | Origin=Ukraine | Volume=1L']);
+        ->and($rows[0])->toBe(['SKU-WINE', 'Wine', 'Material=Glass | Origin=Ukraine', ''])
+        ->and($rows[1])->toBe(['SKU-WINE-1L', 'Wine', 'Material=Glass | Origin=Ukraine', 'Volume=1L']);
 });
 
 test('importing a product updates categories and product attributes', function (): void {
@@ -643,4 +646,149 @@ test('importing a product updates categories and product attributes', function (
 
     expect($product->categories->pluck('id')->all())->toBe([$red->id])
         ->and(app(FormatsVariantAttributes::class)->forProduct($product))->toBe('Material=Glass | Origin=Georgia');
+});
+
+test('export splits product attributes from variant dimensions', function (): void {
+    $product = Product::factory()->variant()->create([
+        'sku' => 'SKU-SPLIT',
+        'name' => 'Wine',
+    ]);
+
+    $volume = Attribute::factory()->create([
+        'name' => 'Volume',
+        'slug' => 'volume',
+        'type' => FieldType::Select,
+        'is_enabled' => true,
+    ]);
+    $oneLiter = AttributeValue::factory()->create([
+        'attribute_id' => $volume->id,
+        'key' => '1l',
+        'value' => '1L',
+        'position' => 1,
+    ]);
+    $origin = Attribute::factory()->create([
+        'name' => 'Origin',
+        'slug' => 'origin',
+        'type' => FieldType::Select,
+        'is_enabled' => true,
+    ]);
+    $ukraine = AttributeValue::factory()->create([
+        'attribute_id' => $origin->id,
+        'key' => 'ukraine',
+        'value' => 'Ukraine',
+        'position' => 1,
+    ]);
+
+    $product->options()->attach($volume->id, ['attribute_value_id' => $oneLiter->id]);
+    $product->options()->attach($origin->id, ['attribute_value_id' => $ukraine->id]);
+
+    $variant = ProductVariant::factory()->create([
+        'product_id' => $product->id,
+        'sku' => 'SKU-SPLIT-1L',
+        'name' => 'Wine 1L',
+        'position' => 1,
+    ]);
+    $variant->values()->attach($oneLiter->id);
+
+    $product->load(['attributeProducts.attribute', 'attributeProducts.value', 'variants.values.attribute']);
+
+    expect(app(FormatsVariantAttributes::class)->forProduct($product))->toBe('Origin=Ukraine')
+        ->and(app(FormatsVariantAttributes::class)->forVariantDimensions($variant))->toBe('Volume=1L');
+});
+
+test('importing a new product uses variant_attributes as variant dimensions', function (): void {
+    $volume = Attribute::factory()->create([
+        'name' => 'Volume',
+        'slug' => 'volume',
+        'type' => FieldType::Select,
+        'is_enabled' => true,
+    ]);
+    AttributeValue::factory()->create([
+        'attribute_id' => $volume->id,
+        'key' => '1l',
+        'value' => '1L',
+        'position' => 1,
+    ]);
+    $origin = Attribute::factory()->create([
+        'name' => 'Origin',
+        'slug' => 'origin',
+        'type' => FieldType::Select,
+        'is_enabled' => true,
+    ]);
+    AttributeValue::factory()->create([
+        'attribute_id' => $origin->id,
+        'key' => 'ukraine',
+        'value' => 'Ukraine',
+        'position' => 1,
+    ]);
+
+    importProductRow($this->admin, [
+        'sku' => 'SKU-NEW-WINE',
+        'name' => 'Merlot',
+        'type' => ProductType::Variant->value,
+        'attributes' => 'Origin=Ukraine',
+    ]);
+
+    $pendingParent = PendingProductImport::query()->where('sku', 'SKU-NEW-WINE')->first();
+
+    expect($pendingParent)->not->toBeNull();
+
+    app(ApprovePendingProductImportAction::class)->handle($pendingParent, $this->admin);
+
+    importProductRow($this->admin, [
+        'sku' => 'SKU-NEW-WINE-1L',
+        'parent_sku' => 'SKU-NEW-WINE',
+        'name' => 'Merlot 1L',
+        'price' => 1200,
+        'attributes' => 'Origin=Ukraine',
+        'variant_attributes' => 'Volume=1L',
+    ]);
+
+    $product = Product::query()->where('sku', 'SKU-NEW-WINE')->first();
+    $variant = ProductVariant::query()->where('sku', 'SKU-NEW-WINE-1L')->first();
+
+    expect($product)->not->toBeNull()
+        ->and($variant)->not->toBeNull();
+
+    $product->load(['attributeProducts.attribute', 'attributeProducts.value', 'variants.values.attribute']);
+    $variant->load('values.attribute');
+
+    expect($variant->values->pluck('value')->all())->toBe(['1L'])
+        ->and($variant->values->pluck('attribute.name')->all())->toBe(['Volume'])
+        ->and(app(FormatsVariantAttributes::class)->forProduct($product))->toBe('Origin=Ukraine')
+        ->and(app(FormatsVariantAttributes::class)->forVariantDimensions($variant))->toBe('Volume=1L')
+        ->and(PendingProductImport::query()->pending()->count())->toBe(0);
+});
+
+test('importing a variant without variant_attributes falls back to the attributes column', function (): void {
+    $product = Product::factory()->variant()->create([
+        'sku' => 'SKU-FALLBACK-PARENT',
+        'name' => 'Tee',
+    ]);
+
+    $size = Attribute::factory()->create([
+        'name' => 'Size',
+        'slug' => 'size',
+        'type' => FieldType::Select,
+        'is_enabled' => true,
+    ]);
+    AttributeValue::factory()->create([
+        'attribute_id' => $size->id,
+        'key' => 'm',
+        'value' => 'M',
+        'position' => 1,
+    ]);
+
+    importProductRow($this->admin, [
+        'sku' => 'SKU-FALLBACK-M',
+        'parent_sku' => 'SKU-FALLBACK-PARENT',
+        'name' => 'Tee M',
+        'price' => 900,
+        'attributes' => 'Size=M',
+    ]);
+
+    $variant = ProductVariant::query()->where('sku', 'SKU-FALLBACK-M')->first();
+
+    expect($variant)->not->toBeNull()
+        ->and($variant->values->pluck('value')->all())->toBe(['M']);
 });

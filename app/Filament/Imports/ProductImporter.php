@@ -114,7 +114,14 @@ final class ProductImporter extends Importer
                 ->rules(['nullable', 'string'])
                 ->ignoreBlankState()
                 ->helperText(__('backend.product_imports.attributes_help'))
-                ->example('Volume=1L | Origin=Ukraine | Material=Cotton')
+                ->example('Origin=Ukraine | Material=Cotton')
+                ->fillRecordUsing(fn (): mixed => null),
+            ImportColumn::make('variant_attributes')
+                ->label(__('backend.product_imports.variant_attributes'))
+                ->rules(['nullable', 'string'])
+                ->ignoreBlankState()
+                ->helperText(__('backend.product_imports.variant_attributes_help'))
+                ->example('Volume=1L')
                 ->fillRecordUsing(fn (): mixed => null),
             ImportColumn::make('published_at')
                 ->label(__('shopper::forms.label.published_at'))

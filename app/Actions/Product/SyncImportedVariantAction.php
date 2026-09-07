@@ -84,6 +84,14 @@ final class SyncImportedVariantAction
      */
     private function syncAttributeValues(Product $parent, array $data, ?ProductVariant $variant): array
     {
+        $explicitPairs = $this->formatsVariantAttributes->parse(
+            is_string($data['variant_attributes'] ?? null) ? $data['variant_attributes'] : null,
+        );
+
+        if ($explicitPairs !== []) {
+            return $this->syncDimensionPairs($parent, $explicitPairs);
+        }
+
         $pairs = $this->formatsVariantAttributes->parse(
             is_string($data['attributes'] ?? null) ? $data['attributes'] : null,
         );
@@ -92,7 +100,21 @@ final class SyncImportedVariantAction
             return [];
         }
 
-        $dimensionIds = $this->variantDimensionIds($parent, $variant);
+        return $this->syncDimensionPairs(
+            $parent,
+            $pairs,
+            $this->variantDimensionIds($parent, $variant),
+        );
+    }
+
+    /**
+     * @param  list<array{name: string, value: string}>  $pairs
+     * @param  list<int>  $dimensionIds
+     * @return list<int>
+     */
+    private function syncDimensionPairs(Product $parent, array $pairs, array $dimensionIds = []): array
+    {
+        $restrictToExisting = $dimensionIds !== [];
         $valueIds = [];
 
         foreach ($pairs as $pair) {
@@ -102,7 +124,7 @@ final class SyncImportedVariantAction
                 continue;
             }
 
-            if ($dimensionIds !== [] && ! in_array($attribute->id, $dimensionIds, true)) {
+            if ($restrictToExisting && ! in_array($attribute->id, $dimensionIds, true)) {
                 continue;
             }
 

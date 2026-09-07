@@ -45,6 +45,9 @@ final class ProductExporter extends Exporter
                 ->label(__('shopper::forms.label.featured')),
             ExportColumn::make('brand.name')
                 ->label(__('shopper::forms.label.brand')),
+            ExportColumn::make('categories')
+                ->label(__('backend.product_imports.categories'))
+                ->state(fn (Product $record): string => app(FormatsVariantAttributes::class)->forCategories($record)),
             ExportColumn::make('price')
                 ->label(__('shopper::layout.tables.price'))
                 ->state(fn (Product $record): ?int => $record->isVariant() ? null : $record->getPrice()?->amount),
@@ -53,7 +56,7 @@ final class ProductExporter extends Exporter
                 ->state(fn (Product $record): ?int => $record->isVariant() ? null : $record->stock),
             ExportColumn::make('attributes')
                 ->label(__('backend.product_imports.attributes'))
-                ->state(fn (): string => ''),
+                ->state(fn (Product $record): string => app(FormatsVariantAttributes::class)->forProduct($record)),
             ExportColumn::make('published_at')
                 ->label(__('shopper::forms.label.published_at')),
         ];
@@ -68,6 +71,9 @@ final class ProductExporter extends Exporter
         return $query->with([
             'brand',
             'prices.currency',
+            'categories.parent',
+            'attributeProducts.attribute',
+            'attributeProducts.value',
             'variants.values.attribute',
             'variants.prices.currency',
         ]);
@@ -110,9 +116,10 @@ final class ProductExporter extends Exporter
             'is_visible' => $product->is_visible ? '1' : '0',
             'featured' => $product->featured ? '1' : '0',
             'brand.name' => $product->brand?->name ?? '',
+            'categories' => app(FormatsVariantAttributes::class)->forCategories($product),
             'price' => $variant->getPrice()?->amount,
             'stock' => $variant->stock,
-            'attributes' => app(FormatsVariantAttributes::class)->toString($variant),
+            'attributes' => app(FormatsVariantAttributes::class)->forVariant($variant),
             'published_at' => $product->published_at?->toDateTimeString() ?? '',
         ];
 

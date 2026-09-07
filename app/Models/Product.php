@@ -11,7 +11,9 @@ use App\Concerns\ResolvesStorefrontStock;
 use App\Traits\HasProductPricing;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Shopper\Core\Models\AttributeProduct;
 use Shopper\Core\Models\Price;
 use Shopper\Models\Product as Model;
 
@@ -22,6 +24,14 @@ final class Product extends Model
     use ResolvesStorefrontPrice;
     use ResolvesStorefrontReviews;
     use ResolvesStorefrontStock;
+
+    /**
+     * @return HasMany<AttributeProduct, $this>
+     */
+    public function attributeProducts(): HasMany
+    {
+        return $this->hasMany(AttributeProduct::class, 'product_id');
+    }
 
     /**
      * @param  Builder<self>  $query

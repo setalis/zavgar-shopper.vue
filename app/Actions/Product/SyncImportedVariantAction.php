@@ -7,6 +7,7 @@ namespace App\Actions\Product;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Support\FormatsVariantAttributes;
+use App\Support\ResolvesCatalogAttributes;
 use Illuminate\Validation\ValidationException;
 use Shopper\Actions\Store\Product\CreateNewVariant;
 use Shopper\Core\Models\Attribute;
@@ -18,6 +19,7 @@ final class SyncImportedVariantAction
         private CreateNewVariant $createNewVariant,
         private ApplyImportedProductDataAction $applyImportedProductData,
         private FormatsVariantAttributes $formatsVariantAttributes,
+        private ResolvesCatalogAttributes $resolvesCatalogAttributes,
     ) {}
 
     /**
@@ -31,7 +33,8 @@ final class SyncImportedVariantAction
             ]);
         }
 
-        $valueIds = $this->syncAttributeValues($parent, $data);
+        $valueIds = $this->syncAttributeValues($parent, $data, $variant);
+        $skipAttributeIds = $this->attributeIdsForValues($valueIds);
 
         if (! $variant instanceof ProductVariant) {
             $variant = ($this->createNewVariant)([
@@ -50,6 +53,7 @@ final class SyncImportedVariantAction
         }
 
         $this->applyImportedProductData->handle($variant, $data);
+        $this->applyImportedProductData->handle($parent, $data, $skipAttributeIds);
 
         return $variant->refresh();
     }
@@ -78,7 +82,7 @@ final class SyncImportedVariantAction
      * @param  array<string, mixed>  $data
      * @return list<int>
      */
-    private function syncAttributeValues(Product $parent, array $data): array
+    private function syncAttributeValues(Product $parent, array $data, ?ProductVariant $variant): array
     {
         $pairs = $this->formatsVariantAttributes->parse(
             is_string($data['attributes'] ?? null) ? $data['attributes'] : null,
@@ -88,57 +92,64 @@ final class SyncImportedVariantAction
             return [];
         }
 
+        $dimensionIds = $this->variantDimensionIds($parent, $variant);
         $valueIds = [];
 
         foreach ($pairs as $pair) {
-            $attribute = $this->resolveAttribute($pair['name']);
-            $value = $this->resolveAttributeValue($attribute, $pair['value']);
+            $attribute = $this->resolvesCatalogAttributes->attribute($pair['name']);
 
+            if ($attribute->hasTextValue()) {
+                continue;
+            }
+
+            if ($dimensionIds !== [] && ! in_array($attribute->id, $dimensionIds, true)) {
+                continue;
+            }
+
+            $value = $this->resolvesCatalogAttributes->value($attribute, $pair['value']);
             $this->attachOption($parent, $attribute, $value);
             $valueIds[] = $value->id;
         }
 
-        return $valueIds;
+        return array_values(array_unique($valueIds));
     }
 
-    private function resolveAttribute(string $name): Attribute
+    /**
+     * @return list<int>
+     */
+    private function variantDimensionIds(Product $parent, ?ProductVariant $variant): array
     {
-        $attribute = Attribute::query()
-            ->where(function ($query) use ($name): void {
-                $query->where('name', $name)
-                    ->orWhere('slug', str()->slug($name));
-            })
-            ->first();
+        $parent->loadMissing('variants.values');
 
-        if (! $attribute instanceof Attribute) {
-            throw ValidationException::withMessages([
-                'attributes' => __('backend.product_imports.unknown_attribute', ['name' => $name]),
-            ]);
+        $ids = $parent->variants
+            ->flatMap(fn (ProductVariant $existing): array => $existing->values->pluck('attribute_id')->all())
+            ->all();
+
+        if ($variant instanceof ProductVariant) {
+            $variant->loadMissing('values');
+            $ids = [...$ids, ...$variant->values->pluck('attribute_id')->all()];
         }
 
-        return $attribute;
+        return array_values(array_unique(array_map(intval(...), $ids)));
     }
 
-    private function resolveAttributeValue(Attribute $attribute, string $value): AttributeValue
+    /**
+     * @param  list<int>  $valueIds
+     * @return list<int>
+     */
+    private function attributeIdsForValues(array $valueIds): array
     {
-        $attributeValue = AttributeValue::query()
-            ->where('attribute_id', $attribute->id)
-            ->where(function ($query) use ($value): void {
-                $query->where('value', $value)
-                    ->orWhere('key', str()->slug($value));
-            })
-            ->first();
-
-        if ($attributeValue instanceof AttributeValue) {
-            return $attributeValue;
+        if ($valueIds === []) {
+            return [];
         }
 
-        return AttributeValue::create([
-            'attribute_id' => $attribute->id,
-            'key' => str()->slug($value),
-            'value' => $value,
-            'position' => (int) $attribute->values()->max('position') + 1,
-        ]);
+        return AttributeValue::query()
+            ->whereIn('id', $valueIds)
+            ->pluck('attribute_id')
+            ->map(intval(...))
+            ->unique()
+            ->values()
+            ->all();
     }
 
     private function attachOption(Product $parent, Attribute $attribute, AttributeValue $value): void

@@ -89,6 +89,13 @@ final class ProductImporter extends Importer
                         $record->brand_id = $brandId;
                     }
                 }),
+            ImportColumn::make('categories')
+                ->label(__('backend.product_imports.categories'))
+                ->rules(['nullable', 'string'])
+                ->ignoreBlankState()
+                ->helperText(__('backend.product_imports.categories_help'))
+                ->example('Wine | Red')
+                ->fillRecordUsing(fn (): mixed => null),
             ImportColumn::make('price')
                 ->label(__('shopper::layout.tables.price'))
                 ->numeric()
@@ -107,7 +114,7 @@ final class ProductImporter extends Importer
                 ->rules(['nullable', 'string'])
                 ->ignoreBlankState()
                 ->helperText(__('backend.product_imports.attributes_help'))
-                ->example('Color=Red | Size=M')
+                ->example('Volume=1L | Origin=Ukraine | Material=Cotton')
                 ->fillRecordUsing(fn (): mixed => null),
             ImportColumn::make('published_at')
                 ->label(__('shopper::forms.label.published_at'))

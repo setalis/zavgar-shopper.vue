@@ -9,11 +9,13 @@ use App\Filament\Exports\ProductExporter;
 use App\Filament\Imports\ProductImporter;
 use App\Livewire\Shopper\Pages\Product\Index;
 use App\Livewire\Shopper\Pages\Product\PendingImports;
+use App\Models\Category;
 use App\Models\PendingProductImport;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Support\ConvertsSpreadsheetToCsv;
+use App\Support\FormatsVariantAttributes;
 use Filament\Actions\Exports\Models\Export;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -377,6 +379,7 @@ test('product exporter writes a row for each variant', function (): void {
         ->and($rows[0][0])->toBe('SKU-PARENT')
         ->and($rows[0][1])->toBeEmpty()
         ->and($rows[0][2])->toBe('Shirt')
+        ->and($rows[0][4])->toBe('Color=Red')
         ->and($rows[1])->toBe(['SKU-RED', 'SKU-PARENT', 'Shirt Red', '2500', 'Color=Red']);
 });
 
@@ -502,4 +505,142 @@ test('approving a pending variant import creates the variant on the parent produ
         ->and($variant->getPrice()?->amount)->toBe(4500)
         ->and($pending->status)->toBe(PendingProductImportStatus::Approved)
         ->and($pending->product_id)->toBe($product->id);
+});
+
+test('product exporter includes all product attributes and categories', function (): void {
+    $category = Category::factory()->create([
+        'name' => 'Wine',
+        'slug' => 'wine',
+        'is_enabled' => true,
+        'parent_id' => null,
+    ]);
+
+    $product = Product::factory()->variant()->create([
+        'sku' => 'SKU-WINE',
+        'name' => 'Cabernet',
+    ]);
+    $product->categories()->attach($category);
+
+    $volume = Attribute::factory()->create([
+        'name' => 'Volume',
+        'slug' => 'volume',
+        'type' => FieldType::Select,
+        'is_enabled' => true,
+    ]);
+    $oneLiter = AttributeValue::factory()->create([
+        'attribute_id' => $volume->id,
+        'key' => '1l',
+        'value' => '1L',
+        'position' => 1,
+    ]);
+    $origin = Attribute::factory()->create([
+        'name' => 'Origin',
+        'slug' => 'origin',
+        'type' => FieldType::Select,
+        'is_enabled' => true,
+    ]);
+    $ukraine = AttributeValue::factory()->create([
+        'attribute_id' => $origin->id,
+        'key' => 'ukraine',
+        'value' => 'Ukraine',
+        'position' => 1,
+    ]);
+    $material = Attribute::factory()->create([
+        'name' => 'Material',
+        'slug' => 'material',
+        'type' => FieldType::Text,
+        'is_enabled' => true,
+    ]);
+
+    $product->options()->attach($volume->id, ['attribute_value_id' => $oneLiter->id]);
+    $product->options()->attach($origin->id, ['attribute_value_id' => $ukraine->id]);
+    $product->options()->attach($material->id, ['attribute_custom_value' => 'Glass']);
+
+    $variant = ProductVariant::factory()->create([
+        'product_id' => $product->id,
+        'sku' => 'SKU-WINE-1L',
+        'name' => 'Cabernet 1L',
+        'position' => 1,
+    ]);
+    $variant->values()->attach($oneLiter->id);
+
+    $product->load([
+        'brand',
+        'categories.parent',
+        'attributeProducts.attribute',
+        'attributeProducts.value',
+        'variants.values.attribute',
+        'variants.prices.currency',
+    ]);
+
+    $export = Export::query()->create([
+        'file_disk' => 'local',
+        'exporter' => ProductExporter::class,
+        'total_rows' => 1,
+        'user_id' => $this->admin->id,
+    ]);
+
+    $exporter = new ProductExporter($export, [
+        'sku' => 'sku',
+        'categories' => 'categories',
+        'attributes' => 'attributes',
+    ], []);
+
+    $rows = $exporter->rowsFor($product);
+
+    expect($rows)->toHaveCount(2)
+        ->and($rows[0])->toBe(['SKU-WINE', 'Wine', 'Material=Glass | Origin=Ukraine | Volume=1L'])
+        ->and($rows[1])->toBe(['SKU-WINE-1L', 'Wine', 'Material=Glass | Origin=Ukraine | Volume=1L']);
+});
+
+test('importing a product updates categories and product attributes', function (): void {
+    $wine = Category::factory()->create([
+        'name' => 'Wine',
+        'slug' => 'wine',
+        'is_enabled' => true,
+        'parent_id' => null,
+    ]);
+    $red = Category::factory()->create([
+        'name' => 'Red',
+        'slug' => 'red',
+        'is_enabled' => true,
+        'parent_id' => $wine->id,
+    ]);
+
+    $product = Product::factory()->standard()->create([
+        'sku' => 'SKU-ATTR-1',
+        'name' => 'Bottle',
+    ]);
+    $product->categories()->attach($wine);
+
+    $origin = Attribute::factory()->create([
+        'name' => 'Origin',
+        'slug' => 'origin',
+        'type' => FieldType::Select,
+        'is_enabled' => true,
+    ]);
+    AttributeValue::factory()->create([
+        'attribute_id' => $origin->id,
+        'key' => 'georgia',
+        'value' => 'Georgia',
+        'position' => 1,
+    ]);
+    $material = Attribute::factory()->create([
+        'name' => 'Material',
+        'slug' => 'material',
+        'type' => FieldType::Text,
+        'is_enabled' => true,
+    ]);
+
+    importProductRow($this->admin, [
+        'sku' => 'SKU-ATTR-1',
+        'categories' => 'Wine / Red',
+        'attributes' => 'Origin=Georgia | Material=Glass',
+    ]);
+
+    $product->refresh();
+    $product->load(['categories', 'attributeProducts.attribute', 'attributeProducts.value']);
+
+    expect($product->categories->pluck('id')->all())->toBe([$red->id])
+        ->and(app(FormatsVariantAttributes::class)->forProduct($product))->toBe('Material=Glass | Origin=Georgia');
 });

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Casts\TailwindTintCast;
 use App\Enums\HomepageBannerBackgroundType;
 use App\Enums\HomepageBannerCtaType;
+use App\Enums\HomepageBannerPlacement;
 use App\Enums\HomepageBannerSize;
 use App\Support\TailwindTint;
 use Database\Factories\HomepageBannerFactory;
@@ -33,9 +34,11 @@ final class HomepageBanner extends Model implements SpatieHasMedia
     protected $fillable = [
         'eyebrow',
         'title',
+        'highlight',
         'description',
         'button_text',
         'size',
+        'placement',
         'background_type',
         'gradient',
         'overlay_gradient',
@@ -54,6 +57,7 @@ final class HomepageBanner extends Model implements SpatieHasMedia
      */
     protected $attributes = [
         'size' => 'medium',
+        'placement' => 'bento',
         'background_type' => 'gradient',
         'cta_type' => 'url',
         'is_enabled' => true,
@@ -133,6 +137,7 @@ final class HomepageBanner extends Model implements SpatieHasMedia
      *     size: string,
      *     eyebrow: string|null,
      *     title: string,
+     *     highlight: string|null,
      *     description: string|null,
      *     button_text: string|null,
      *     href: string|null,
@@ -153,6 +158,7 @@ final class HomepageBanner extends Model implements SpatieHasMedia
             'size' => $this->size->value,
             'eyebrow' => $this->eyebrow,
             'title' => $this->title,
+            'highlight' => filled($this->highlight) ? $this->highlight : null,
             'description' => $this->description,
             'button_text' => $href !== null ? $buttonText : null,
             'href' => $buttonText !== null ? $href : null,
@@ -175,12 +181,23 @@ final class HomepageBanner extends Model implements SpatieHasMedia
     }
 
     /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    #[Scope]
+    protected function placement(Builder $query, HomepageBannerPlacement $placement): Builder
+    {
+        return $query->where('placement', $placement);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
             'size' => HomepageBannerSize::class,
+            'placement' => HomepageBannerPlacement::class,
             'background_type' => HomepageBannerBackgroundType::class,
             'gradient' => TailwindTintCast::class,
             'overlay_gradient' => TailwindTintCast::class,

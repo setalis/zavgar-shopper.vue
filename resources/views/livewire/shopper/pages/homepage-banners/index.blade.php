@@ -1,10 +1,12 @@
 <x-shopper::container class="py-5">
-    <x-shopper::heading :title="__('backend.banners.menu')">
+    <x-shopper::heading
+        :title="$this->isPromo() ? __('backend.banners.promo_menu') : __('backend.banners.menu')"
+    >
         <x-slot name="action">
             @can('add_homepage_banners')
                 <x-filament::button
                     tag="a"
-                    :href="route('shopper.banners.create')"
+                    :href="route($this->placement->createRouteName())"
                     wire:navigate
                 >
                     {{ __('shopper::forms.actions.add_label', ['label' => __('backend.banners.single')]) }}

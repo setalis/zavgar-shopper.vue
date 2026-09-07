@@ -6,6 +6,7 @@ namespace App\Livewire\Shopper\Pages\HomepageBanners;
 
 use App\Enums\HomepageBannerBackgroundType;
 use App\Enums\HomepageBannerCtaType;
+use App\Enums\HomepageBannerPlacement;
 use App\Enums\HomepageBannerSize;
 use App\Models\Collection;
 use App\Models\HomepageBanner;
@@ -39,6 +40,7 @@ use Throwable;
 final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
 {
     use HandlesAuthorizationExceptions;
+    use HasHomepageBannerPlacement;
     use InteractsWithActions;
     use InteractsWithSchemas;
 
@@ -49,8 +51,17 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
 
     public function mount(?HomepageBanner $banner = null): void
     {
+        $this->syncPlacementFromRoute();
+
         if ($banner instanceof HomepageBanner && $banner->exists) {
             $this->authorize('edit_homepage_banners');
+
+            if (HomepageBannerPlacement::fromRoute() instanceof HomepageBannerPlacement
+                && $banner->placement !== $this->placement) {
+                abort(404);
+            }
+
+            $this->placement = $banner->placement;
             $this->banner = $banner;
             $this->form->fill($banner->attributesToArray());
 
@@ -61,6 +72,7 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
         $this->banner = new HomepageBanner;
         $this->form->fill([
             'size' => HomepageBannerSize::Medium->value,
+            'placement' => $this->placement->value,
             'background_type' => HomepageBannerBackgroundType::Gradient->value,
             'gradient' => null,
             'overlay_gradient' => null,
@@ -100,10 +112,16 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
                                     ->label(__('backend.banners.title'))
                                     ->required()
                                     ->maxLength(255),
+                                TextInput::make('highlight')
+                                    ->label(__('backend.banners.highlight'))
+                                    ->helperText(__('backend.banners.highlight_help'))
+                                    ->maxLength(255)
+                                    ->visible(fn (): bool => $this->isPromo()),
                                 Textarea::make('description')
                                     ->label(__('backend.banners.description'))
                                     ->rows(3)
-                                    ->maxLength(2000),
+                                    ->maxLength(2000)
+                                    ->visible(fn (): bool => ! $this->isPromo()),
                                 TextInput::make('button_text')
                                     ->label(__('backend.banners.button_text'))
                                     ->maxLength(255),
@@ -111,7 +129,8 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
                                     ->label(__('backend.banners.size'))
                                     ->options(HomepageBannerSize::options())
                                     ->native(false)
-                                    ->required(),
+                                    ->required(fn (): bool => ! $this->isPromo())
+                                    ->visible(fn (): bool => ! $this->isPromo()),
                             ]),
                         Section::make(__('backend.banners.cta'))
                             ->compact()
@@ -237,7 +256,16 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
         $data = $this->payload($this->form->getState());
 
         if ($creating) {
-            $data['position'] = (int) HomepageBanner::query()->max('position') + 1;
+            $data['placement'] = $this->placement;
+            $data['position'] = (int) HomepageBanner::query()
+                ->placement($this->placement)
+                ->max('position') + 1;
+
+            if ($this->isPromo()) {
+                $data['size'] = HomepageBannerSize::Medium;
+                $data['description'] = null;
+            }
+
             $this->banner = HomepageBanner::create($data);
             $this->form->model($this->banner)->saveRelationships();
 
@@ -246,9 +274,15 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
                 ->success()
                 ->send();
 
-            $this->redirect(route('shopper.banners.edit', $this->banner), navigate: true);
+            $this->redirect(route($this->placement->editRouteName(), $this->banner), navigate: true);
 
             return;
+        }
+
+        if ($this->isPromo()) {
+            $data['size'] = HomepageBannerSize::Medium;
+            $data['description'] = null;
+            $data['placement'] = HomepageBannerPlacement::Promo;
         }
 
         $this->banner->update($data);
@@ -264,8 +298,8 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
         return view('livewire.shopper.pages.homepage-banners.edit')
             ->title(
                 $this->banner->exists
-                    ? __('backend.banners.edit')
-                    : __('backend.banners.create'),
+                    ? ($this->isPromo() ? __('backend.banners.promo_edit') : __('backend.banners.edit'))
+                    : ($this->isPromo() ? __('backend.banners.promo_create') : __('backend.banners.create')),
             );
     }
 

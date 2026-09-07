@@ -16,3 +16,10 @@ Route::get('/banners/create', HomepageBannerEdit::class)
     ->name('banners.create');
 Route::get('/banners/{banner}/edit', HomepageBannerEdit::class)
     ->name('banners.edit');
+
+Route::get('/promo-banners', HomepageBannersIndex::class)
+    ->name('promo-banners.index');
+Route::get('/promo-banners/create', HomepageBannerEdit::class)
+    ->name('promo-banners.create');
+Route::get('/promo-banners/{banner}/edit', HomepageBannerEdit::class)
+    ->name('promo-banners.edit');

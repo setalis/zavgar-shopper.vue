@@ -25,6 +25,14 @@ final class HomepageBannersSidebar extends AbstractAdminSidebar
                 $item->route('shopper.banners.index');
                 $item->setIcon('phosphor-squares-four');
             });
+
+            $group->item(__('backend.banners.promo_menu'), function (Item $item): void {
+                $item->weight(2);
+                $item->setAuthorized($this->canBrowseHomepageBanners());
+                $item->useSpa();
+                $item->route('shopper.promo-banners.index');
+                $item->setIcon('phosphor-rectangle');
+            });
         });
 
         return $menu;

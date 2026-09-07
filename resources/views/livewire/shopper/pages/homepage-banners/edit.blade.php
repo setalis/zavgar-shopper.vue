@@ -1,15 +1,17 @@
 <x-shopper::container class="py-5">
-    <x-shopper::breadcrumb :back="route('shopper.banners.index')">
+    <x-shopper::breadcrumb :back="route($this->placement->indexRouteName())">
         <x-untitledui-chevron-left class="size-4 shrink-0 text-gray-300 dark:text-gray-600" aria-hidden="true" />
         <x-shopper::breadcrumb.link
-            :link="route('shopper.banners.index')"
-            :title="__('backend.banners.menu')"
+            :link="route($this->placement->indexRouteName())"
+            :title="$this->isPromo() ? __('backend.banners.promo_menu') : __('backend.banners.menu')"
         />
     </x-shopper::breadcrumb>
 
     <x-shopper::heading
         class="mt-6"
-        :title="$banner->exists ? $banner->title : __('backend.banners.create')"
+        :title="$banner->exists
+            ? $banner->title
+            : ($this->isPromo() ? __('backend.banners.promo_create') : __('backend.banners.create'))"
     />
 
     <form wire:submit="store" class="mt-8 border-t border-gray-200 pt-10 dark:border-white/20">

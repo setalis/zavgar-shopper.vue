@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\HomepageBannerBackgroundType;
 use App\Enums\HomepageBannerColor;
 use App\Enums\HomepageBannerCtaType;
+use App\Enums\HomepageBannerPlacement;
 use App\Enums\HomepageBannerShade;
 use App\Enums\HomepageBannerSize;
 use App\Livewire\Shopper\Pages\HomepageBanners\Edit;
@@ -285,4 +286,56 @@ test('admins can delete a homepage banner from the index', function (): void {
         ->assertHasNoErrors();
 
     expect(HomepageBanner::query()->find($banner->id))->toBeNull();
+});
+
+test('promo index lists promo tiles and hides bento banners', function (): void {
+    HomepageBanner::factory()->create([
+        'title' => 'Bento card',
+    ]);
+
+    HomepageBanner::factory()->promo()->create([
+        'title' => 'Watch deal',
+    ]);
+
+    Livewire::actingAs($this->admin)
+        ->test(Index::class, ['placement' => HomepageBannerPlacement::Promo])
+        ->assertSuccessful()
+        ->assertSee('Watch deal')
+        ->assertDontSee('Bento card');
+});
+
+test('admins can create a promo tile without a size', function (): void {
+    Livewire::actingAs($this->admin)
+        ->test(Edit::class, ['placement' => HomepageBannerPlacement::Promo])
+        ->set('data.title', 'Watch deal')
+        ->set('data.eyebrow', 'This week only')
+        ->set('data.highlight', '−25%')
+        ->set('data.button_text', 'Shop now')
+        ->set('data.background_type', HomepageBannerBackgroundType::Gradient->value)
+        ->set('data.gradient', TailwindTint::of(HomepageBannerColor::Purple)->value())
+        ->set('data.cta_type', HomepageBannerCtaType::Url->value)
+        ->set('data.cta_url', '/shop')
+        ->set('data.is_enabled', true)
+        ->call('store')
+        ->assertHasNoErrors();
+
+    $banner = HomepageBanner::query()->first();
+
+    expect($banner)->not->toBeNull()
+        ->and($banner->title)->toBe('Watch deal')
+        ->and($banner->highlight)->toBe('−25%')
+        ->and($banner->placement)->toBe(HomepageBannerPlacement::Promo)
+        ->and($banner->size)->toBe(HomepageBannerSize::Medium)
+        ->and($banner->description)->toBeNull();
+});
+
+test('editing a bento banner through the promo route returns not found', function (): void {
+    $banner = HomepageBanner::factory()->create([
+        'title' => 'Bento card',
+    ]);
+
+    $this->withoutMiddleware()
+        ->actingAs($this->admin)
+        ->get(route('shopper.promo-banners.edit', $banner))
+        ->assertNotFound();
 });

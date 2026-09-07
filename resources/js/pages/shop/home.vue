@@ -18,6 +18,7 @@ import type { Category, Collection, HomepageBanner, Product } from '@/types/shop
 
 const props = defineProps<{
     bentoBanners: HomepageBanner[];
+    promoBanners: HomepageBanner[];
     featuredProducts: Product[];
     latestProducts: Product[];
     featuredCollections: Collection[];
@@ -102,7 +103,7 @@ const compactProducts = computed<Product[]>(() =>
         </Container>
     </section>
 
-    <DiscountBanners />
+    <DiscountBanners :banners="promoBanners" />
 
     <section v-if="categories.length" class="py-14 md:py-20">
         <Container>

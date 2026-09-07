@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Shop;
 
+use App\Enums\HomepageBannerPlacement;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Collection;
@@ -35,14 +36,8 @@ final class HomeController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('shop/home', [
-            'bentoBanners' => fn () => HomepageBanner::query()
-                ->enabled()
-                ->with(['media', 'category', 'product', 'collection', 'brand'])
-                ->orderBy('position')
-                ->get()
-                ->map(fn (HomepageBanner $banner): array => $banner->toStorefrontArray())
-                ->values()
-                ->all(),
+            'bentoBanners' => $this->bannersFor(HomepageBannerPlacement::Bento),
+            'promoBanners' => $this->bannersFor(HomepageBannerPlacement::Promo),
             'featuredProducts' => fn () => $this->cardQuery()
                 ->where('featured', true)
                 ->limit(10)
@@ -79,5 +74,21 @@ final class HomeController extends Controller
             ->withCurrentStock()
             ->withApprovedReviewSummary()
             ->scopes('publish');
+    }
+
+    /**
+     * @return \Closure(): list<array<string, mixed>>
+     */
+    private function bannersFor(HomepageBannerPlacement $placement): \Closure
+    {
+        return fn () => HomepageBanner::query()
+            ->enabled()
+            ->placement($placement)
+            ->with(['media', 'category', 'product', 'collection', 'brand'])
+            ->orderBy('position')
+            ->get()
+            ->map(fn (HomepageBanner $banner): array => $banner->toStorefrontArray())
+            ->values()
+            ->all();
     }
 }

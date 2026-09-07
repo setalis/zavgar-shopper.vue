@@ -12,6 +12,7 @@ import collections from './collections'
 import discounts from './discounts'
 import reviews from './reviews'
 import banners from './banners'
+import promoBanners from './promo-banners'
 /**
 * @see \Shopper\Livewire\Pages\Auth\Login::__invoke
  * @see vendor/shopper/framework/src/Livewire/Pages/Auth/Login.php:7
@@ -570,6 +571,7 @@ collections: Object.assign(collections, collections),
 discounts: Object.assign(discounts, discounts),
 reviews: Object.assign(reviews, reviews),
 banners: Object.assign(banners, banners),
+promoBanners: Object.assign(promoBanners, promoBanners),
 }
 
 export default shopper

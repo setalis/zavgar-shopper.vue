@@ -59,6 +59,7 @@ test('home page renders storefront home with featured and latest products', func
             ->where('featuredProducts.0.id', $featured->id)
             ->has('latestProducts', 2)
             ->has('bentoBanners', 0)
+            ->has('promoBanners', 0)
             ->has('categories')
             ->has('featuredCollections')
             ->has('shop.cart_count')
@@ -435,5 +436,50 @@ test('home page omits gradients when none are selected', function (): void {
             ->component('shop/home')
             ->where('bentoBanners.0.gradient', null)
             ->where('bentoBanners.0.overlay_gradient', null)
+        );
+});
+
+test('home page includes enabled promo banners in position order', function (): void {
+    $second = HomepageBanner::factory()->promo()->create([
+        'title' => 'Audio deal',
+        'highlight' => '−40%',
+        'position' => 2,
+        'cta_url' => '/shop',
+        'button_text' => 'Shop',
+    ]);
+
+    $first = HomepageBanner::factory()->promo()->create([
+        'title' => 'Watch deal',
+        'highlight' => '−25%',
+        'position' => 1,
+        'cta_url' => '/contact',
+        'button_text' => 'Contact',
+    ]);
+
+    HomepageBanner::factory()->promo()->disabled()->create([
+        'title' => 'Hidden promo',
+        'position' => 0,
+    ]);
+
+    HomepageBanner::factory()->create([
+        'title' => 'Bento card',
+        'position' => 1,
+        'cta_url' => '/shop',
+        'button_text' => 'Shop',
+    ]);
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('shop/home')
+            ->has('promoBanners', 2)
+            ->where('promoBanners.0.id', $first->id)
+            ->where('promoBanners.0.title', 'Watch deal')
+            ->where('promoBanners.0.highlight', '−25%')
+            ->where('promoBanners.0.href', '/contact')
+            ->where('promoBanners.1.id', $second->id)
+            ->where('promoBanners.1.href', '/shop')
+            ->has('bentoBanners', 1)
+            ->where('bentoBanners.0.title', 'Bento card')
         );
 });

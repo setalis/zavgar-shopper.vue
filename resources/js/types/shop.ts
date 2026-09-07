@@ -49,6 +49,7 @@ export type HomepageBanner = {
     size: 'large' | 'medium' | 'small';
     eyebrow: string | null;
     title: string;
+    highlight: string | null;
     description: string | null;
     button_text: string | null;
     href: string | null;

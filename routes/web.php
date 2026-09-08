@@ -11,6 +11,7 @@ use App\Http\Controllers\Shop\CategoryController;
 use App\Http\Controllers\Shop\CheckoutController;
 use App\Http\Controllers\Shop\CheckoutSuccessController;
 use App\Http\Controllers\Shop\CollectionController;
+use App\Http\Controllers\Shop\ContactController;
 use App\Http\Controllers\Shop\HomeController;
 use App\Http\Controllers\Shop\ProductController;
 use App\Http\Controllers\Shop\ProductReviewController;
@@ -37,7 +38,8 @@ Route::get('brands', [BrandController::class, 'index'])->name('shop.brands');
 Route::get('brands/{brand:slug}', [BrandController::class, 'show'])->name('shop.brand');
 Route::get('search', SearchController::class)->middleware('throttle:30,1')->name('shop.search');
 Route::get('search/suggest', SearchSuggestController::class)->middleware('throttle:30,1')->name('shop.search.suggest');
-Route::inertia('contact', 'shop/contact')->name('shop.contact');
+Route::get('contact', [ContactController::class, 'index'])->name('shop.contact');
+Route::post('contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('shop.contact.store');
 
 // Cart
 Route::get('cart', [CartController::class, 'index'])->name('shop.cart');

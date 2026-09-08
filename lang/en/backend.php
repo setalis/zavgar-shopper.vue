@@ -25,6 +25,26 @@ return [
         'submitted' => 'Your review has been submitted and is awaiting moderation.',
         'already_submitted' => 'You have already reviewed this product.',
     ],
+    'contact' => [
+        'sent' => 'Your message has been sent. We will get back to you shortly.',
+        'heading' => 'New contact message',
+        'subject' => 'Contact: :topic',
+        'fields' => [
+            'name' => 'Name',
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'topic' => 'Topic',
+            'order_number' => 'Order number',
+            'body' => 'Message',
+        ],
+        'topics' => [
+            'order' => 'Order status',
+            'product' => 'Product question',
+            'returns' => 'Returns',
+            'trade' => 'Trade / wholesale',
+            'other' => 'Something else',
+        ],
+    ],
     'checkout' => [
         'option_unavailable' => 'Selected option is no longer available.',
         'payment_prepare_failed' => 'Unable to prepare payment. Please try again.',

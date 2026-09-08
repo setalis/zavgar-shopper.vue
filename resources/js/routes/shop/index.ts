@@ -1,6 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 import productD87513 from './product'
 import searchD2f59a from './search'
+import contact50a660 from './contact'
 import cartB8cf73 from './cart'
 import wishlistE18b57 from './wishlist'
 import zone from './zone'
@@ -726,8 +727,8 @@ search.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     
     search.form = searchForm
 /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
 export const contact = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -741,8 +742,8 @@ contact.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
 contact.url = (options?: RouteQueryOptions) => {
@@ -750,8 +751,8 @@ contact.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
 contact.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -759,8 +760,8 @@ contact.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
 contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -769,8 +770,8 @@ contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
     /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
     const contactForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -779,8 +780,8 @@ contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     })
 
             /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
         contactForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -788,8 +789,8 @@ contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
             method: 'get',
         })
             /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
         contactForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -968,7 +969,7 @@ collection: Object.assign(collection, collection),
 brands: Object.assign(brands, brands),
 brand: Object.assign(brand, brand),
 search: Object.assign(search, searchD2f59a),
-contact: Object.assign(contact, contact),
+contact: Object.assign(contact, contact50a660),
 cart: Object.assign(cart, cartB8cf73),
 wishlist: Object.assign(wishlist, wishlistE18b57),
 zone: Object.assign(zone, zone),

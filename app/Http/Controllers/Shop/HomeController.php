@@ -38,30 +38,32 @@ final class HomeController extends Controller
         return Inertia::render('shop/home', [
             'bentoBanners' => $this->bannersFor(HomepageBannerPlacement::Bento),
             'promoBanners' => $this->bannersFor(HomepageBannerPlacement::Promo),
-            'featuredProducts' => fn () => $this->cardQuery()
+            'featuredProducts' => fn () => localize_storefront($this->cardQuery()
                 ->where('featured', true)
                 ->limit(10)
-                ->get(),
-            'latestProducts' => fn () => $this->cardQuery()
+                ->get()),
+            'latestProducts' => fn () => localize_storefront($this->cardQuery()
                 ->latest()
                 ->limit(10)
-                ->get(),
-            'featuredCollections' => fn () => Collection::query()
+                ->get()),
+            'featuredCollections' => fn () => localize_storefront(Collection::query()
                 ->has('products')
+                ->withStorefrontTranslations()
                 ->withCount('products')
                 ->with('media')
                 ->orderByDesc('products_count')
                 ->limit(6)
-                ->get(),
-            'categories' => fn () => Category::hydrateBranchProductsCount(
+                ->get()),
+            'categories' => fn () => localize_storefront(Category::hydrateBranchProductsCount(
                 Category::query()
                     ->scopes('enabled')
                     ->whereNull('parent_id')
+                    ->withStorefrontTranslations()
                     ->with('media')
                     ->orderBy('position')
                     ->limit(10)
                     ->get(),
-            ),
+            )),
         ]);
     }
 
@@ -70,6 +72,7 @@ final class HomeController extends Controller
         return Product::query()
             ->select(self::CARD_COLUMNS)
             ->with(['media', 'brand.media'])
+            ->withStorefrontTranslations()
             ->withCurrentPrices()
             ->withCurrentStock()
             ->withApprovedReviewSummary()
@@ -84,6 +87,7 @@ final class HomeController extends Controller
         return fn () => HomepageBanner::query()
             ->enabled()
             ->placement($placement)
+            ->withStorefrontTranslations()
             ->with(['media', 'category', 'product', 'collection', 'brand'])
             ->orderBy('position')
             ->get()

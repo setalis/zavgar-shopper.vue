@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Product;
 
+use App\Actions\LocalizeCatalog;
 use App\Models\Product;
 use Illuminate\Support\Collection;
 use Shopper\Core\Enum\FieldType;
@@ -69,7 +70,10 @@ final class BuildProductAttributes
             return null;
         }
 
-        $value = $this->formatValue($attribute, $group);
+        $localizer = resolve(LocalizeCatalog::class);
+        $localizer->handle($attribute);
+
+        $value = $this->formatValue($attribute, $group, $localizer);
 
         if ($value === '') {
             return null;
@@ -87,10 +91,18 @@ final class BuildProductAttributes
     /**
      * @param  Collection<int, AttributeProduct>  $group
      */
-    private function formatValue(Attribute $attribute, Collection $group): string
+    private function formatValue(Attribute $attribute, Collection $group, LocalizeCatalog $localizer): string
     {
         $values = $group
-            ->map(fn (AttributeProduct $row): ?string => $row->real_value)
+            ->map(function (AttributeProduct $row) use ($localizer): ?string {
+                $localizer->handle($row);
+
+                if ($row->value !== null) {
+                    $localizer->handle($row->value);
+                }
+
+                return $row->attribute_custom_value ?? $row->value?->value;
+            })
             ->filter(fn (?string $value): bool => filled($value))
             ->unique()
             ->values();

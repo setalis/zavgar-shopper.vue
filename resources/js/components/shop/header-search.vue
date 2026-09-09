@@ -6,6 +6,7 @@ import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import SearchSuggestController from '@/actions/App/Http/Controllers/Shop/SearchSuggestController';
 import PriceDisplay from '@/components/shop/price-display.vue';
 import { Spinner } from '@/components/ui/spinner';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { StorefrontPrice } from '@/types/shop';
@@ -20,6 +21,7 @@ type SearchSuggestion = {
 };
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 const http = useHttp();
 
 const term = ref<string>('');
@@ -67,9 +69,11 @@ async function fetchSuggestions(query: string): Promise<void> {
     products.value = [];
 
     try {
-        const data = (await http.submit(
-            SearchSuggestController.get({ query: { q: query } }),
-        )) as { products: SearchSuggestion[] };
+        const request = SearchSuggestController.get({ query: { q: query } });
+        const data = (await http.submit({
+            ...request,
+            url: localized(request.url),
+        })) as { products: SearchSuggestion[] };
 
         if (id !== requestId) {
             return;
@@ -101,7 +105,7 @@ function submitSearch(): void {
         return;
     }
 
-    router.get(shop.search.url(), { q: query }, { preserveState: false });
+    router.get(localized(shop.search.url()), { q: query }, { preserveState: false });
 }
 
 function closeSuggestions(): void {
@@ -109,7 +113,7 @@ function closeSuggestions(): void {
 }
 
 function productHref(slug: string): string {
-    return shop.product.url({ product: slug });
+    return localized(shop.product.url({ product: slug }));
 }
 </script>
 
@@ -202,7 +206,7 @@ function productHref(slug: string): string {
                 </ul>
 
                 <Link
-                    :href="shop.search.url({ query: { q: term.trim() } })"
+                    :href="localized(shop.search.url({ query: { q: term.trim() } }))"
                     class="block border-t border-rule px-4 py-3 text-center font-mono text-xs font-semibold tracking-[0.04em] text-brand transition hover:bg-brand-soft"
                     @click="closeSuggestions"
                 >

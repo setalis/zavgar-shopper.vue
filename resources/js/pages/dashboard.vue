@@ -2,6 +2,7 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Heart, MapPin, ShoppingBag, User } from 'lucide-vue-next';
 import Card from '@/components/shop/card.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import {
     addresses as accountAddresses,
@@ -12,6 +13,7 @@ import * as shop from '@/routes/shop';
 
 const page = usePage();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const firstName =
     (page.props.auth.user as { first_name?: string; name?: string } | null)
@@ -33,7 +35,7 @@ const firstName =
     </h1>
 
     <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link :href="accountOrders.url()" class="block">
+        <Link :href="localized(accountOrders.url())" class="block">
             <Card class="flex items-center gap-3">
                 <div
                     class="flex size-10 items-center justify-center rounded-full bg-brand-soft"
@@ -51,7 +53,7 @@ const firstName =
             </Card>
         </Link>
 
-        <Link :href="shop.wishlist.url()" class="block">
+        <Link :href="localized(shop.wishlist.url())" class="block">
             <Card class="flex items-center gap-3">
                 <div
                     class="flex size-10 items-center justify-center rounded-full bg-brand-soft"
@@ -69,7 +71,7 @@ const firstName =
             </Card>
         </Link>
 
-        <Link :href="accountAddresses.url()" class="block">
+        <Link :href="localized(accountAddresses.url())" class="block">
             <Card class="flex items-center gap-3">
                 <div
                     class="flex size-10 items-center justify-center rounded-full bg-brand-soft"
@@ -87,7 +89,7 @@ const firstName =
             </Card>
         </Link>
 
-        <Link :href="profile.edit.url()" class="block">
+        <Link :href="localized(profile.edit.url())" class="block">
             <Card class="flex items-center gap-3">
                 <div
                     class="flex size-10 items-center justify-center rounded-full bg-brand-soft"

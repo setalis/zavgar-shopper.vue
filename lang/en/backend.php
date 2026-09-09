@@ -3,6 +3,21 @@
 declare(strict_types=1);
 
 return [
+    'catalog' => [
+        'english' => 'English',
+        'fields' => [
+            'name' => 'Name (English)',
+            'summary' => 'Summary (English)',
+            'description' => 'Description (English)',
+            'seo_title' => 'SEO title (English)',
+            'seo_description' => 'SEO description (English)',
+            'value' => 'Value (English)',
+            'eyebrow' => 'Eyebrow (English)',
+            'title' => 'Title (English)',
+            'highlight' => 'Highlight (English)',
+            'button_text' => 'Button text (English)',
+        ],
+    ],
     'tax' => [
         'ttc' => 'TTC',
         'ht' => 'HT',

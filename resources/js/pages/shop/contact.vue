@@ -25,10 +25,12 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { home } from '@/routes';
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const topic = ref<string>('order');
 
@@ -55,9 +57,18 @@ const topics = ['order', 'product', 'returns', 'trade', 'other'] as const;
 const faqs = ['shipping', 'returns', 'warranty', 'trade'] as const;
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
     { label: t('shop.contact.title') },
 ]);
+
+const contactForm = computed(() => {
+    const form = store.form();
+
+    return {
+        ...form,
+        action: localized(form.action),
+    };
+});
 </script>
 
 <template>
@@ -142,7 +153,7 @@ const crumbs = computed(() => [
             </div>
 
             <Form
-                v-bind="store.form()"
+                v-bind="contactForm"
                 reset-on-success
                 class="rounded-lg border border-rule bg-paper p-7 md:p-10"
                 v-slot="{ errors, processing, wasSuccessful }"

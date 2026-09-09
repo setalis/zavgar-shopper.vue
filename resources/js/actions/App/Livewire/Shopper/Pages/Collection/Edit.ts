@@ -1,7 +1,7 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../../wayfinder'
 /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
 const Edit = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -15,8 +15,8 @@ Edit.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
 Edit.url = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -43,8 +43,8 @@ Edit.url = (args: { collection: string | number } | [collection: string | number
 }
 
 /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
 Edit.get = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -52,8 +52,8 @@ Edit.get = (args: { collection: string | number } | [collection: string | number
     method: 'get',
 })
 /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
 Edit.head = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -62,8 +62,8 @@ Edit.head = (args: { collection: string | number } | [collection: string | numbe
 })
 
     /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
     const EditForm = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -72,8 +72,8 @@ Edit.head = (args: { collection: string | number } | [collection: string | numbe
     })
 
             /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
         EditForm.get = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -81,8 +81,8 @@ Edit.head = (args: { collection: string | number } | [collection: string | numbe
             method: 'get',
         })
             /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
         EditForm.head = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

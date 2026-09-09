@@ -12,6 +12,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard, login, logout, register } from '@/routes';
 import * as shop from '@/routes/shop';
@@ -21,6 +22,7 @@ const open = defineModel<boolean>('open', { required: true });
 
 const page = usePage();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const navCategories = computed<NavCategory[]>(
     () => page.props.shop?.nav_categories ?? [],
@@ -177,7 +179,9 @@ function hasChildren(item: Pick<NavMenuItem, 'children'>): boolean {
                     >
                         <Link
                             :href="
-                                shop.category.url({ category: category.slug })
+                                localized(
+                                    shop.category.url({ category: category.slug }),
+                                )
                             "
                             class="flex items-center gap-2 text-sm font-semibold text-ink transition hover:text-brand"
                             @click="close"
@@ -205,7 +209,11 @@ function hasChildren(item: Pick<NavMenuItem, 'children'>): boolean {
                         <Link
                             v-for="child in category.children ?? []"
                             :key="child.id"
-                            :href="shop.category.url({ category: child.slug })"
+                            :href="
+                                localized(
+                                    shop.category.url({ category: child.slug }),
+                                )
+                            "
                             class="block pl-7 text-sm text-ink-mute transition hover:text-brand"
                             @click="close"
                         >
@@ -217,7 +225,7 @@ function hasChildren(item: Pick<NavMenuItem, 'children'>): boolean {
                 <div class="mt-6 space-y-3 border-t border-rule pt-5">
                     <template v-if="page.props.auth.user">
                         <Link
-                            :href="dashboard.url()"
+                            :href="localized(dashboard.url())"
                             class="block text-sm text-ink-soft transition hover:text-brand"
                             @click="close"
                         >
@@ -256,7 +264,7 @@ function hasChildren(item: Pick<NavMenuItem, 'children'>): boolean {
             >
                 <LocaleSwitcher class="text-ink-mute" />
                 <Button as-child size="sm">
-                    <Link :href="shop.cart.url()" @click="close">
+                    <Link :href="localized(shop.cart.url())" @click="close">
                         {{ t('shop.cart.view') }}
                     </Link>
                 </Button>

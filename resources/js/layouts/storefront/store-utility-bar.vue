@@ -2,11 +2,13 @@
 import { Link } from '@inertiajs/vue3';
 import Container from '@/components/shop/container.vue';
 import LocaleSwitcher from '@/components/shop/locale-switcher.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { orders as accountOrders } from '@/routes/account';
 import * as shop from '@/routes/shop';
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 </script>
 
 <template>
@@ -27,13 +29,13 @@ const { t } = useTrans();
                 class="hidden items-center gap-5 text-paper/70 md:inline-flex"
             >
                 <Link
-                    :href="accountOrders.url()"
+                    :href="localized(accountOrders.url())"
                     class="transition hover:text-paper"
                 >
                     {{ t('shop.utility.track_order') }}
                 </Link>
                 <Link
-                    :href="shop.contact.url()"
+                    :href="localized(shop.contact.url())"
                     class="transition hover:text-paper"
                 >
                     {{ t('shop.utility.help') }}

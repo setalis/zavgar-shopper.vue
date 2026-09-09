@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Brand } from '@/types/shop';
@@ -10,13 +11,14 @@ const props = defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const href = computed<string | null>(() => {
     if (!props.brand.slug || props.brand.is_enabled === false) {
         return null;
     }
 
-    return shop.brand.url({ brand: props.brand.slug });
+    return localized(shop.brand.url({ brand: props.brand.slug }));
 });
 
 const label = computed(() =>

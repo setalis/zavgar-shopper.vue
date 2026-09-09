@@ -13,6 +13,7 @@ import BrandShopper from '@/components/shop/brand-shopper.vue';
 import BrandVue from '@/components/shop/brand-vue.vue';
 import Container from '@/components/shop/container.vue';
 import ZoneSelector from '@/components/shop/zone-selector.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard, home, login, register } from '@/routes';
 import {
@@ -24,6 +25,7 @@ import type { NavCategory } from '@/types/shop';
 
 const page = usePage();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const currentYear = new Date().getFullYear();
 
@@ -40,25 +42,25 @@ const socials = [
 ];
 
 const helpLinks = computed(() => [
-    { href: shop.contact.url(), label: t('shop.footer.help.contact') },
-    { href: accountOrders.url(), label: t('shop.footer.help.track_order') },
-    { href: shop.contact.url(), label: t('shop.footer.help.returns') },
-    { href: shop.contact.url(), label: t('shop.footer.help.shipping') },
-    { href: shop.contact.url(), label: t('shop.footer.help.warranty') },
+    { href: localized(shop.contact.url()), label: t('shop.footer.help.contact') },
+    { href: localized(accountOrders.url()), label: t('shop.footer.help.track_order') },
+    { href: localized(shop.contact.url()), label: t('shop.footer.help.returns') },
+    { href: localized(shop.contact.url()), label: t('shop.footer.help.shipping') },
+    { href: localized(shop.contact.url()), label: t('shop.footer.help.warranty') },
 ]);
 
 const resourceLinks = computed(() => [
-    { href: shop.index.url(), label: t('shop.footer.resources.all_products') },
+    { href: localized(shop.index.url()), label: t('shop.footer.resources.all_products') },
     {
-        href: shop.categories.url(),
+        href: localized(shop.categories.url()),
         label: t('shop.footer.resources.categories'),
     },
     {
-        href: shop.brands.url(),
+        href: localized(shop.brands.url()),
         label: t('shop.footer.resources.brands'),
     },
-    { href: shop.search.url(), label: t('shop.footer.resources.search') },
-    { href: shop.cart.url(), label: t('shop.footer.resources.cart') },
+    { href: localized(shop.search.url()), label: t('shop.footer.resources.search') },
+    { href: localized(shop.cart.url()), label: t('shop.footer.resources.cart') },
 ]);
 </script>
 
@@ -77,7 +79,7 @@ const resourceLinks = computed(() => [
             >
                 <div>
                     <Link
-                        :href="home.url()"
+                        :href="localized(home.url())"
                         class="mb-4 inline-flex items-center gap-2 font-heading text-2xl font-extrabold tracking-[-0.02em] text-paper"
                     >
                         <BrandIcon class="h-9 w-auto fill-current text-paper" />
@@ -121,9 +123,11 @@ const resourceLinks = computed(() => [
                         >
                             <Link
                                 :href="
-                                    shop.category.url({
-                                        category: category.slug,
-                                    })
+                                    localized(
+                                        shop.category.url({
+                                            category: category.slug,
+                                        }),
+                                    )
                                 "
                                 class="text-sm text-paper/70 transition hover:text-paper"
                             >
@@ -173,7 +177,7 @@ const resourceLinks = computed(() => [
                         <template v-if="page.props.auth.user">
                             <li>
                                 <Link
-                                    :href="dashboard.url()"
+                                    :href="localized(dashboard.url())"
                                     class="text-sm text-paper/70 transition hover:text-paper"
                                 >
                                     {{ t('shop.footer.my_account') }}
@@ -181,7 +185,7 @@ const resourceLinks = computed(() => [
                             </li>
                             <li>
                                 <Link
-                                    :href="accountOrders.url()"
+                                    :href="localized(accountOrders.url())"
                                     class="text-sm text-paper/70 transition hover:text-paper"
                                 >
                                     {{ t('shop.footer.my_orders') }}
@@ -189,7 +193,7 @@ const resourceLinks = computed(() => [
                             </li>
                             <li>
                                 <Link
-                                    :href="accountAddresses.url()"
+                                    :href="localized(accountAddresses.url())"
                                     class="text-sm text-paper/70 transition hover:text-paper"
                                 >
                                     {{ t('shop.footer.my_addresses') }}

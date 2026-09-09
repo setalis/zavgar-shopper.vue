@@ -3,6 +3,21 @@
 declare(strict_types=1);
 
 return [
+    'catalog' => [
+        'english' => 'English',
+        'fields' => [
+            'name' => 'Назва (English)',
+            'summary' => 'Короткий опис (English)',
+            'description' => 'Опис (English)',
+            'seo_title' => 'SEO заголовок (English)',
+            'seo_description' => 'SEO опис (English)',
+            'value' => 'Значення (English)',
+            'eyebrow' => 'Надзаголовок (English)',
+            'title' => 'Заголовок (English)',
+            'highlight' => 'Акцент (English)',
+            'button_text' => 'Текст кнопки (English)',
+        ],
+    ],
     'tax' => [
         'ttc' => 'з ПДВ',
         'ht' => 'без ПДВ',

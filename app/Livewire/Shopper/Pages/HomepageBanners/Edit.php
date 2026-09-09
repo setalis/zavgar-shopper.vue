@@ -11,6 +11,7 @@ use App\Enums\HomepageBannerSize;
 use App\Models\Collection;
 use App\Models\HomepageBanner;
 use App\Models\Product;
+use App\Support\CatalogEnglishFields;
 use App\Support\TailwindTint;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -63,7 +64,10 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
 
             $this->placement = $banner->placement;
             $this->banner = $banner;
-            $this->form->fill($banner->attributesToArray());
+            $this->form->fill([
+                ...$banner->attributesToArray(),
+                'english' => $banner->catalogTranslationPayload('en'),
+            ]);
 
             return;
         }
@@ -125,6 +129,10 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
                                 TextInput::make('button_text')
                                     ->label(__('backend.banners.button_text'))
                                     ->maxLength(255),
+                                CatalogEnglishFields::section(
+                                    ['eyebrow', 'title', 'highlight', 'description', 'button_text'],
+                                    richDescription: false,
+                                ),
                                 Select::make('size')
                                     ->label(__('backend.banners.size'))
                                     ->options(HomepageBannerSize::options())
@@ -253,7 +261,8 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
 
         $this->authorize($creating ? 'add_homepage_banners' : 'edit_homepage_banners');
 
-        $data = $this->payload($this->form->getState());
+        $english = is_array($this->data['english'] ?? null) ? $this->data['english'] : [];
+        $data = $this->payload(CatalogEnglishFields::withoutEnglish($this->form->getState()));
 
         if ($creating) {
             $data['placement'] = $this->placement;
@@ -268,6 +277,7 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
 
             $this->banner = HomepageBanner::create($data);
             $this->form->model($this->banner)->saveRelationships();
+            $this->banner->saveCatalogTranslation('en', $english);
 
             Notification::make()
                 ->title(__('backend.banners.created'))
@@ -286,6 +296,7 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
         }
 
         $this->banner->update($data);
+        $this->banner->saveCatalogTranslation('en', $english);
 
         Notification::make()
             ->title(__('backend.banners.updated'))
@@ -321,7 +332,7 @@ final class Edit extends AbstractPageComponent implements HasActions, HasSchemas
         $data['gradient'] = $this->normalizeGradient($data['gradient'] ?? null);
         $data['overlay_gradient'] = $this->normalizeGradient($data['overlay_gradient'] ?? null);
 
-        unset($data['background'], $data['accent']);
+        unset($data['background'], $data['accent'], $data['english']);
 
         return $data;
     }

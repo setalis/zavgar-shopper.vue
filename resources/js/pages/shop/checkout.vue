@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Spinner } from '@/components/ui/spinner';
 import { useShop } from '@/composables/useShop';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import { home } from '@/routes';
@@ -53,6 +54,7 @@ const props = defineProps<{
 
 const { currency, taxLabel, zone } = useShop();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const step = computed<1 | 2 | 3>(() => props.step);
 
@@ -135,7 +137,7 @@ watch(
         if (method.driver === 'stripe' && !props.stripeData) {
             preparingStripe.value = true;
             router.post(
-                checkout.preparePayment.url(),
+                localized(checkout.preparePayment.url()),
                 { payment_method_id: id },
                 {
                     preserveScroll: true,
@@ -154,8 +156,8 @@ const total = computed<number>(() => {
 });
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
-    { label: t('shop.cart.heading'), href: shop.cart.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
+    { label: t('shop.cart.heading'), href: localized(shop.cart.url()) },
     { label: t('shop.checkout.heading') },
 ]);
 
@@ -192,22 +194,22 @@ function goToStep(target: 1 | 2 | 3): void {
     }
 
     router.get(
-        checkout.index.url(),
+        localized(checkout.index.url()),
         { step: target },
         { preserveScroll: true, preserveState: false },
     );
 }
 
 function submitAddress(): void {
-    addressForm.post(checkout.shippingAddress.url(), { preserveScroll: true });
+    addressForm.post(localized(checkout.shippingAddress.url()), { preserveScroll: true });
 }
 
 function submitShipping(): void {
-    shippingForm.post(checkout.shippingOption.url(), { preserveScroll: true });
+    shippingForm.post(localized(checkout.shippingOption.url()), { preserveScroll: true });
 }
 
 function placeOrder(): void {
-    paymentForm.post(checkout.placeOrder.url(), { preserveScroll: true });
+    paymentForm.post(localized(checkout.placeOrder.url()), { preserveScroll: true });
 }
 
 function lineImage(line: Cart['lines'][number]): string | null {

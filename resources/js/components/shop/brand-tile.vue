@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { Tag } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Brand } from '@/types/shop';
@@ -11,9 +12,10 @@ const props = defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const brandHref = computed<string>(() =>
-    shop.brand.url({ brand: props.brand.slug ?? '' }),
+    localized(shop.brand.url({ brand: props.brand.slug ?? '' })),
 );
 
 function productLabel(count: number): string {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Shop;
 
 use App\Actions\Cart\AddToCart;
+use App\Actions\LocalizeCatalog;
 use App\CheckoutSession;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
@@ -24,6 +25,8 @@ final class CartController extends Controller
         $cart = resolve(CartSessionManager::class)->current();
 
         $cart?->load(['lines.purchasable.media']);
+
+        resolve(LocalizeCatalog::class)->cart($cart);
 
         $context = $cart
             ? resolve(CartManager::class)->calculate($cart)

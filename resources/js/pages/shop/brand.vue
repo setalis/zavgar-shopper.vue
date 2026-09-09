@@ -23,6 +23,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { stripHtml } from '@/lib/format';
 import { withPriceParams } from '@/lib/price-filter';
@@ -52,13 +53,14 @@ const props = defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const sort = ref<string>(props.filters.sort);
 const filtersOpen = ref<boolean>(false);
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
-    { label: t('shop.brands.heading'), href: shop.brands.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
+    { label: t('shop.brands.heading'), href: localized(shop.brands.url()) },
     { label: props.brand.name },
 ]);
 
@@ -71,7 +73,7 @@ function visit(overrides: Partial<Filters> = {}): void {
     filtersOpen.value = false;
 
     router.get(
-        shop.brand.url({ brand: props.brand.slug ?? '' }),
+        localized(shop.brand.url({ brand: props.brand.slug ?? '' })),
         withPriceParams({ sort: next.sort }, next.price_min, next.price_max),
         { preserveState: true, preserveScroll: true, replace: true },
     );

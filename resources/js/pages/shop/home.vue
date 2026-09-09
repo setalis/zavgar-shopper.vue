@@ -12,6 +12,7 @@ import NewsletterBanner from '@/components/shop/newsletter-banner.vue';
 import ProductCard from '@/components/shop/product-card.vue';
 import SectionHead from '@/components/shop/section-head.vue';
 import TrustBadges from '@/components/shop/trust-badges.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Category, Collection, HomepageBanner, Product } from '@/types/shop';
@@ -26,6 +27,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 type TrendingTab = 'featured' | 'latest';
 
@@ -63,7 +65,7 @@ const compactProducts = computed<Product[]>(() =>
         <Container>
             <SectionHead
                 :title="t('shop.home.trending.title')"
-                :view-all-href="shop.index.url()"
+                :view-all-href="localized(shop.index.url())"
                 :view-all-label="t('shop.home.featured.view_all')"
             />
 
@@ -110,7 +112,7 @@ const compactProducts = computed<Product[]>(() =>
             <SectionHead
                 :title="t('shop.home.categories.title')"
                 :description="t('shop.home.categories.subtitle')"
-                :view-all-href="shop.categories.url()"
+                :view-all-href="localized(shop.categories.url())"
                 :view-all-label="t('shop.home.categories.view_all')"
             />
 
@@ -142,7 +144,7 @@ const compactProducts = computed<Product[]>(() =>
         <Container>
             <SectionHead
                 :title="t('shop.home.just_for_you.title')"
-                :view-all-href="shop.index.url()"
+                :view-all-href="localized(shop.index.url())"
                 :view-all-label="t('shop.home.featured.view_all')"
             />
 

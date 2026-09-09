@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Concerns\HasCatalogTranslations;
 use App\Concerns\InteractsWithStorefrontMedia;
 use App\Concerns\ResolvesStorefrontPrice;
 use App\Concerns\ResolvesStorefrontReviews;
 use App\Concerns\ResolvesStorefrontStock;
+use App\Support\StorefrontLocale;
 use App\Traits\HasProductPricing;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,6 +19,7 @@ use Shopper\Models\Product as Model;
 
 final class Product extends Model
 {
+    use HasCatalogTranslations;
     use HasProductPricing;
     use InteractsWithStorefrontMedia;
     use ResolvesStorefrontPrice;
@@ -37,6 +40,15 @@ final class Product extends Model
         return $query->where(function (Builder $query) use ($like, $table): void {
             $query->where("{$table}.name", 'like', $like)
                 ->orWhere("{$table}.sku", 'like', $like)
+                ->when(
+                    ! StorefrontLocale::isDefault(),
+                    fn (Builder $query): Builder => $query->orWhereHas(
+                        'translations',
+                        fn (Builder $translations): Builder => $translations
+                            ->where('locale', StorefrontLocale::current())
+                            ->where('name', 'like', $like),
+                    ),
+                )
                 ->orWhereHas(
                     'variants',
                     fn (Builder $variants): Builder => $variants->where('sku', 'like', $like),

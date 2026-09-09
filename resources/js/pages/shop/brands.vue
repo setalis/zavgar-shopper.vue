@@ -15,6 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { cn } from '@/lib/utils';
 import { home } from '@/routes';
@@ -43,13 +44,14 @@ const props = defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const search = ref<string>(props.filters.q);
 const sort = ref<string>(props.filters.sort);
 let debounceId: number | undefined;
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
     { label: t('shop.brands.heading') },
 ]);
 
@@ -65,7 +67,7 @@ function visit(overrides: Partial<Filters> = {}): void {
     const next = { ...props.filters, ...overrides };
 
     router.get(
-        shop.brands.url(),
+        localized(shop.brands.url()),
         {
             q: next.q || undefined,
             letter: next.letter ?? undefined,

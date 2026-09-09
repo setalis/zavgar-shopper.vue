@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { ChevronDown, ChevronRight, LayoutGrid, Menu } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import Container from '@/components/shop/container.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { cn } from '@/lib/utils';
 import * as shop from '@/routes/shop';
@@ -10,6 +11,7 @@ import type { NavCategory, NavMenuItem } from '@/types/shop';
 
 const page = usePage();
 const { t } = useTrans();
+const { localized, withoutLocalePrefix } = useLocalizedRoute();
 
 const megaOpen = ref<boolean>(false);
 const menuMegaId = ref<number | null>(null);
@@ -69,7 +71,9 @@ function isActive(href: string): boolean {
 }
 
 function isCategoryActive(slug: string): boolean {
-    return currentPath.value.startsWith(`/categories/${slug}`);
+    return withoutLocalePrefix(currentPath.value).startsWith(
+        `/categories/${slug}`,
+    );
 }
 
 function isExternal(href: string): boolean {
@@ -96,7 +100,7 @@ onBeforeUnmount(() => {
             @mouseleave="scheduleCloseMega"
         >
             <Link
-                :href="shop.categories.url()"
+                :href="localized(shop.categories.url())"
                 class="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-paper transition hover:bg-brand-deep"
                 :aria-expanded="megaOpen"
                 aria-controls="storefront-categories-mega-menu"
@@ -203,9 +207,11 @@ onBeforeUnmount(() => {
                         >
                             <Link
                                 :href="
-                                    shop.category.url({
-                                        category: category.slug,
-                                    })
+                                    localized(
+                                        shop.category.url({
+                                            category: category.slug,
+                                        }),
+                                    )
                                 "
                                 :class="
                                     cn(
@@ -247,9 +253,11 @@ onBeforeUnmount(() => {
                                 >
                                     <Link
                                         :href="
-                                            shop.category.url({
-                                                category: child.slug,
-                                            })
+                                            localized(
+                                                shop.category.url({
+                                                    category: child.slug,
+                                                }),
+                                            )
                                         "
                                         :class="
                                             cn(
@@ -269,7 +277,7 @@ onBeforeUnmount(() => {
 
                     <div class="border-t border-rule px-5 py-3.5">
                         <Link
-                            :href="shop.categories.url()"
+                            :href="localized(shop.categories.url())"
                             class="flex items-center justify-between gap-2 rounded-md p-2 text-sm transition-colors hover:bg-brand-soft hover:text-brand-deep"
                             @click="closeMega"
                         >

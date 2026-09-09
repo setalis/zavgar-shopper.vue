@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Concerns\HasCatalogTranslations;
 use App\Concerns\InteractsWithStorefrontMedia;
 use App\Observers\CategoryObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -14,7 +15,21 @@ use Shopper\Models\Category as Model;
 #[ObservedBy([CategoryObserver::class])]
 final class Category extends Model
 {
+    use HasCatalogTranslations;
     use InteractsWithStorefrontMedia;
+
+    /**
+     * @return array<string, string>
+     */
+    public function catalogTranslationMap(): array
+    {
+        return [
+            'name' => 'name',
+            'description' => 'description',
+            'seo_title' => 'seo_title',
+            'seo_description' => 'seo_description',
+        ];
+    }
 
     /**
      * @param  Collection<int, self>  $categories

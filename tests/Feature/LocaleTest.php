@@ -26,7 +26,46 @@ class LocaleTest extends TestCase
         );
     }
 
-    public function test_locale_can_be_switched_to_english(): void
+    public function test_english_url_sets_storefront_locale(): void
+    {
+        $response = $this->get('/en');
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->where('locale', 'en')
+            ->where('default_locale', 'uk')
+            ->where('locale_urls.uk', '/')
+            ->where('locale_urls.en', '/en')
+        );
+    }
+
+    public function test_storefront_locale_urls_keep_the_current_path(): void
+    {
+        $this->get('/shop')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('locale', 'uk')
+                ->where('locale_urls.uk', '/shop')
+                ->where('locale_urls.en', '/en/shop')
+            );
+
+        $this->get('/en/shop')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('locale', 'en')
+                ->where('locale_urls.uk', '/shop')
+                ->where('locale_urls.en', '/en/shop')
+            );
+    }
+
+    public function test_ukrainian_home_prefix_redirects_without_locale(): void
+    {
+        $this->get('/uk')
+            ->assertRedirect('/')
+            ->assertStatus(301);
+    }
+
+    public function test_locale_session_can_still_be_updated(): void
     {
         $response = $this
             ->from(route('home'))

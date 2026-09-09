@@ -75,18 +75,19 @@ final class BrandController extends Controller
         $priceRange = $filterByStorefrontPrice->bounds($query);
         $query = $filterByStorefrontPrice->apply($query, $price['min'], $price['max'])
             ->with(['media', 'brand.media'])
+            ->withStorefrontTranslations()
             ->withCurrentPrices()
             ->withCurrentStock()
             ->withApprovedReviewSummary();
 
         $query = match ($sort) {
-            'name' => $query->orderBy('name'),
+            'name' => $query->orderByLocalizedName(),
             default => $query->latest(),
         };
 
         return Inertia::render('shop/brand', [
             'brand' => $brand->load('media'),
-            'products' => $query->paginate(12)->withQueryString(),
+            'products' => localize_storefront($query->paginate(12)->withQueryString()),
             'priceRange' => $priceRange,
             'filters' => [
                 'sort' => $sort,

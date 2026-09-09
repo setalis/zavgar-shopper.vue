@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import CategoryTile from '@/components/shop/category-tile.vue';
 import Container from '@/components/shop/container.vue';
 import PageHead from '@/components/shop/page-head.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { home } from '@/routes';
 import type { Category } from '@/types/shop';
@@ -13,9 +14,10 @@ defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
     { label: t('shop.categories.heading') },
 ]);
 </script>

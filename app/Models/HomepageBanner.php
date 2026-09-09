@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Casts\TailwindTintCast;
+use App\Concerns\HasCatalogTranslations;
 use App\Enums\HomepageBannerBackgroundType;
 use App\Enums\HomepageBannerCtaType;
 use App\Enums\HomepageBannerPlacement;
@@ -22,6 +23,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class HomepageBanner extends Model implements SpatieHasMedia
 {
+    use HasCatalogTranslations;
+
     /** @use HasFactory<HomepageBannerFactory> */
     use HasFactory;
 
@@ -112,21 +115,35 @@ final class HomepageBanner extends Model implements SpatieHasMedia
         return $this->belongsTo(Brand::class);
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function catalogTranslationMap(): array
+    {
+        return [
+            'title' => 'name',
+            'eyebrow' => 'eyebrow',
+            'highlight' => 'highlight',
+            'description' => 'description',
+            'button_text' => 'button_text',
+        ];
+    }
+
     public function href(): ?string
     {
         return match ($this->cta_type) {
             HomepageBannerCtaType::Url => filled($this->cta_url) ? $this->cta_url : null,
             HomepageBannerCtaType::Category => $this->categoryIsAvailable()
-                ? route('shop.category', $this->category)
+                ? route('shop.category', ['category' => $this->category])
                 : null,
             HomepageBannerCtaType::Product => $this->product?->isPublished()
-                ? route('shop.product', $this->product)
+                ? route('shop.product', ['product' => $this->product])
                 : null,
             HomepageBannerCtaType::Collection => $this->collectionIsPublished()
-                ? route('shop.collection', $this->collection)
+                ? route('shop.collection', ['collection' => $this->collection])
                 : null,
             HomepageBannerCtaType::Brand => $this->brandIsAvailable()
-                ? route('shop.brand', $this->brand)
+                ? route('shop.brand', ['brand' => $this->brand])
                 : null,
         };
     }
@@ -150,6 +167,8 @@ final class HomepageBanner extends Model implements SpatieHasMedia
      */
     public function toStorefrontArray(): array
     {
+        $this->localizeForStorefront();
+
         $href = $this->href();
         $buttonText = filled($this->button_text) ? $this->button_text : null;
 

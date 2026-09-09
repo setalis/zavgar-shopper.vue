@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shopper\SlideOvers;
 
+use App\Models\CatalogTranslation;
+use App\Support\CatalogEnglishFields;
+use App\Support\CatalogFieldMap;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -21,6 +25,22 @@ use Shopper\Livewire\SlideOvers\AttributeForm as BaseAttributeForm;
 
 class AttributeForm extends BaseAttributeForm
 {
+    public function mount(?int $attributeId = null): void
+    {
+        parent::mount($attributeId);
+
+        if ($this->attribute instanceof Attribute) {
+            $this->form->fill([
+                ...$this->data ?? [],
+                'english' => CatalogTranslation::payloadFor(
+                    $this->attribute,
+                    'en',
+                    CatalogFieldMap::for($this->attribute),
+                ),
+            ]);
+        }
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -39,6 +59,7 @@ class AttributeForm extends BaseAttributeForm
                             $set('slug', Str::slug($state));
                         }
                     }),
+                CatalogEnglishFields::input('name'),
                 TextInput::make('slug')
                     ->label(__('shopper::forms.label.slug'))
                     ->disabled()
@@ -74,5 +95,33 @@ class AttributeForm extends BaseAttributeForm
             ])
             ->statePath('data')
             ->model($this->attribute);
+    }
+
+    public function store(): void
+    {
+        $english = is_array($this->data['english'] ?? null) ? $this->data['english'] : [];
+
+        if ($this->attribute) {
+            $this->authorize('edit_attributes');
+
+            $this->attribute->update(CatalogEnglishFields::withoutEnglish($this->form->getState()));
+
+            CatalogTranslation::syncFor($this->attribute, 'en', $english);
+        } else {
+            $this->authorize('add_attributes');
+
+            $attribute = Attribute::query()->create(CatalogEnglishFields::withoutEnglish($this->form->getState()));
+
+            CatalogTranslation::syncFor($attribute, 'en', $english);
+        }
+
+        Notification::make()
+            ->title(__('shopper::pages/attributes.notifications.save'))
+            ->success()
+            ->send();
+
+        $this->closePanel();
+
+        $this->redirect(route('shopper.attributes.index'), navigate: true);
     }
 }

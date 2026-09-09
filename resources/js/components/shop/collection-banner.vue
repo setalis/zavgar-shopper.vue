@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowRight } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { stripHtml } from '@/lib/format';
 import * as shop from '@/routes/shop';
@@ -10,6 +11,7 @@ import type { Collection } from '@/types/shop';
 const props = defineProps<{ collection: Collection }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const description = computed<string>(() =>
     stripHtml(props.collection.description),
@@ -18,7 +20,7 @@ const description = computed<string>(() =>
 
 <template>
     <Link
-        :href="shop.collection.url({ collection: collection.slug })"
+        :href="localized(shop.collection.url({ collection: collection.slug }))"
         class="group relative block overflow-hidden rounded-xl bg-linear-to-br from-card-blue to-card-blue-2"
     >
         <div class="aspect-video sm:aspect-3/2">

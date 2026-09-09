@@ -98,16 +98,16 @@ final class MenuItem extends Model
         return match ($this->target_type) {
             MenuItemTargetType::Url => filled($this->url) ? $this->url : null,
             MenuItemTargetType::Brand => $this->brandIsAvailable()
-                ? route('shop.brand', $this->brand)
+                ? route('shop.brand', ['brand' => $this->brand])
                 : null,
             MenuItemTargetType::Category => $this->categoryIsAvailable()
-                ? route('shop.category', $this->category)
+                ? route('shop.category', ['category' => $this->category])
                 : null,
             MenuItemTargetType::Collection => $this->collectionIsPublished()
-                ? route('shop.collection', $this->collection)
+                ? route('shop.collection', ['collection' => $this->collection])
                 : null,
             MenuItemTargetType::Product => $this->product?->isPublished()
-                ? route('shop.product', $this->product)
+                ? route('shop.product', ['product' => $this->product])
                 : null,
         };
     }

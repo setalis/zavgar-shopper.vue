@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Product;
 
+use App\Actions\LocalizeCatalog;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Exception;
@@ -100,6 +101,9 @@ final class BuildVariantOptions
                 $attrId = $value->attribute_id;
 
                 if (! $grouped->has($attrId)) {
+                    $localizer = resolve(LocalizeCatalog::class);
+                    $localizer->handle($value->attribute);
+
                     $grouped->put($attrId, [
                         'id' => $attrId,
                         'name' => $value->attribute->name,
@@ -117,6 +121,9 @@ final class BuildVariantOptions
                     if ($value->attribute->type === FieldType::ColorPicker) {
                         $image = $variant->thumbnail;
                     }
+
+                    $localizer = resolve(LocalizeCatalog::class);
+                    $localizer->handle($value);
 
                     $attr['values']->push([
                         'id' => $value->id,

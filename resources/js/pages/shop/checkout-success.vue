@@ -4,6 +4,7 @@ import { Check } from 'lucide-vue-next';
 import Container from '@/components/shop/container.vue';
 import TrustBadges from '@/components/shop/trust-badges.vue';
 import { Button } from '@/components/ui/button';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import { orders as accountOrders } from '@/routes/account';
@@ -22,6 +23,7 @@ type Order = {
 const props = defineProps<{ order: Order }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 function statusLabel(status: OrderStatusLike): string {
     if (!status) {
@@ -117,12 +119,12 @@ function statusLabel(status: OrderStatusLike): string {
                 class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
             >
                 <Button as-child>
-                    <Link :href="accountOrders.url()">
+                    <Link :href="localized(accountOrders.url())">
                         {{ t('shop.checkout.success.view_orders') }}
                     </Link>
                 </Button>
                 <Button as-child variant="outline">
-                    <Link :href="shop.index.url()">
+                    <Link :href="localized(shop.index.url())">
                         {{ t('shop.checkout.success.continue_shopping') }}
                     </Link>
                 </Button>

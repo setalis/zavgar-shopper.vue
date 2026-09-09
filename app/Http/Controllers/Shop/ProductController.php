@@ -37,47 +37,53 @@ final class ProductController extends Controller
         if ($categoryId !== null) {
             $selectedCategory = Category::query()
                 ->scopes('enabled')
+                ->withStorefrontTranslations()
                 ->where('id', $categoryId)
                 ->first();
 
             if ($selectedCategory !== null) {
+                $selectedCategory->localizeForStorefront();
+
                 $query->whereHas(
                     'categories',
                     fn ($q) => $q->where('id', $selectedCategory->id),
                 );
 
-                $children = Category::hydrateBranchProductsCount(
+                $children = localize_storefront(Category::hydrateBranchProductsCount(
                     $selectedCategory->children()
                         ->scopes('enabled')
+                        ->withStorefrontTranslations()
                         ->with('media')
                         ->orderBy('position')
                         ->get(),
-                );
+                ));
             }
         }
 
         $priceRange = $filterByStorefrontPrice->bounds($query);
         $query = $filterByStorefrontPrice->apply($query, $price['min'], $price['max'])
             ->with(['media', 'brand.media'])
+            ->withStorefrontTranslations()
             ->withCurrentPrices()
             ->withCurrentStock()
             ->withApprovedReviewSummary();
 
         $sort = (string) $request->string('sort', 'latest');
         $query = match ($sort) {
-            'name' => $query->orderBy('name'),
+            'name' => $query->orderByLocalizedName(),
             default => $query->latest(),
         };
 
         return Inertia::render('shop/index', [
-            'products' => $query->paginate(12)->withQueryString(),
-            'categories' => Category::query()
+            'products' => localize_storefront($query->paginate(12)->withQueryString()),
+            'categories' => localize_storefront(Category::query()
                 ->scopes('enabled')
                 ->whereNull('parent_id')
-                ->with(['children' => fn ($q) => $q->scopes('enabled')->orderBy('position')->select(['id', 'name', 'slug', 'parent_id'])])
+                ->withStorefrontTranslations()
+                ->with(['children' => fn ($q) => $q->scopes('enabled')->withStorefrontTranslations()->orderBy('position')->select(['id', 'name', 'slug', 'parent_id'])])
                 ->orderBy('position')
-                ->get(['id', 'name', 'slug']),
-            'children' => $children,
+                ->get(['id', 'name', 'slug'])),
+            'children' => localize_storefront($children),
             'priceRange' => $priceRange,
             'filters' => [
                 'search' => $search,
@@ -99,13 +105,15 @@ final class ProductController extends Controller
         $product->load([
             'brand.media',
             'media',
+            'translations',
             'prices' => $priceConstraint,
-            'relatedProducts' => fn ($q) => $q->withCurrentPrices()->withCurrentStock()->withApprovedReviewSummary(),
+            'relatedProducts' => fn ($q) => $q->withStorefrontTranslations()->withCurrentPrices()->withCurrentStock()->withApprovedReviewSummary(),
             'relatedProducts.brand.media',
             'relatedProducts.media',
             'relatedProducts.variants' => fn ($q) => $q->select(['id', 'product_id']),
             'relatedProducts.variants.prices' => $priceConstraint,
             'variants.media',
+            'variants.translations',
             'variants.values.attribute',
             'variants.prices' => $priceConstraint,
             'ratings' => fn ($q) => $q
@@ -128,6 +136,10 @@ final class ProductController extends Controller
             $product->append('stock');
         }
 
+        $product->localizeForStorefront();
+        localize_storefront($product->relatedProducts);
+        localize_storefront($product->variants);
+
         if (filled($product->description)) {
             $product->setAttribute(
                 'description',
@@ -140,6 +152,7 @@ final class ProductController extends Controller
             'variantOptions' => $variantOptions,
             'productAttributes' => $buildProductAttributes->handle($product),
             'canReview' => $this->canReview($product),
+            'hreflang' => storefront_hreflang('shop.product', ['product' => $product]),
         ]);
     }
 

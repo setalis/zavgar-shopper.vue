@@ -5,6 +5,7 @@ import { computed } from 'vue';
 import OrderStatusBadge from '@/components/account/order-status-badge.vue';
 import ProductPagination from '@/components/shop/product-pagination.vue';
 import { Button } from '@/components/ui/button';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import { orders as accountOrders } from '@/routes/account';
@@ -60,6 +61,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const tabs = computed(() => [
     { value: 'all', label: t('account.orders.tabs.all') },
@@ -71,7 +73,7 @@ const activeTab = computed<string>(() => props.filters.tab || 'all');
 
 function changeTab(value: string): void {
     router.get(
-        accountOrders.url(),
+        localized(accountOrders.url()),
         { tab: value },
         { preserveScroll: true, preserveState: true, replace: true },
     );
@@ -171,7 +173,7 @@ function shippingLabel(order: Order): string {
         <p class="mt-1 text-sm text-ink-mute">
             {{ t('account.orders.empty.description') }}
         </p>
-        <Link :href="shop.index.url()" class="mt-6">
+        <Link :href="localized(shop.index.url())" class="mt-6">
             <Button>{{ t('account.orders.empty.cta') }}</Button>
         </Link>
     </div>
@@ -248,7 +250,7 @@ function shippingLabel(order: Order): string {
                             })
                         }}</span>
                         <Link
-                            :href="ordersShow.url(order.id)"
+                            :href="localized(ordersShow.url(order.id))"
                             class="text-sm font-medium text-ink hover:underline"
                         >
                             {{ t('account.orders.view_details') }}
@@ -302,9 +304,11 @@ function shippingLabel(order: Order): string {
                                 <Link
                                     v-if="item.product?.slug"
                                     :href="
-                                        shop.product.url({
-                                            product: item.product.slug,
-                                        })
+                                        localized(
+                                            shop.product.url({
+                                                product: item.product.slug,
+                                            }),
+                                        )
                                     "
                                     class="line-clamp-2 font-heading text-sm font-medium text-ink hover:underline"
                                 >

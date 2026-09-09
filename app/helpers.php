@@ -6,6 +6,7 @@ use App\Actions\LocalizeCatalog;
 use App\Actions\ZoneSessionManager;
 use App\DTO\CountryByZoneData;
 use App\Models\Channel;
+use App\Support\SettingMediaPath;
 use App\Support\StorefrontLocale;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\AbstractPaginator;
@@ -66,15 +67,9 @@ if (! function_exists('current_tax_label')) {
 if (! function_exists('storefront_logo_url')) {
     function storefront_logo_url(): ?string
     {
-        $logo = shopper_setting('logo');
+        $path = SettingMediaPath::path(shopper_setting('logo'));
 
-        if (blank($logo)) {
-            return null;
-        }
-
-        $path = is_array($logo) ? (array_values($logo)[0] ?? null) : $logo;
-
-        if (! is_string($path) || blank($path)) {
+        if ($path === null) {
             return null;
         }
 

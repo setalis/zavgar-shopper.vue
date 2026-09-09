@@ -30,10 +30,15 @@ const { localized } = useLocalizedRoute();
                 :href="localized(home.url())"
                 class="inline-flex items-center gap-2 font-heading text-xl font-extrabold tracking-[-0.02em] text-ink md:text-2xl"
             >
-                <BrandIcon class="h-9 w-auto fill-current text-brand" />
-                <span class="sr-only md:not-sr-only">
-                    {{ page.props.name }}
-                </span>
+                <BrandIcon class="h-16 w-auto fill-current text-brand" />
+                <div class="hidden flex-col md:flex leading-6">
+                    <span
+                        class="font-sans font-black text-blue-800"
+                    >
+                        {{ page.props.name }}
+                    </span>
+                    <span class="text-sm font-medium">интернет магазин</span>
+                </div>
             </Link>
 
             <HeaderSearch />

@@ -61,3 +61,23 @@ test('storefront logo url helper resolves filament array value', function (): vo
 
     expect(storefront_logo_url())->toBe(shopper_asset($path));
 });
+
+test('storefront logo url helper uses the last path in a filament map', function (): void {
+    $disk = config('shopper.media.storage.disk_name');
+    $path = 'latest-logo.jpg';
+
+    Storage::disk($disk)->put($path, 'fake-logo');
+
+    Setting::query()->updateOrCreate(['key' => 'logo'], [
+        'value' => [
+            '11111111-1111-1111-1111-111111111111' => 'old-logo.png',
+            '22222222-2222-2222-2222-222222222222' => $path,
+        ],
+        'display_name' => Setting::lockedAttributesDisplayName('logo'),
+        'locked' => true,
+    ]);
+
+    Cache::forget('shopper-setting.logo');
+
+    expect(storefront_logo_url())->toBe(shopper_asset($path));
+});

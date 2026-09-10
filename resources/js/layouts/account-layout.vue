@@ -2,6 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import Container from '@/components/shop/container.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard, logout } from '@/routes';
 import {
@@ -15,13 +16,14 @@ type NavItem = { href: string; label: string; exact?: boolean };
 
 const page = usePage();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const items = computed<NavItem[]>(() => [
-    { href: dashboard.url(), label: t('account.nav.overview'), exact: true },
-    { href: accountOrders.url(), label: t('account.nav.orders') },
-    { href: shop.wishlist.url(), label: t('account.nav.wishlist') },
-    { href: accountAddresses.url(), label: t('account.nav.addresses') },
-    { href: profile.edit.url(), label: t('account.nav.profile') },
+    { href: localized(dashboard.url()), label: t('account.nav.overview'), exact: true },
+    { href: localized(accountOrders.url()), label: t('account.nav.orders') },
+    { href: localized(shop.wishlist.url()), label: t('account.nav.wishlist') },
+    { href: localized(accountAddresses.url()), label: t('account.nav.addresses') },
+    { href: localized(profile.edit.url()), label: t('account.nav.profile') },
 ]);
 
 function isActive(item: NavItem): boolean {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Product;
 
+use App\Actions\LocalizeCatalog;
 use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Support\Collection;
@@ -134,8 +135,11 @@ final class BuildCategoryAttributeFilters
             return null;
         }
 
+        $localizer = resolve(LocalizeCatalog::class);
+        $localizer->handle($attribute);
+
         $values = $group
-            ->map(fn (AttributeProduct $row): ?array => $this->mapValue($row))
+            ->map(fn (AttributeProduct $row): ?array => $this->mapValue($row, $localizer))
             ->filter()
             ->unique('key')
             ->sortBy([
@@ -165,11 +169,13 @@ final class BuildCategoryAttributeFilters
     /**
      * @return array{key: string, label: string, position: int}|null
      */
-    private function mapValue(AttributeProduct $row): ?array
+    private function mapValue(AttributeProduct $row, LocalizeCatalog $localizer): ?array
     {
         $attributeValue = $row->value;
 
         if ($attributeValue instanceof AttributeValue && filled($attributeValue->key)) {
+            $localizer->handle($attributeValue);
+
             return [
                 'key' => $attributeValue->key,
                 'label' => filled($attributeValue->value) ? $attributeValue->value : $attributeValue->key,
@@ -177,6 +183,7 @@ final class BuildCategoryAttributeFilters
             ];
         }
 
+        $localizer->handle($row);
         $customValue = $row->attribute_custom_value;
 
         if (! filled($customValue)) {

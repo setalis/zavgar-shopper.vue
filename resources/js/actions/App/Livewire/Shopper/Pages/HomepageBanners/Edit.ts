@@ -174,6 +174,181 @@ Edit34d56b2dcc6381e5211f298be75dda81.head = (args: { banner: string | number } |
         })
     
     Edit34d56b2dcc6381e5211f298be75dda81.form = Edit34d56b2dcc6381e5211f298be75dda81Form
+    /**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/create'
+ */
+const Editb4ada1959213970026d2e468d610fe11 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Editb4ada1959213970026d2e468d610fe11.url(options),
+    method: 'get',
+})
+
+Editb4ada1959213970026d2e468d610fe11.definition = {
+    methods: ["get","head"],
+    url: '/cpanel/promo-banners/create',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/create'
+ */
+Editb4ada1959213970026d2e468d610fe11.url = (options?: RouteQueryOptions) => {
+    return Editb4ada1959213970026d2e468d610fe11.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/create'
+ */
+Editb4ada1959213970026d2e468d610fe11.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Editb4ada1959213970026d2e468d610fe11.url(options),
+    method: 'get',
+})
+/**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/create'
+ */
+Editb4ada1959213970026d2e468d610fe11.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Editb4ada1959213970026d2e468d610fe11.url(options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/create'
+ */
+    const Editb4ada1959213970026d2e468d610fe11Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: Editb4ada1959213970026d2e468d610fe11.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/create'
+ */
+        Editb4ada1959213970026d2e468d610fe11Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: Editb4ada1959213970026d2e468d610fe11.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/create'
+ */
+        Editb4ada1959213970026d2e468d610fe11Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: Editb4ada1959213970026d2e468d610fe11.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    Editb4ada1959213970026d2e468d610fe11.form = Editb4ada1959213970026d2e468d610fe11Form
+    /**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/{banner}/edit'
+ */
+const Editadece54cd38a3184d0204e65bf065f02 = (args: { banner: string | number } | [banner: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Editadece54cd38a3184d0204e65bf065f02.url(args, options),
+    method: 'get',
+})
+
+Editadece54cd38a3184d0204e65bf065f02.definition = {
+    methods: ["get","head"],
+    url: '/cpanel/promo-banners/{banner}/edit',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/{banner}/edit'
+ */
+Editadece54cd38a3184d0204e65bf065f02.url = (args: { banner: string | number } | [banner: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { banner: args }
+    }
+
+    
+    if (Array.isArray(args)) {
+        args = {
+                    banner: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        banner: args.banner,
+                }
+
+    return Editadece54cd38a3184d0204e65bf065f02.definition.url
+            .replace('{banner}', parsedArgs.banner.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/{banner}/edit'
+ */
+Editadece54cd38a3184d0204e65bf065f02.get = (args: { banner: string | number } | [banner: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Editadece54cd38a3184d0204e65bf065f02.url(args, options),
+    method: 'get',
+})
+/**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/{banner}/edit'
+ */
+Editadece54cd38a3184d0204e65bf065f02.head = (args: { banner: string | number } | [banner: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Editadece54cd38a3184d0204e65bf065f02.url(args, options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/{banner}/edit'
+ */
+    const Editadece54cd38a3184d0204e65bf065f02Form = (args: { banner: string | number } | [banner: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: Editadece54cd38a3184d0204e65bf065f02.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/{banner}/edit'
+ */
+        Editadece54cd38a3184d0204e65bf065f02Form.get = (args: { banner: string | number } | [banner: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: Editadece54cd38a3184d0204e65bf065f02.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Livewire\Shopper\Pages\HomepageBanners\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/HomepageBanners/Edit.php:7
+ * @route '/cpanel/promo-banners/{banner}/edit'
+ */
+        Editadece54cd38a3184d0204e65bf065f02Form.head = (args: { banner: string | number } | [banner: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: Editadece54cd38a3184d0204e65bf065f02.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    Editadece54cd38a3184d0204e65bf065f02.form = Editadece54cd38a3184d0204e65bf065f02Form
 
 /**
 * Multiple routes resolve to \App\Livewire\Shopper\Pages\HomepageBanners\Edit::Edit, so this export is a
@@ -183,6 +358,8 @@ Edit34d56b2dcc6381e5211f298be75dda81.head = (args: { banner: string | number } |
 const Edit = {
     '/cpanel/banners/create': Edit1f370c87d0c2605cc933d22396779212,
     '/cpanel/banners/{banner}/edit': Edit34d56b2dcc6381e5211f298be75dda81,
+    '/cpanel/promo-banners/create': Editb4ada1959213970026d2e468d610fe11,
+    '/cpanel/promo-banners/{banner}/edit': Editadece54cd38a3184d0204e65bf065f02,
 }
 
 export default Edit

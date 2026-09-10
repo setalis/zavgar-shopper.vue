@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import * as profile from '@/routes/profile';
 import * as security from '@/routes/security';
@@ -9,10 +10,11 @@ type Item = { href: string; label: string };
 
 const page = usePage();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const items = computed<Item[]>(() => [
-    { href: profile.edit.url(), label: t('settings.nav.profile') },
-    { href: security.edit.url(), label: t('settings.nav.security') },
+    { href: localized(profile.edit.url()), label: t('settings.nav.profile') },
+    { href: localized(security.edit.url()), label: t('settings.nav.security') },
 ]);
 
 function isActive(item: Item): boolean {

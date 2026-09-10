@@ -1,5 +1,6 @@
 import { router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import * as zone from '@/routes/shop/zone';
 import type { ShopSharedProps } from '@/types/shop';
 
@@ -10,6 +11,7 @@ import type { ShopSharedProps } from '@/types/shop';
  */
 export function useShop() {
     const page = usePage<{ shop: ShopSharedProps }>();
+    const { localized } = useLocalizedRoute();
 
     const shop = computed<ShopSharedProps>(() => page.props.shop);
     const cartCount = computed<number>(() => shop.value.cart_count);
@@ -23,7 +25,7 @@ export function useShop() {
 
     function changeZone(countryCode: string): void {
         router.patch(
-            zone.update.url(),
+            localized(zone.update.url()),
             { country_code: countryCode },
             { preserveScroll: true, preserveState: true },
         );

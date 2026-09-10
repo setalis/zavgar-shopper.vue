@@ -25,6 +25,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { withPriceParams } from '@/lib/price-filter';
 import { home } from '@/routes';
@@ -32,6 +33,7 @@ import * as shop from '@/routes/shop';
 import type { Category, PriceRange, Product } from '@/types/shop';
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 type Paginated<T> = {
     data: T[];
@@ -68,7 +70,7 @@ const filtersOpen = ref<boolean>(false);
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
     { label: t('shop.index.title') },
 ]);
 
@@ -76,7 +78,7 @@ function visit(overrides: Partial<Filters> = {}): void {
     const next = { ...props.filters, ...overrides };
 
     router.get(
-        shop.index.url(),
+        localized(shop.index.url()),
         withPriceParams(
             {
                 search: next.search,
@@ -114,7 +116,8 @@ function changePrice(min: number | null, max: number | null): void {
 }
 
 function categoryFilterUrl(categoryId: number): string {
-    return shop.index.url({
+    return localized(
+        shop.index.url({
         query: withPriceParams(
             {
                 search: props.filters.search,
@@ -124,7 +127,8 @@ function categoryFilterUrl(categoryId: number): string {
             props.filters.price_min,
             props.filters.price_max,
         ),
-    });
+    }),
+    );
 }
 </script>
 

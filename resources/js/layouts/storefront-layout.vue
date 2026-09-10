@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Toaster } from '@/components/ui/sonner';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import StoreCategoryNav from '@/layouts/storefront/store-category-nav.vue';
 import StoreFooter from '@/layouts/storefront/store-footer.vue';
@@ -9,6 +10,7 @@ import StoreMobileDrawer from '@/layouts/storefront/store-mobile-drawer.vue';
 import StoreUtilityBar from '@/layouts/storefront/store-utility-bar.vue';
 
 const { t } = useTrans();
+useLocalizedRoute();
 
 const drawerOpen = ref<boolean>(false);
 </script>

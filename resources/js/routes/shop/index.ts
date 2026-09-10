@@ -1,6 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 import productD87513 from './product'
 import searchD2f59a from './search'
+import contact50a660 from './contact'
 import cartB8cf73 from './cart'
 import wishlistE18b57 from './wishlist'
 import zone from './zone'
@@ -85,7 +86,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:92
+ * @see app/Http/Controllers/Shop/ProductController.php:98
  * @route '/shop/{product}'
  */
 export const product = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -100,7 +101,7 @@ product.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:92
+ * @see app/Http/Controllers/Shop/ProductController.php:98
  * @route '/shop/{product}'
  */
 product.url = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions) => {
@@ -133,7 +134,7 @@ product.url = (args: { product: string | { slug: string } } | [product: string |
 
 /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:92
+ * @see app/Http/Controllers/Shop/ProductController.php:98
  * @route '/shop/{product}'
  */
 product.get = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -142,7 +143,7 @@ product.get = (args: { product: string | { slug: string } } | [product: string |
 })
 /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:92
+ * @see app/Http/Controllers/Shop/ProductController.php:98
  * @route '/shop/{product}'
  */
 product.head = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -152,7 +153,7 @@ product.head = (args: { product: string | { slug: string } } | [product: string 
 
     /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:92
+ * @see app/Http/Controllers/Shop/ProductController.php:98
  * @route '/shop/{product}'
  */
     const productForm = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -162,7 +163,7 @@ product.head = (args: { product: string | { slug: string } } | [product: string 
 
             /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:92
+ * @see app/Http/Controllers/Shop/ProductController.php:98
  * @route '/shop/{product}'
  */
         productForm.get = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -171,7 +172,7 @@ product.head = (args: { product: string | { slug: string } } | [product: string 
         })
             /**
 * @see \App\Http\Controllers\Shop\ProductController::product
- * @see app/Http/Controllers/Shop/ProductController.php:92
+ * @see app/Http/Controllers/Shop/ProductController.php:98
  * @route '/shop/{product}'
  */
         productForm.head = (args: { product: string | { slug: string } } | [product: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -265,7 +266,7 @@ categories.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     categories.form = categoriesForm
 /**
 * @see \App\Http\Controllers\Shop\CategoryController::category
- * @see app/Http/Controllers/Shop/CategoryController.php:33
+ * @see app/Http/Controllers/Shop/CategoryController.php:34
  * @route '/categories/{category}'
  */
 export const category = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -280,7 +281,7 @@ category.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\CategoryController::category
- * @see app/Http/Controllers/Shop/CategoryController.php:33
+ * @see app/Http/Controllers/Shop/CategoryController.php:34
  * @route '/categories/{category}'
  */
 category.url = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions) => {
@@ -313,7 +314,7 @@ category.url = (args: { category: string | { slug: string } } | [category: strin
 
 /**
 * @see \App\Http\Controllers\Shop\CategoryController::category
- * @see app/Http/Controllers/Shop/CategoryController.php:33
+ * @see app/Http/Controllers/Shop/CategoryController.php:34
  * @route '/categories/{category}'
  */
 category.get = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -322,7 +323,7 @@ category.get = (args: { category: string | { slug: string } } | [category: strin
 })
 /**
 * @see \App\Http\Controllers\Shop\CategoryController::category
- * @see app/Http/Controllers/Shop/CategoryController.php:33
+ * @see app/Http/Controllers/Shop/CategoryController.php:34
  * @route '/categories/{category}'
  */
 category.head = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -332,7 +333,7 @@ category.head = (args: { category: string | { slug: string } } | [category: stri
 
     /**
 * @see \App\Http\Controllers\Shop\CategoryController::category
- * @see app/Http/Controllers/Shop/CategoryController.php:33
+ * @see app/Http/Controllers/Shop/CategoryController.php:34
  * @route '/categories/{category}'
  */
     const categoryForm = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -342,7 +343,7 @@ category.head = (args: { category: string | { slug: string } } | [category: stri
 
             /**
 * @see \App\Http\Controllers\Shop\CategoryController::category
- * @see app/Http/Controllers/Shop/CategoryController.php:33
+ * @see app/Http/Controllers/Shop/CategoryController.php:34
  * @route '/categories/{category}'
  */
         categoryForm.get = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -351,7 +352,7 @@ category.head = (args: { category: string | { slug: string } } | [category: stri
         })
             /**
 * @see \App\Http\Controllers\Shop\CategoryController::category
- * @see app/Http/Controllers/Shop/CategoryController.php:33
+ * @see app/Http/Controllers/Shop/CategoryController.php:34
  * @route '/categories/{category}'
  */
         categoryForm.head = (args: { category: string | { slug: string } } | [category: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -468,8 +469,86 @@ collection.head = (args: { collection: string | { slug: string } } | [collection
     
     collection.form = collectionForm
 /**
-* @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:17
+* @see \App\Http\Controllers\Shop\BrandController::brands
+ * @see app/Http/Controllers/Shop/BrandController.php:19
+ * @route '/brands'
+ */
+export const brands = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: brands.url(options),
+    method: 'get',
+})
+
+brands.definition = {
+    methods: ["get","head"],
+    url: '/brands',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Shop\BrandController::brands
+ * @see app/Http/Controllers/Shop/BrandController.php:19
+ * @route '/brands'
+ */
+brands.url = (options?: RouteQueryOptions) => {
+    return brands.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Shop\BrandController::brands
+ * @see app/Http/Controllers/Shop/BrandController.php:19
+ * @route '/brands'
+ */
+brands.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: brands.url(options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\Shop\BrandController::brands
+ * @see app/Http/Controllers/Shop/BrandController.php:19
+ * @route '/brands'
+ */
+brands.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: brands.url(options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\Shop\BrandController::brands
+ * @see app/Http/Controllers/Shop/BrandController.php:19
+ * @route '/brands'
+ */
+    const brandsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: brands.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Shop\BrandController::brands
+ * @see app/Http/Controllers/Shop/BrandController.php:19
+ * @route '/brands'
+ */
+        brandsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: brands.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Shop\BrandController::brands
+ * @see app/Http/Controllers/Shop/BrandController.php:19
+ * @route '/brands'
+ */
+        brandsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: brands.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    brands.form = brandsForm
+/**
+* @see \App\Http\Controllers\Shop\BrandController::brand
+ * @see app/Http/Controllers/Shop/BrandController.php:66
  * @route '/brands/{brand}'
  */
 export const brand = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -483,8 +562,8 @@ brand.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:17
+* @see \App\Http\Controllers\Shop\BrandController::brand
+ * @see app/Http/Controllers/Shop/BrandController.php:66
  * @route '/brands/{brand}'
  */
 brand.url = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions) => {
@@ -516,8 +595,8 @@ brand.url = (args: { brand: string | { slug: string } } | [brand: string | { slu
 }
 
 /**
-* @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:17
+* @see \App\Http\Controllers\Shop\BrandController::brand
+ * @see app/Http/Controllers/Shop/BrandController.php:66
  * @route '/brands/{brand}'
  */
 brand.get = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -525,8 +604,8 @@ brand.get = (args: { brand: string | { slug: string } } | [brand: string | { slu
     method: 'get',
 })
 /**
-* @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:17
+* @see \App\Http\Controllers\Shop\BrandController::brand
+ * @see app/Http/Controllers/Shop/BrandController.php:66
  * @route '/brands/{brand}'
  */
 brand.head = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -535,8 +614,8 @@ brand.head = (args: { brand: string | { slug: string } } | [brand: string | { sl
 })
 
     /**
-* @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:17
+* @see \App\Http\Controllers\Shop\BrandController::brand
+ * @see app/Http/Controllers/Shop/BrandController.php:66
  * @route '/brands/{brand}'
  */
     const brandForm = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -545,8 +624,8 @@ brand.head = (args: { brand: string | { slug: string } } | [brand: string | { sl
     })
 
             /**
-* @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:17
+* @see \App\Http\Controllers\Shop\BrandController::brand
+ * @see app/Http/Controllers/Shop/BrandController.php:66
  * @route '/brands/{brand}'
  */
         brandForm.get = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -554,8 +633,8 @@ brand.head = (args: { brand: string | { slug: string } } | [brand: string | { sl
             method: 'get',
         })
             /**
-* @see \App\Http\Controllers\Shop\BrandController::__invoke
- * @see app/Http/Controllers/Shop/BrandController.php:17
+* @see \App\Http\Controllers\Shop\BrandController::brand
+ * @see app/Http/Controllers/Shop/BrandController.php:66
  * @route '/brands/{brand}'
  */
         brandForm.head = (args: { brand: string | { slug: string } } | [brand: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -648,8 +727,8 @@ search.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     
     search.form = searchForm
 /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
 export const contact = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -663,8 +742,8 @@ contact.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
 contact.url = (options?: RouteQueryOptions) => {
@@ -672,8 +751,8 @@ contact.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
 contact.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -681,8 +760,8 @@ contact.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
 contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -691,8 +770,8 @@ contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
     /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
     const contactForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -701,8 +780,8 @@ contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     })
 
             /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
         contactForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -710,8 +789,8 @@ contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
             method: 'get',
         })
             /**
-* @see \Inertia\Controller::__invoke
- * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @see \App\Http\Controllers\Shop\ContactController::contact
+ * @see app/Http/Controllers/Shop/ContactController.php:18
  * @route '/contact'
  */
         contactForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -727,7 +806,7 @@ contact.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     contact.form = contactForm
 /**
 * @see \App\Http\Controllers\Shop\CartController::cart
- * @see app/Http/Controllers/Shop/CartController.php:22
+ * @see app/Http/Controllers/Shop/CartController.php:23
  * @route '/cart'
  */
 export const cart = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -742,7 +821,7 @@ cart.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\CartController::cart
- * @see app/Http/Controllers/Shop/CartController.php:22
+ * @see app/Http/Controllers/Shop/CartController.php:23
  * @route '/cart'
  */
 cart.url = (options?: RouteQueryOptions) => {
@@ -751,7 +830,7 @@ cart.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Shop\CartController::cart
- * @see app/Http/Controllers/Shop/CartController.php:22
+ * @see app/Http/Controllers/Shop/CartController.php:23
  * @route '/cart'
  */
 cart.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -760,7 +839,7 @@ cart.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Shop\CartController::cart
- * @see app/Http/Controllers/Shop/CartController.php:22
+ * @see app/Http/Controllers/Shop/CartController.php:23
  * @route '/cart'
  */
 cart.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -770,7 +849,7 @@ cart.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Shop\CartController::cart
- * @see app/Http/Controllers/Shop/CartController.php:22
+ * @see app/Http/Controllers/Shop/CartController.php:23
  * @route '/cart'
  */
     const cartForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -780,7 +859,7 @@ cart.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Shop\CartController::cart
- * @see app/Http/Controllers/Shop/CartController.php:22
+ * @see app/Http/Controllers/Shop/CartController.php:23
  * @route '/cart'
  */
         cartForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -789,7 +868,7 @@ cart.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Shop\CartController::cart
- * @see app/Http/Controllers/Shop/CartController.php:22
+ * @see app/Http/Controllers/Shop/CartController.php:23
  * @route '/cart'
  */
         cartForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -887,9 +966,10 @@ product: Object.assign(product, productD87513),
 categories: Object.assign(categories, categories),
 category: Object.assign(category, category),
 collection: Object.assign(collection, collection),
+brands: Object.assign(brands, brands),
 brand: Object.assign(brand, brand),
 search: Object.assign(search, searchD2f59a),
-contact: Object.assign(contact, contact),
+contact: Object.assign(contact, contact50a660),
 cart: Object.assign(cart, cartB8cf73),
 wishlist: Object.assign(wishlist, wishlistE18b57),
 zone: Object.assign(zone, zone),

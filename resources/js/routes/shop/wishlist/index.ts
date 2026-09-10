@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Shop\WishlistController::store
- * @see app/Http/Controllers/Shop/WishlistController.php:66
+ * @see app/Http/Controllers/Shop/WishlistController.php:68
  * @route '/wishlist'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\WishlistController::store
- * @see app/Http/Controllers/Shop/WishlistController.php:66
+ * @see app/Http/Controllers/Shop/WishlistController.php:68
  * @route '/wishlist'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Shop\WishlistController::store
- * @see app/Http/Controllers/Shop/WishlistController.php:66
+ * @see app/Http/Controllers/Shop/WishlistController.php:68
  * @route '/wishlist'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
     /**
 * @see \App\Http\Controllers\Shop\WishlistController::store
- * @see app/Http/Controllers/Shop/WishlistController.php:66
+ * @see app/Http/Controllers/Shop/WishlistController.php:68
  * @route '/wishlist'
  */
     const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +45,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
             /**
 * @see \App\Http\Controllers\Shop\WishlistController::store
- * @see app/Http/Controllers/Shop/WishlistController.php:66
+ * @see app/Http/Controllers/Shop/WishlistController.php:68
  * @route '/wishlist'
  */
         storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -56,7 +56,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     store.form = storeForm
 /**
 * @see \App\Http\Controllers\Shop\WishlistController::destroy
- * @see app/Http/Controllers/Shop/WishlistController.php:81
+ * @see app/Http/Controllers/Shop/WishlistController.php:83
  * @route '/wishlist/{product}'
  */
 export const destroy = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -71,7 +71,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Shop\WishlistController::destroy
- * @see app/Http/Controllers/Shop/WishlistController.php:81
+ * @see app/Http/Controllers/Shop/WishlistController.php:83
  * @route '/wishlist/{product}'
  */
 destroy.url = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -104,7 +104,7 @@ destroy.url = (args: { product: number | { id: number } } | [product: number | {
 
 /**
 * @see \App\Http\Controllers\Shop\WishlistController::destroy
- * @see app/Http/Controllers/Shop/WishlistController.php:81
+ * @see app/Http/Controllers/Shop/WishlistController.php:83
  * @route '/wishlist/{product}'
  */
 destroy.delete = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -114,7 +114,7 @@ destroy.delete = (args: { product: number | { id: number } } | [product: number 
 
     /**
 * @see \App\Http\Controllers\Shop\WishlistController::destroy
- * @see app/Http/Controllers/Shop/WishlistController.php:81
+ * @see app/Http/Controllers/Shop/WishlistController.php:83
  * @route '/wishlist/{product}'
  */
     const destroyForm = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -129,7 +129,7 @@ destroy.delete = (args: { product: number | { id: number } } | [product: number 
 
             /**
 * @see \App\Http\Controllers\Shop\WishlistController::destroy
- * @see app/Http/Controllers/Shop/WishlistController.php:81
+ * @see app/Http/Controllers/Shop/WishlistController.php:83
  * @route '/wishlist/{product}'
  */
         destroyForm.delete = (args: { product: number | { id: number } } | [product: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

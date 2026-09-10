@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/composables/useCart';
 import { useShop } from '@/composables/useShop';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import { home } from '@/routes';
@@ -26,6 +27,7 @@ const page = usePage();
 const { currency, taxLabel } = useShop();
 const cartActions = useCart();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 /**
  * Promotion codes are applied during checkout, so the cart field mirrors the
@@ -34,7 +36,7 @@ const { t } = useTrans();
 const promoCode = ref<string>('');
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
     { label: t('shop.cart.heading') },
 ]);
 
@@ -91,7 +93,7 @@ function confirmClear(): void {
                 {{ t('shop.cart.empty.subtitle') }}
             </p>
             <Button as-child class="mt-6">
-                <Link :href="shop.index.url()">
+                <Link :href="localized(shop.index.url())">
                     {{ t('shop.cart.continue_shopping') }}
                 </Link>
             </Button>
@@ -129,11 +131,13 @@ function confirmClear(): void {
                                 <Link
                                     v-if="productSlug(line.purchasable)"
                                     :href="
-                                        shop.product.url({
-                                            product: productSlug(
-                                                line.purchasable,
-                                            ) as string,
-                                        })
+                                        localized(
+                                            shop.product.url({
+                                                product: productSlug(
+                                                    line.purchasable,
+                                                ) as string,
+                                            }),
+                                        )
                                     "
                                     class="transition hover:text-brand"
                                 >
@@ -187,7 +191,7 @@ function confirmClear(): void {
                     class="mt-4 flex flex-wrap items-center justify-between gap-3"
                 >
                     <Link
-                        :href="shop.index.url()"
+                        :href="localized(shop.index.url())"
                         class="text-sm text-ink-mute transition hover:text-brand"
                     >
                         {{ t('shop.cart.continue_shopping_back') }}
@@ -292,7 +296,7 @@ function confirmClear(): void {
                     </dl>
 
                     <Button as-child block size="lg" class="mt-6">
-                        <Link :href="checkout.index.url()">
+                        <Link :href="localized(checkout.index.url())">
                             {{
                                 page.props.auth.user
                                     ? t('shop.cart.proceed_checkout')

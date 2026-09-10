@@ -6,6 +6,7 @@ import CollectionController from './CollectionController'
 import BrandController from './BrandController'
 import SearchController from './SearchController'
 import SearchSuggestController from './SearchSuggestController'
+import ContactController from './ContactController'
 import CartController from './CartController'
 import WishlistController from './WishlistController'
 import ZoneController from './ZoneController'
@@ -21,6 +22,7 @@ CollectionController: Object.assign(CollectionController, CollectionController),
 BrandController: Object.assign(BrandController, BrandController),
 SearchController: Object.assign(SearchController, SearchController),
 SearchSuggestController: Object.assign(SearchSuggestController, SearchSuggestController),
+ContactController: Object.assign(ContactController, ContactController),
 CartController: Object.assign(CartController, CartController),
 WishlistController: Object.assign(WishlistController, WishlistController),
 ZoneController: Object.assign(ZoneController, ZoneController),

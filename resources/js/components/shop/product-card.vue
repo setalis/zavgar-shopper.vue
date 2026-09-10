@@ -6,6 +6,7 @@ import PriceDisplay from '@/components/shop/price-display.vue';
 import StarRating from '@/components/shop/star-rating.vue';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/composables/useCart';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { useWishlist } from '@/composables/useWishlist';
 import * as shop from '@/routes/shop';
@@ -15,11 +16,12 @@ import type { Product } from '@/types/shop';
 const props = defineProps<{ product: Product }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 const { add } = useCart();
 const { has, toggle } = useWishlist();
 
 const href = computed<string>(() =>
-    shop.product.url({ product: props.product.slug }),
+    localized(shop.product.url({ product: props.product.slug })),
 );
 
 const thumbnail = computed<string | null>(

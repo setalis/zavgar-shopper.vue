@@ -19,14 +19,15 @@ final class CategoryController extends Controller
     public function index(): Response
     {
         return Inertia::render('shop/categories', [
-            'categories' => Category::hydrateBranchProductsCount(
+            'categories' => localize_storefront(Category::hydrateBranchProductsCount(
                 Category::query()
                     ->scopes('enabled')
                     ->whereNull('parent_id')
+                    ->withStorefrontTranslations()
                     ->with('media')
                     ->orderBy('position')
                     ->get(),
-            ),
+            )),
         ]);
     }
 
@@ -51,25 +52,30 @@ final class CategoryController extends Controller
         $priceRange = $filterByStorefrontPrice->bounds($query);
         $query = $filterByStorefrontPrice->apply($query, $price['min'], $price['max'])
             ->with(['media', 'brand.media'])
+            ->withStorefrontTranslations()
             ->withCurrentPrices()
             ->withCurrentStock()
             ->withApprovedReviewSummary();
 
         $query = match ($sort) {
-            'name' => $query->orderBy('name'),
+            'name' => $query->orderByLocalizedName(),
             default => $query->latest(),
         };
 
+        $category->load(['media', 'translations']);
+        $category->localizeForStorefront();
+
         return Inertia::render('shop/category', [
-            'category' => $category->load('media'),
-            'children' => Category::hydrateBranchProductsCount(
+            'category' => $category,
+            'children' => localize_storefront(Category::hydrateBranchProductsCount(
                 $category->children()
                     ->scopes('enabled')
+                    ->withStorefrontTranslations()
                     ->with('media')
                     ->orderBy('position')
                     ->get(),
-            ),
-            'products' => $query->paginate(12)->withQueryString(),
+            )),
+            'products' => localize_storefront($query->paginate(12)->withQueryString()),
             'attributeFilters' => $attributeFilters,
             'priceRange' => $priceRange,
             'filters' => [
@@ -78,6 +84,7 @@ final class CategoryController extends Controller
                 'price_min' => $price['min'],
                 'price_max' => $price['max'],
             ],
+            'hreflang' => storefront_hreflang('shop.category', ['category' => $category]),
         ]);
     }
 }

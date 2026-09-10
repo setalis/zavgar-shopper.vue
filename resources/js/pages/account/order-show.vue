@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import OrderStatusBadge from '@/components/account/order-status-badge.vue';
 import Card from '@/components/shop/card.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { formatMoney } from '@/lib/format';
 import { dashboard } from '@/routes';
@@ -56,6 +57,7 @@ type Order = {
 const props = defineProps<{ order: Order }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const shippingPrice = props.order.shipping_option?.price ?? 0;
 const itemsTotal =
@@ -84,11 +86,11 @@ function formatDate(value: string): string {
     />
 
     <nav class="flex items-center gap-2 text-sm text-ink-mute">
-        <Link :href="dashboard.url()" class="hover:text-ink">{{
+        <Link :href="localized(dashboard.url())" class="hover:text-ink">{{
             t('account.order_show.breadcrumb.account')
         }}</Link>
         <span>/</span>
-        <Link :href="accountOrders.url()" class="hover:text-ink">{{
+        <Link :href="localized(accountOrders.url())" class="hover:text-ink">{{
             t('account.order_show.breadcrumb.orders')
         }}</Link>
         <span>/</span>
@@ -255,7 +257,9 @@ function formatDate(value: string): string {
                         <Link
                             v-if="item.product?.slug"
                             :href="
-                                shop.product.url({ product: item.product.slug })
+                                localized(
+                                    shop.product.url({ product: item.product.slug }),
+                                )
                             "
                             class="line-clamp-2 font-heading text-sm font-medium text-ink hover:underline"
                         >

@@ -33,13 +33,14 @@ final class SearchController extends Controller
                 ->matchingSearch($query);
 
             $priceRange = $filterByStorefrontPrice->bounds($listing);
-            $products = $filterByStorefrontPrice->apply($listing, $price['min'], $price['max'])
+            $products = localize_storefront($filterByStorefrontPrice->apply($listing, $price['min'], $price['max'])
                 ->with(['media', 'brand.media'])
+                ->withStorefrontTranslations()
                 ->withCurrentPrices()
                 ->withCurrentStock()
                 ->withApprovedReviewSummary()
                 ->paginate(12)
-                ->withQueryString();
+                ->withQueryString());
         }
 
         return Inertia::render('shop/search', [

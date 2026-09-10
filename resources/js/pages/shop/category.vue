@@ -2,6 +2,7 @@
 import { Head, router } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import HreflangLinks from '@/components/shop/hreflang-links.vue';
 import CategoryAttributeFilters from '@/components/shop/category-attribute-filters.vue';
 import CategoryTile from '@/components/shop/category-tile.vue';
 import Container from '@/components/shop/container.vue';
@@ -24,6 +25,8 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
+import type { HreflangLink } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { stripHtml } from '@/lib/format';
 import { withPriceParams } from '@/lib/price-filter';
@@ -53,16 +56,18 @@ const props = defineProps<{
     attributeFilters: AttributeFilter[];
     priceRange: PriceRange | null;
     filters: Filters;
+    hreflang: HreflangLink[];
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const sort = ref<string>(props.filters.sort);
 const filtersOpen = ref<boolean>(false);
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
-    { label: t('shop.nav.categories'), href: shop.categories.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
+    { label: t('shop.nav.categories'), href: localized(shop.categories.url()) },
     { label: props.category.name },
 ]);
 
@@ -91,7 +96,7 @@ function visit(
     filtersOpen.value = false;
 
     router.get(
-        shop.category.url({ category: props.category.slug }),
+        localized(shop.category.url({ category: props.category.slug })),
         withPriceParams({ sort: nextSort, attrs }, priceMin, priceMax),
         { preserveState: true, preserveScroll: true, replace: true },
     );
@@ -131,7 +136,9 @@ watch(sort, (value) => {
 </script>
 
 <template>
-    <Head :title="category.name" />
+    <Head :title="category.name">
+        <HreflangLinks :links="hreflang" />
+    </Head>
 
     <PageHead
         :title="category.name"

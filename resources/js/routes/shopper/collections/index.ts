@@ -78,8 +78,8 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     
     index.form = indexForm
 /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
 export const edit = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -93,8 +93,8 @@ edit.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
 edit.url = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -121,8 +121,8 @@ edit.url = (args: { collection: string | number } | [collection: string | number
 }
 
 /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
 edit.get = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -130,8 +130,8 @@ edit.get = (args: { collection: string | number } | [collection: string | number
     method: 'get',
 })
 /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
 edit.head = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -140,8 +140,8 @@ edit.head = (args: { collection: string | number } | [collection: string | numbe
 })
 
     /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
     const editForm = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -150,8 +150,8 @@ edit.head = (args: { collection: string | number } | [collection: string | numbe
     })
 
             /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
         editForm.get = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -159,8 +159,8 @@ edit.head = (args: { collection: string | number } | [collection: string | numbe
             method: 'get',
         })
             /**
-* @see \Shopper\Livewire\Pages\Collection\Edit::__invoke
- * @see vendor/shopper/framework/src/Livewire/Pages/Collection/Edit.php:7
+* @see \App\Livewire\Shopper\Pages\Collection\Edit::__invoke
+ * @see app/Livewire/Shopper/Pages/Collection/Edit.php:7
  * @route '/cpanel/collections/{collection}/edit'
  */
         editForm.head = (args: { collection: string | number } | [collection: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

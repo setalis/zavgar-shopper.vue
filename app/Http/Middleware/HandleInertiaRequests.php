@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Actions\FlushStorefrontCategoryCache;
+use App\Actions\FlushStorefrontMenuCache;
 use App\Actions\GetCountriesByZone;
 use App\Actions\Wishlist\WishlistManager;
 use App\Actions\ZoneSessionManager;
 use App\Models\Category;
 use App\Models\Channel;
+use App\Models\MenuItem;
+use App\Support\StorefrontLocale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
@@ -40,7 +43,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'locale' => fn (): string => app()->getLocale(),
+            'default_locale' => fn (): string => StorefrontLocale::default(),
             'locales' => fn (): array => config('app.available_locales', []),
+            'locale_urls' => fn (): array => StorefrontLocale::switchUrls($request),
             'translations' => fn (): array => $this->frontendTranslations(),
             'shop' => fn (): array => $this->shopProps(),
         ];
@@ -96,6 +101,7 @@ class HandleInertiaRequests extends Middleware
             'tax_label' => current_tax_label(),
             'logo' => storefront_logo_url(),
             'nav_categories' => $this->navCategories(),
+            'nav_menu' => $this->navMenu(),
             'footer_categories' => $this->topCategories(FlushStorefrontCategoryCache::FOOTER_LIMIT, 'footer'),
         ];
     }
@@ -111,32 +117,79 @@ class HandleInertiaRequests extends Middleware
             fn (): array => Category::query()
                 ->scopes('enabled')
                 ->whereNull('parent_id')
+                ->withStorefrontTranslations()
                 ->with([
                     'media',
                     'children' => fn ($query) => $query
                         ->scopes('enabled')
+                        ->withStorefrontTranslations()
                         ->with('media')
                         ->orderBy('position'),
                 ])
                 ->orderBy('position')
                 ->get(['id', 'name', 'slug'])
-                ->map(fn (Category $category): array => [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'slug' => $category->slug,
-                    'thumbnail' => $category->getFirstMedia(
-                        (string) config('shopper.media.storage.thumbnail_collection', 'thumbnail'),
-                    )?->getUrl(),
-                    'children' => $category->children
-                        ->map(fn (Category $child): array => [
-                            'id' => $child->id,
-                            'name' => $child->name,
-                            'slug' => $child->slug,
-                        ])
-                        ->values()
-                        ->all(),
-                ])
+                ->map(function (Category $category): array {
+                    $category->localizeForStorefront();
+
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'slug' => $category->slug,
+                        'thumbnail' => $category->getFirstMedia(
+                            (string) config('shopper.media.storage.thumbnail_collection', 'thumbnail'),
+                        )?->getUrl(),
+                        'children' => $category->children
+                            ->map(function (Category $child): array {
+                                $child->localizeForStorefront();
+
+                                return [
+                                    'id' => $child->id,
+                                    'name' => $child->name,
+                                    'slug' => $child->slug,
+                                ];
+                            })
+                            ->values()
+                            ->all(),
+                    ];
+                })
                 ->all(),
+        );
+    }
+
+    /**
+     * @return list<array{id: int, title: string, href: string, children: list<mixed>}>
+     */
+    private function navMenu(): array
+    {
+        return Cache::remember(
+            FlushStorefrontMenuCache::navKey(app()->getLocale()),
+            FlushStorefrontMenuCache::CACHE_TTL,
+            function (): array {
+                $targets = ['brand', 'category', 'product', 'collection'];
+
+                return MenuItem::query()
+                    ->scopes('enabled')
+                    ->roots()
+                    ->with([
+                        ...$targets,
+                        'children' => fn ($query) => $query
+                            ->scopes('enabled')
+                            ->orderBy('position')
+                            ->with([
+                                ...$targets,
+                                'children' => fn ($query) => $query
+                                    ->scopes('enabled')
+                                    ->orderBy('position')
+                                    ->with($targets),
+                            ]),
+                    ])
+                    ->orderBy('position')
+                    ->get()
+                    ->map(fn (MenuItem $item): ?array => $item->toNavArray())
+                    ->filter()
+                    ->values()
+                    ->all();
+            },
         );
     }
 
@@ -156,14 +209,19 @@ class HandleInertiaRequests extends Middleware
             fn (): array => Category::query()
                 ->scopes('enabled')
                 ->whereNull('parent_id')
+                ->withStorefrontTranslations()
                 ->orderBy('position')
                 ->take($limit)
                 ->get(['id', 'name', 'slug'])
-                ->map(fn (Category $category): array => [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'slug' => $category->slug,
-                ])
+                ->map(function (Category $category): array {
+                    $category->localizeForStorefront();
+
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'slug' => $category->slug,
+                    ];
+                })
                 ->all(),
         );
     }

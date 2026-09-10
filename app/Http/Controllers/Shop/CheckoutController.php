@@ -8,6 +8,7 @@ use App\Actions\Checkout\BuildShippingPackages;
 use App\Actions\Checkout\FetchDeliveryRates;
 use App\Actions\Checkout\FetchPaymentMethods;
 use App\Actions\CreateOrder;
+use App\Actions\LocalizeCatalog;
 use App\Actions\ZoneSessionManager;
 use App\CheckoutSession;
 use App\Http\Controllers\Controller;
@@ -43,6 +44,7 @@ final class CheckoutController extends Controller
         }
 
         $cart->load(['lines.purchasable.media']);
+        resolve(LocalizeCatalog::class)->cart($cart);
         $context = resolve(CartManager::class)->calculate($cart);
 
         $checkoutCartId = session()->get('checkout_cart_id');

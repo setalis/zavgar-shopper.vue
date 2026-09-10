@@ -2,11 +2,20 @@
 
 namespace Tests;
 
+use App\Support\StorefrontLocale;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Laravel\Fortify\Features;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        app()->setLocale(StorefrontLocale::default());
+        StorefrontLocale::applyUrlDefaults(StorefrontLocale::default());
+    }
+
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
     {
         if (! Features::enabled($feature)) {

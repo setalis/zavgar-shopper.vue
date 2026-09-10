@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shopper\Pages\HomepageBanners;
 
+use App\Enums\HomepageBannerPlacement;
 use App\Models\HomepageBanner;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -29,6 +30,7 @@ use Throwable;
 final class Index extends AbstractPageComponent implements HasActions, HasSchemas, HasTable
 {
     use HandlesAuthorizationExceptions;
+    use HasHomepageBannerPlacement;
     use InteractsWithActions;
     use InteractsWithSchemas;
     use InteractsWithTable;
@@ -36,6 +38,7 @@ final class Index extends AbstractPageComponent implements HasActions, HasSchema
     public function mount(): void
     {
         $this->authorize('browse_homepage_banners');
+        $this->syncPlacementFromRoute();
     }
 
     public function exception(Throwable $e, callable $stopPropagation): void
@@ -60,7 +63,7 @@ final class Index extends AbstractPageComponent implements HasActions, HasSchema
         $canDelete = $user?->can('delete_homepage_banners') ?? false;
 
         return $table
-            ->query(HomepageBanner::query()->orderBy('position'))
+            ->query(HomepageBanner::query()->placement($this->placement)->orderBy('position'))
             ->columns([
                 SpatieMediaLibraryImageColumn::make('preview')
                     ->collection(HomepageBanner::MEDIA_BACKGROUND)
@@ -73,7 +76,8 @@ final class Index extends AbstractPageComponent implements HasActions, HasSchema
                     ->sortable(),
                 TextColumn::make('size')
                     ->label(__('backend.banners.size'))
-                    ->badge(),
+                    ->badge()
+                    ->visible($this->placement === HomepageBannerPlacement::Bento),
                 TextColumn::make('cta_type')
                     ->label(__('backend.banners.cta'))
                     ->badge(),
@@ -91,7 +95,7 @@ final class Index extends AbstractPageComponent implements HasActions, HasSchema
                     ->iconButton()
                     ->url(
                         fn (HomepageBanner $record): string => route(
-                            'shopper.banners.edit',
+                            $this->placement->editRouteName(),
                             ['banner' => $record],
                         ),
                     )
@@ -133,12 +137,20 @@ final class Index extends AbstractPageComponent implements HasActions, HasSchema
                     ->visible($canDelete)
                     ->deselectRecordsAfterCompletion(),
             ])
-            ->emptyStateHeading(__('backend.banners.empty'));
+            ->emptyStateHeading(
+                $this->isPromo()
+                    ? __('backend.banners.promo_empty')
+                    : __('backend.banners.empty'),
+            );
     }
 
     public function render(): View
     {
         return view('livewire.shopper.pages.homepage-banners.index')
-            ->title(__('backend.banners.menu'));
+            ->title(
+                $this->isPromo()
+                    ? __('backend.banners.promo_menu')
+                    : __('backend.banners.menu'),
+            );
     }
 }

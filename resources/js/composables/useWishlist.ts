@@ -1,9 +1,11 @@
 import { router } from '@inertiajs/vue3';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useShop } from '@/composables/useShop';
 import * as wishlist from '@/routes/shop/wishlist';
 
 export function useWishlist() {
     const { wishlistIds } = useShop();
+    const { localized } = useLocalizedRoute();
 
     function has(productId: number): boolean {
         return wishlistIds.value.includes(productId);
@@ -11,14 +13,14 @@ export function useWishlist() {
 
     function add(productId: number): void {
         router.post(
-            wishlist.store.url(),
+            localized(wishlist.store.url()),
             { product_id: productId },
             { preserveScroll: true },
         );
     }
 
     function remove(productId: number): void {
-        router.delete(wishlist.destroy.url(productId), {
+        router.delete(localized(wishlist.destroy.url(productId)), {
             preserveScroll: true,
         });
     }

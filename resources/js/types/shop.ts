@@ -49,6 +49,7 @@ export type HomepageBanner = {
     size: 'large' | 'medium' | 'small';
     eyebrow: string | null;
     title: string;
+    highlight: string | null;
     description: string | null;
     button_text: string | null;
     href: string | null;
@@ -59,7 +60,10 @@ export type HomepageBanner = {
     accent_image: string | null;
 };
 
-export type Brand = BaseBrand & WithStorefrontMedia;
+export type Brand = BaseBrand &
+    WithStorefrontMedia & {
+        products_count?: number;
+    };
 
 export type Category = BaseCategory &
     WithStorefrontMedia & {
@@ -71,6 +75,13 @@ export type NavCategoryChild = Pick<BaseCategory, 'id' | 'name' | 'slug'>;
 export type NavCategory = Pick<BaseCategory, 'id' | 'name' | 'slug'> & {
     thumbnail?: string | null;
     children?: NavCategoryChild[];
+};
+
+export type NavMenuItem = {
+    id: number;
+    title: string;
+    href: string;
+    children: NavMenuItem[];
 };
 
 export type Collection = BaseCollection &
@@ -207,6 +218,7 @@ export type ShopSharedProps = {
     tax_label: string;
     logo: string | null;
     nav_categories: NavCategory[];
+    nav_menu: NavMenuItem[];
     footer_categories: NavCategory[];
 };
 

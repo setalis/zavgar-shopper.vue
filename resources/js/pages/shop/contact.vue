@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-import { Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-vue-next';
+import { store } from '@/actions/App/Http/Controllers/Shop/ContactController';
+import { Form, Head } from '@inertiajs/vue3';
+import { Clock, Mail, Phone } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import InputError from '@/components/input-error.vue';
 import Container from '@/components/shop/container.vue';
 import PageHead from '@/components/shop/page-head.vue';
 import SectionHead from '@/components/shop/section-head.vue';
@@ -21,34 +23,52 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { home } from '@/routes';
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
-/**
- * The template's contact page has no backend counterpart yet, so the form
- * acknowledges the submission locally instead of posting anywhere.
- */
-const sent = ref<boolean>(false);
 const topic = ref<string>('order');
 
 const infoBlocks = computed(() => [
     { icon: Phone, key: 'phone' },
     { icon: Mail, key: 'email' },
-    { icon: MessageCircle, key: 'chat' },
-    { icon: MapPin, key: 'address' },
     { icon: Clock, key: 'hours' },
 ]);
+
+const phones = computed(() => [
+    {
+        display: t('shop.contact.info.phone.primary'),
+        href: 'tel:+380955807707',
+    },
+    {
+        display: t('shop.contact.info.phone.secondary'),
+        href: 'tel:+380735807707',
+    },
+]);
+
+const email = computed(() => t('shop.contact.info.email.value'));
 
 const topics = ['order', 'product', 'returns', 'trade', 'other'] as const;
 const faqs = ['shipping', 'returns', 'warranty', 'trade'] as const;
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
     { label: t('shop.contact.title') },
 ]);
+
+const contactForm = computed(() => {
+    const form = store.form();
+
+    return {
+        ...form,
+        action: localized(form.action),
+    };
+});
 </script>
 
 <template>
@@ -86,7 +106,30 @@ const crumbs = computed(() => [
                         >
                             {{ t(`shop.contact.info.${block.key}.label`) }}
                         </p>
-                        <p class="font-heading text-md font-semibold text-ink">
+                        <div
+                            v-if="block.key === 'phone'"
+                            class="flex flex-col gap-0.5 font-heading text-md font-semibold text-ink"
+                        >
+                            <a
+                                v-for="phone in phones"
+                                :key="phone.href"
+                                :href="phone.href"
+                                class="transition hover:text-brand"
+                            >
+                                {{ phone.display }}
+                            </a>
+                        </div>
+                        <a
+                            v-else-if="block.key === 'email'"
+                            :href="`mailto:${email}`"
+                            class="font-heading text-md font-semibold text-ink transition hover:text-brand"
+                        >
+                            {{ email }}
+                        </a>
+                        <p
+                            v-else
+                            class="font-heading text-md font-semibold text-ink"
+                        >
                             {{ t(`shop.contact.info.${block.key}.value`) }}
                         </p>
                     </div>
@@ -109,9 +152,11 @@ const crumbs = computed(() => [
                 </div>
             </div>
 
-            <form
+            <Form
+                v-bind="contactForm"
+                reset-on-success
                 class="rounded-lg border border-rule bg-paper p-7 md:p-10"
-                @submit.prevent="sent = true"
+                v-slot="{ errors, processing, wasSuccessful }"
             >
                 <h2 class="text-xl">{{ t('shop.contact.form.title') }}</h2>
                 <p class="mt-1.5 mb-7 text-sm text-ink-mute">
@@ -126,7 +171,13 @@ const crumbs = computed(() => [
                         >
                             {{ t('shop.contact.form.first_name') }}
                         </Label>
-                        <Input id="contact-first-name" required />
+                        <Input
+                            id="contact-first-name"
+                            name="first_name"
+                            autocomplete="given-name"
+                            required
+                        />
+                        <InputError :message="errors.first_name" />
                     </div>
                     <div class="grid gap-2">
                         <Label
@@ -135,7 +186,13 @@ const crumbs = computed(() => [
                         >
                             {{ t('shop.contact.form.last_name') }}
                         </Label>
-                        <Input id="contact-last-name" required />
+                        <Input
+                            id="contact-last-name"
+                            name="last_name"
+                            autocomplete="family-name"
+                            required
+                        />
+                        <InputError :message="errors.last_name" />
                     </div>
                     <div class="grid gap-2">
                         <Label
@@ -144,7 +201,14 @@ const crumbs = computed(() => [
                         >
                             {{ t('shop.contact.form.email') }}
                         </Label>
-                        <Input id="contact-email" type="email" required />
+                        <Input
+                            id="contact-email"
+                            type="email"
+                            name="email"
+                            autocomplete="email"
+                            required
+                        />
+                        <InputError :message="errors.email" />
                     </div>
                     <div class="grid gap-2">
                         <Label
@@ -153,7 +217,13 @@ const crumbs = computed(() => [
                         >
                             {{ t('shop.contact.form.phone') }}
                         </Label>
-                        <Input id="contact-phone" type="tel" />
+                        <Input
+                            id="contact-phone"
+                            type="tel"
+                            name="phone"
+                            autocomplete="tel"
+                        />
+                        <InputError :message="errors.phone" />
                     </div>
                 </div>
 
@@ -163,6 +233,7 @@ const crumbs = computed(() => [
                     >
                         {{ t('shop.contact.form.topic') }}
                     </Label>
+                    <input type="hidden" name="topic" :value="topic" />
                     <Select v-model="topic">
                         <SelectTrigger class="w-full">
                             <SelectValue />
@@ -177,6 +248,7 @@ const crumbs = computed(() => [
                             </SelectItem>
                         </SelectContent>
                     </Select>
+                    <InputError :message="errors.topic" />
                 </div>
 
                 <div class="mt-4 grid gap-2">
@@ -186,7 +258,8 @@ const crumbs = computed(() => [
                     >
                         {{ t('shop.contact.form.order_number') }}
                     </Label>
-                    <Input id="contact-order" />
+                    <Input id="contact-order" name="order_number" />
+                    <InputError :message="errors.order_number" />
                 </div>
 
                 <div class="mt-4 grid gap-2">
@@ -196,12 +269,24 @@ const crumbs = computed(() => [
                     >
                         {{ t('shop.contact.form.message') }}
                     </Label>
-                    <Textarea id="contact-message" rows="5" required />
+                    <Textarea
+                        id="contact-message"
+                        name="message"
+                        rows="5"
+                        required
+                    />
+                    <InputError :message="errors.message" />
                 </div>
 
-                <Button type="submit" block class="mt-7">
+                <Button
+                    type="submit"
+                    block
+                    class="mt-7"
+                    :disabled="processing"
+                >
+                    <Spinner v-if="processing" />
                     {{
-                        sent
+                        wasSuccessful
                             ? t('shop.contact.form.sent')
                             : t('shop.contact.form.submit')
                     }}
@@ -210,7 +295,7 @@ const crumbs = computed(() => [
                 <p class="mt-4 text-xs text-ink-mute">
                     {{ t('shop.contact.form.privacy') }}
                 </p>
-            </form>
+            </Form>
         </div>
     </Container>
 

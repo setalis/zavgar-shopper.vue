@@ -7,6 +7,7 @@ namespace Database\Factories;
 use App\Enums\HomepageBannerBackgroundType;
 use App\Enums\HomepageBannerColor;
 use App\Enums\HomepageBannerCtaType;
+use App\Enums\HomepageBannerPlacement;
 use App\Enums\HomepageBannerSize;
 use App\Models\Brand;
 use App\Models\Category;
@@ -29,9 +30,11 @@ final class HomepageBannerFactory extends Factory
         return [
             'eyebrow' => fake()->words(2, true),
             'title' => fake()->sentence(4),
+            'highlight' => null,
             'description' => fake()->sentence(12),
             'button_text' => fake()->words(2, true),
             'size' => HomepageBannerSize::Medium,
+            'placement' => HomepageBannerPlacement::Bento,
             'background_type' => HomepageBannerBackgroundType::Gradient,
             'gradient' => TailwindTint::of(HomepageBannerColor::Blue),
             'overlay_gradient' => null,
@@ -53,6 +56,14 @@ final class HomepageBannerFactory extends Factory
     {
         return $this->state(fn (array $attributes): array => [
             'size' => HomepageBannerSize::Large,
+        ]);
+    }
+
+    public function promo(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'placement' => HomepageBannerPlacement::Promo,
+            'highlight' => fake()->numerify('−##%'),
         ]);
     }
 

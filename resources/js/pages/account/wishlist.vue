@@ -5,6 +5,7 @@ import ProductCard from '@/components/shop/product-card.vue';
 import ProductPagination from '@/components/shop/product-pagination.vue';
 import type { PaginatorLink } from '@/components/shop/product-pagination.vue';
 import { Button } from '@/components/ui/button';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Product } from '@/types/shop';
@@ -22,6 +23,7 @@ defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 </script>
 
 <template>
@@ -50,7 +52,7 @@ const { t } = useTrans();
         <p class="mt-1 text-sm text-ink-mute">
             {{ t('shop.wishlist.empty.subtitle') }}
         </p>
-        <Link :href="shop.index.url()" class="mt-6">
+        <Link :href="localized(shop.index.url())" class="mt-6">
             <Button>{{ t('shop.wishlist.empty.cta') }}</Button>
         </Link>
     </div>

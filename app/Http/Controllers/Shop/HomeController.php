@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Shop;
 
+use App\Enums\HomepageBannerPlacement;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Collection;
@@ -35,38 +36,34 @@ final class HomeController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('shop/home', [
-            'bentoBanners' => fn () => HomepageBanner::query()
-                ->enabled()
-                ->with(['media', 'category', 'product', 'collection', 'brand'])
-                ->orderBy('position')
-                ->get()
-                ->map(fn (HomepageBanner $banner): array => $banner->toStorefrontArray())
-                ->values()
-                ->all(),
-            'featuredProducts' => fn () => $this->cardQuery()
+            'bentoBanners' => $this->bannersFor(HomepageBannerPlacement::Bento),
+            'promoBanners' => $this->bannersFor(HomepageBannerPlacement::Promo),
+            'featuredProducts' => fn () => localize_storefront($this->cardQuery()
                 ->where('featured', true)
                 ->limit(10)
-                ->get(),
-            'latestProducts' => fn () => $this->cardQuery()
+                ->get()),
+            'latestProducts' => fn () => localize_storefront($this->cardQuery()
                 ->latest()
                 ->limit(10)
-                ->get(),
-            'featuredCollections' => fn () => Collection::query()
+                ->get()),
+            'featuredCollections' => fn () => localize_storefront(Collection::query()
                 ->has('products')
+                ->withStorefrontTranslations()
                 ->withCount('products')
                 ->with('media')
                 ->orderByDesc('products_count')
                 ->limit(6)
-                ->get(),
-            'categories' => fn () => Category::hydrateBranchProductsCount(
+                ->get()),
+            'categories' => fn () => localize_storefront(Category::hydrateBranchProductsCount(
                 Category::query()
                     ->scopes('enabled')
                     ->whereNull('parent_id')
+                    ->withStorefrontTranslations()
                     ->with('media')
                     ->orderBy('position')
                     ->limit(10)
                     ->get(),
-            ),
+            )),
         ]);
     }
 
@@ -75,9 +72,27 @@ final class HomeController extends Controller
         return Product::query()
             ->select(self::CARD_COLUMNS)
             ->with(['media', 'brand.media'])
+            ->withStorefrontTranslations()
             ->withCurrentPrices()
             ->withCurrentStock()
             ->withApprovedReviewSummary()
             ->scopes('publish');
+    }
+
+    /**
+     * @return \Closure(): list<array<string, mixed>>
+     */
+    private function bannersFor(HomepageBannerPlacement $placement): \Closure
+    {
+        return fn () => HomepageBanner::query()
+            ->enabled()
+            ->placement($placement)
+            ->withStorefrontTranslations()
+            ->with(['media', 'category', 'product', 'collection', 'brand'])
+            ->orderBy('position')
+            ->get()
+            ->map(fn (HomepageBanner $banner): array => $banner->toStorefrontArray())
+            ->values()
+            ->all();
     }
 }

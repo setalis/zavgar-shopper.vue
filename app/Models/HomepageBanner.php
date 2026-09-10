@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Casts\TailwindTintCast;
+use App\Concerns\HasCatalogTranslations;
 use App\Enums\HomepageBannerBackgroundType;
 use App\Enums\HomepageBannerCtaType;
+use App\Enums\HomepageBannerPlacement;
 use App\Enums\HomepageBannerSize;
 use App\Support\TailwindTint;
 use Database\Factories\HomepageBannerFactory;
@@ -21,6 +23,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class HomepageBanner extends Model implements SpatieHasMedia
 {
+    use HasCatalogTranslations;
+
     /** @use HasFactory<HomepageBannerFactory> */
     use HasFactory;
 
@@ -33,9 +37,11 @@ final class HomepageBanner extends Model implements SpatieHasMedia
     protected $fillable = [
         'eyebrow',
         'title',
+        'highlight',
         'description',
         'button_text',
         'size',
+        'placement',
         'background_type',
         'gradient',
         'overlay_gradient',
@@ -54,6 +60,7 @@ final class HomepageBanner extends Model implements SpatieHasMedia
      */
     protected $attributes = [
         'size' => 'medium',
+        'placement' => 'bento',
         'background_type' => 'gradient',
         'cta_type' => 'url',
         'is_enabled' => true,
@@ -108,21 +115,35 @@ final class HomepageBanner extends Model implements SpatieHasMedia
         return $this->belongsTo(Brand::class);
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function catalogTranslationMap(): array
+    {
+        return [
+            'title' => 'name',
+            'eyebrow' => 'eyebrow',
+            'highlight' => 'highlight',
+            'description' => 'description',
+            'button_text' => 'button_text',
+        ];
+    }
+
     public function href(): ?string
     {
         return match ($this->cta_type) {
             HomepageBannerCtaType::Url => filled($this->cta_url) ? $this->cta_url : null,
             HomepageBannerCtaType::Category => $this->categoryIsAvailable()
-                ? route('shop.category', $this->category)
+                ? route('shop.category', ['category' => $this->category])
                 : null,
             HomepageBannerCtaType::Product => $this->product?->isPublished()
-                ? route('shop.product', $this->product)
+                ? route('shop.product', ['product' => $this->product])
                 : null,
             HomepageBannerCtaType::Collection => $this->collectionIsPublished()
-                ? route('shop.collection', $this->collection)
+                ? route('shop.collection', ['collection' => $this->collection])
                 : null,
             HomepageBannerCtaType::Brand => $this->brandIsAvailable()
-                ? route('shop.brand', $this->brand)
+                ? route('shop.brand', ['brand' => $this->brand])
                 : null,
         };
     }
@@ -133,6 +154,7 @@ final class HomepageBanner extends Model implements SpatieHasMedia
      *     size: string,
      *     eyebrow: string|null,
      *     title: string,
+     *     highlight: string|null,
      *     description: string|null,
      *     button_text: string|null,
      *     href: string|null,
@@ -145,6 +167,8 @@ final class HomepageBanner extends Model implements SpatieHasMedia
      */
     public function toStorefrontArray(): array
     {
+        $this->localizeForStorefront();
+
         $href = $this->href();
         $buttonText = filled($this->button_text) ? $this->button_text : null;
 
@@ -153,6 +177,7 @@ final class HomepageBanner extends Model implements SpatieHasMedia
             'size' => $this->size->value,
             'eyebrow' => $this->eyebrow,
             'title' => $this->title,
+            'highlight' => filled($this->highlight) ? $this->highlight : null,
             'description' => $this->description,
             'button_text' => $href !== null ? $buttonText : null,
             'href' => $buttonText !== null ? $href : null,
@@ -175,12 +200,23 @@ final class HomepageBanner extends Model implements SpatieHasMedia
     }
 
     /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    #[Scope]
+    protected function placement(Builder $query, HomepageBannerPlacement $placement): Builder
+    {
+        return $query->where('placement', $placement);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
             'size' => HomepageBannerSize::class,
+            'placement' => HomepageBannerPlacement::class,
             'background_type' => HomepageBannerBackgroundType::class,
             'gradient' => TailwindTintCast::class,
             'overlay_gradient' => TailwindTintCast::class,

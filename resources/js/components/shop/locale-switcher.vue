@@ -1,25 +1,28 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useShop } from '@/composables/useShop';
 import { useTrans } from '@/composables/useTrans';
-import * as localeRoute from '@/routes/locale';
+import { update as updateLocale } from '@/routes/locale';
 
+const page = usePage();
 const { locale, locales } = useTrans();
 const { currency } = useShop();
+const { urlForLocale } = useLocalizedRoute();
 
 const localeCodes = computed<string[]>(() => Object.keys(locales.value));
 
-function switchLocale(code: string): void {
-    if (code === locale.value) {
-        return;
-    }
+function hrefFor(code: string): string {
+    return page.props.locale_urls?.[code] ?? urlForLocale(code);
+}
 
-    router.patch(
-        localeRoute.update.url(),
-        { locale: code },
-        { preserveScroll: true, preserveState: false },
-    );
+function usesSessionSwitch(code: string): boolean {
+    return hrefFor(code) === hrefFor(locale.value) && code !== locale.value;
+}
+
+function switchSessionLocale(code: string): void {
+    router.patch(updateLocale.url(), { locale: code }, { preserveScroll: true });
 }
 </script>
 
@@ -34,6 +37,7 @@ function switchLocale(code: string): void {
                 /
             </span>
             <button
+                v-if="usesSessionSwitch(code)"
                 type="button"
                 :class="[
                     'uppercase transition',
@@ -41,11 +45,24 @@ function switchLocale(code: string): void {
                         ? 'opacity-100'
                         : 'opacity-60 hover:opacity-100',
                 ]"
-                :aria-current="code === locale ? 'true' : undefined"
-                @click="switchLocale(code)"
+                @click="switchSessionLocale(code)"
             >
                 {{ code }}
             </button>
+            <Link
+                v-else
+                :href="hrefFor(code)"
+                preserve-scroll
+                :class="[
+                    'uppercase transition',
+                    code === locale
+                        ? 'opacity-100'
+                        : 'opacity-60 hover:opacity-100',
+                ]"
+                :aria-current="code === locale ? 'true' : undefined"
+            >
+                {{ code }}
+            </Link>
         </template>
         <span aria-hidden="true" class="opacity-40">·</span>
         <span>{{ currency }}</span>

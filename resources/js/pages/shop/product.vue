@@ -10,6 +10,7 @@ import {
     Truck,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import HreflangLinks from '@/components/shop/hreflang-links.vue';
 import InputError from '@/components/input-error.vue';
 import BrandLink from '@/components/shop/brand-link.vue';
 import Container from '@/components/shop/container.vue';
@@ -28,6 +29,8 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useCart } from '@/composables/useCart';
 import { useFormat } from '@/composables/useFormat';
 import { useShop } from '@/composables/useShop';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
+import type { HreflangLink } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { useWishlist } from '@/composables/useWishlist';
 import { home, login } from '@/routes';
@@ -79,12 +82,14 @@ const props = defineProps<{
     variantOptions: VariantOptions | null;
     productAttributes: ProductAttribute[];
     canReview: boolean;
+    hreflang: HreflangLink[];
 }>();
 
 const page = usePage();
 const cart = useCart();
 const { has, toggle } = useWishlist();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 const { currency, taxLabel } = useShop();
 const { money } = useFormat();
 
@@ -405,7 +410,7 @@ function setReviewRating(rating: number): void {
 }
 
 function submitReview(): void {
-    reviewForm.post(ProductReviewController.store.url(props.product), {
+    reviewForm.post(localized(ProductReviewController.store.url(props.product)), {
         preserveScroll: true,
         onSuccess: () => {
             reviewForm.reset();
@@ -417,18 +422,20 @@ function submitReview(): void {
 </script>
 
 <template>
-    <Head :title="product.name" />
+    <Head :title="product.name">
+        <HreflangLinks :links="hreflang" />
+    </Head>
 
     <Container class="py-8 md:py-12">
         <nav
             class="mb-8 flex flex-wrap items-center gap-1.5 font-mono text-xs tracking-[0.04em] text-ink-mute"
             :aria-label="t('shop.product.breadcrumb')"
         >
-            <Link :href="home.url()" class="transition hover:text-brand">
+            <Link :href="localized(home.url())" class="transition hover:text-brand">
                 {{ t('shop.nav.home') }}
             </Link>
             <span aria-hidden="true" class="text-ink-faint">/</span>
-            <Link :href="shop.index.url()" class="transition hover:text-brand">
+            <Link :href="localized(shop.index.url())" class="transition hover:text-brand">
                 {{ t('shop.nav.shop') }}
             </Link>
             <span aria-hidden="true" class="text-ink-faint">/</span>
@@ -999,7 +1006,7 @@ function submitReview(): void {
         >
             <SectionHead
                 :title="t('shop.product.related')"
-                :view-all-href="shop.index.url()"
+                :view-all-href="localized(shop.index.url())"
                 :view-all-label="t('shop.home.featured.view_all')"
             />
 

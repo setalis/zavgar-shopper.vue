@@ -2,62 +2,128 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowRight } from 'lucide-vue-next';
 import Container from '@/components/shop/container.vue';
-import { useTrans } from '@/composables/useTrans';
-import * as shop from '@/routes/shop';
+import type { HomepageBanner, HomepageBannerTint } from '@/types/shop';
 
-const { t } = useTrans();
+const props = defineProps<{
+    banners: HomepageBanner[];
+}>();
 
-/**
- * Presentational promo pair from the template — the shop has no campaign model
- * driving discounts, so copy is fixed and both cards link into the catalogue.
- */
-const banners = [
-    {
-        key: 'watch',
-        surface: 'bg-linear-to-br from-ink to-[#1e293b]',
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=520&q=80&auto=format&fit=crop',
-    },
-    {
-        key: 'audio',
-        surface: 'bg-linear-to-br from-card-purple to-card-purple-2',
-        image: 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=520&q=80&auto=format&fit=crop',
-    },
-] as const;
+function hasBackgroundImage(banner: HomepageBanner): boolean {
+    return banner.background_type === 'image' && Boolean(banner.background_image);
+}
+
+function surfaceClass(banner: HomepageBanner): string {
+    if (banner.gradient && !hasBackgroundImage(banner)) {
+        return '';
+    }
+
+    if (hasBackgroundImage(banner)) {
+        return '';
+    }
+
+    return 'bg-ink';
+}
+
+function fillStyle(banner: HomepageBanner): Record<string, string> {
+    if (!banner.gradient || hasBackgroundImage(banner)) {
+        return {};
+    }
+
+    return {
+        backgroundImage: `linear-gradient(to bottom right, ${banner.gradient.from}, ${banner.gradient.to})`,
+    };
+}
+
+function overlayStyle(tint: HomepageBannerTint | null): Record<string, string> {
+    if (!tint) {
+        return {};
+    }
+
+    return {
+        backgroundImage: `linear-gradient(to right, ${tint.from} 12%, color-mix(in oklch, ${tint.from} 80%, transparent) 45%, color-mix(in oklch, ${tint.from} 20%, transparent))`,
+    };
+}
+
+function accentBackdropStyle(
+    tint: HomepageBannerTint | null,
+): Record<string, string> {
+    if (!tint) {
+        return {};
+    }
+
+    return {
+        backgroundImage: `radial-gradient(circle at 50% 70%, ${tint.from}, ${tint.to})`,
+    };
+}
 </script>
 
 <template>
-    <Container>
+    <Container v-if="props.banners.length">
         <div class="grid gap-4 md:grid-cols-2">
             <article
-                v-for="banner in banners"
-                :key="banner.key"
+                v-for="banner in props.banners"
+                :key="banner.id"
                 :class="[
                     'relative flex min-h-[260px] flex-col justify-center overflow-hidden rounded-xl p-10 text-paper',
-                    banner.surface,
+                    surfaceClass(banner),
                 ]"
+                :style="fillStyle(banner)"
             >
-                <p class="mb-5 font-mono text-xs tracking-[0.08em] opacity-70">
-                    {{ t(`shop.discount.${banner.key}.meta`) }}
+                <img
+                    v-if="hasBackgroundImage(banner)"
+                    :src="banner.background_image ?? undefined"
+                    alt=""
+                    class="pointer-events-none absolute inset-0 z-0 size-full object-cover object-[72%_center]"
+                />
+                <div
+                    v-if="hasBackgroundImage(banner) && banner.gradient"
+                    class="pointer-events-none absolute inset-0 z-1"
+                    :style="overlayStyle(banner.gradient)"
+                    aria-hidden="true"
+                />
+
+                <p
+                    v-if="banner.eyebrow"
+                    class="relative z-2 mb-5 font-mono text-xs tracking-[0.08em] opacity-70"
+                >
+                    {{ banner.eyebrow }}
                 </p>
-                <h3 class="mb-2 max-w-[18ch] text-xl leading-[1.1] md:text-2xl">
-                    {{ t(`shop.discount.${banner.key}.title`) }}
-                    <span class="block text-3xl font-extrabold text-amber">
-                        {{ t(`shop.discount.${banner.key}.percentage`) }}
+                <h3
+                    class="relative z-2 mb-2 max-w-[18ch] text-xl leading-[1.1] md:text-2xl"
+                >
+                    {{ banner.title }}
+                    <span
+                        v-if="banner.highlight"
+                        class="block text-3xl font-extrabold text-amber"
+                    >
+                        {{ banner.highlight }}
                     </span>
                 </h3>
                 <Link
-                    :href="shop.index.url()"
-                    class="inline-flex items-center gap-2 self-start border-b-[1.5px] border-current pb-1 text-sm font-semibold transition-all hover:gap-3.5"
+                    v-if="banner.href && banner.button_text"
+                    :href="banner.href"
+                    class="relative z-2 inline-flex items-center gap-2 self-start border-b-[1.5px] border-current pb-1 text-sm font-semibold transition-all hover:gap-3.5"
                 >
-                    {{ t('shop.hero.shop_now') }}
+                    {{ banner.button_text }}
                     <ArrowRight class="size-4" aria-hidden="true" />
                 </Link>
 
-                <img
-                    :src="banner.image"
-                    alt=""
-                    class="pointer-events-none absolute -right-2.5 -bottom-2.5 w-1/2 max-w-[240px] rounded-lg drop-shadow-xl"
-                />
+                <div
+                    v-if="banner.accent_image"
+                    class="pointer-events-none absolute -right-2.5 -bottom-2.5 z-3 w-1/2 max-w-[240px] rounded-lg drop-shadow-xl"
+                >
+                    <div
+                        v-if="banner.overlay_gradient"
+                        class="absolute inset-0"
+                        :style="accentBackdropStyle(banner.overlay_gradient)"
+                        aria-hidden="true"
+                    />
+                    <img
+                        :src="banner.accent_image"
+                        alt=""
+                        class="relative z-1 size-full object-contain"
+                    />
+                </div>
             </article>
         </div>
     </Container>

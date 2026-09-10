@@ -47,6 +47,8 @@ final class WishlistController extends Controller
                 ->sortBy(fn (Product $product): int|false => array_search($product->id, $pageIds, true))
                 ->values();
 
+        localize_storefront($products);
+
         $paginator = new LengthAwarePaginator(
             $products,
             count($ids),
@@ -115,6 +117,7 @@ final class WishlistController extends Controller
         return Product::query()
             ->select(self::CARD_COLUMNS)
             ->with(['media', 'brand.media'])
+            ->withStorefrontTranslations()
             ->withCurrentPrices()
             ->withCurrentStock()
             ->withApprovedReviewSummary()

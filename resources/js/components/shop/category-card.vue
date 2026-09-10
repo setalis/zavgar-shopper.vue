@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { LayoutGrid } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import * as shop from '@/routes/shop';
 import type { Category } from '@/types/shop';
 
-defineProps<{ category: Category }>();
+const props = defineProps<{ category: Category }>();
+const { localized } = useLocalizedRoute();
+
+const href = computed(() =>
+    localized(shop.category.url({ category: props.category.slug })),
+);
 </script>
 
 <template>
     <Link
-        :href="shop.category.url({ category: category.slug })"
+        :href="href"
         class="group flex flex-col items-center"
     >
         <div

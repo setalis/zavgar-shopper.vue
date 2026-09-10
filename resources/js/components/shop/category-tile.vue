@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { LayoutGrid } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Category } from '@/types/shop';
@@ -12,9 +13,12 @@ const props = defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const categoryHref = computed<string>(
-    () => props.href ?? shop.category.url({ category: props.category.slug }),
+    () =>
+        props.href ??
+        localized(shop.category.url({ category: props.category.slug })),
 );
 
 function productLabel(count: number): string {

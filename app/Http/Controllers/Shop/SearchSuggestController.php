@@ -21,9 +21,14 @@ final class SearchSuggestController extends Controller
             ->scopes('publish')
             ->matchingSearch($validated['q'])
             ->with(['media'])
+            ->withStorefrontTranslations()
             ->withCurrentPrices()
             ->limit(8)
-            ->get()
+            ->get();
+
+        localize_storefront($products);
+
+        $products = $products
             ->map(fn (Product $product): array => [
                 'id' => $product->id,
                 'name' => $product->name,

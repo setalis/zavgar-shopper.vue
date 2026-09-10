@@ -16,6 +16,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { withPriceParams } from '@/lib/price-filter';
 import { home } from '@/routes';
@@ -43,13 +44,14 @@ const props = defineProps<{
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const search = ref<string>(props.query);
 const filtersOpen = ref<boolean>(false);
 let debounceId: number | undefined;
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
     { label: t('shop.search.heading') },
 ]);
 
@@ -61,7 +63,7 @@ function visit(overrides: Partial<Filters> & { q?: string } = {}): void {
     filtersOpen.value = false;
 
     router.get(
-        searchRoute.url(),
+        localized(searchRoute.url()),
         withPriceParams(
             { q: overrides.q ?? search.value },
             overrides.price_min !== undefined

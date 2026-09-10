@@ -4,6 +4,7 @@ import { Heart, Menu, Search, ShoppingBag, User } from 'lucide-vue-next';
 import BrandIcon from '@/components/shop/brand-icon.vue';
 import Container from '@/components/shop/container.vue';
 import HeaderSearch from '@/components/shop/header-search.vue';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useShop } from '@/composables/useShop';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard, home, login } from '@/routes';
@@ -14,6 +15,7 @@ const emit = defineEmits<{ openMenu: [] }>();
 const page = usePage();
 const { cartCount, wishlistCount } = useShop();
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 </script>
 
 <template>
@@ -25,20 +27,25 @@ const { t } = useTrans();
             class="grid h-full grid-cols-[auto_1fr_auto] items-center gap-4 md:gap-10"
         >
             <Link
-                :href="home.url()"
+                :href="localized(home.url())"
                 class="inline-flex items-center gap-2 font-heading text-xl font-extrabold tracking-[-0.02em] text-ink md:text-2xl"
             >
-                <BrandIcon class="h-9 w-auto fill-current text-brand" />
-                <span class="sr-only md:not-sr-only">
-                    {{ page.props.name }}
-                </span>
+                <BrandIcon class="h-16 w-auto fill-current text-brand" />
+                <div class="hidden flex-col md:flex leading-6">
+                    <span
+                        class="font-sans font-black text-blue-800"
+                    >
+                        {{ page.props.name }}
+                    </span>
+                    <span class="text-sm font-medium">интернет магазин</span>
+                </div>
             </Link>
 
             <HeaderSearch />
 
             <div class="inline-flex items-center justify-end gap-2">
                 <Link
-                    :href="shop.search.url()"
+                    :href="localized(shop.search.url())"
                     class="grid size-11 place-items-center rounded-full bg-muted text-ink transition hover:bg-brand-soft hover:text-brand md:hidden"
                     :aria-label="t('shop.nav.search')"
                 >
@@ -47,7 +54,7 @@ const { t } = useTrans();
 
                 <Link
                     v-if="page.props.auth.user"
-                    :href="dashboard.url()"
+                    :href="localized(dashboard.url())"
                     class="hidden size-11 place-items-center rounded-full bg-muted text-ink transition hover:bg-brand-soft hover:text-brand md:grid"
                     :aria-label="t('shop.nav.account')"
                 >
@@ -63,7 +70,7 @@ const { t } = useTrans();
                 </Link>
 
                 <Link
-                    :href="shop.wishlist.url()"
+                    :href="localized(shop.wishlist.url())"
                     class="relative hidden size-11 place-items-center rounded-full bg-muted text-ink transition hover:bg-brand-soft hover:text-brand md:grid"
                     :aria-label="t('shop.nav.wishlist')"
                 >
@@ -77,7 +84,7 @@ const { t } = useTrans();
                 </Link>
 
                 <Link
-                    :href="shop.cart.url()"
+                    :href="localized(shop.cart.url())"
                     class="relative grid size-11 place-items-center rounded-full bg-ink text-paper transition hover:bg-primary"
                     :aria-label="t('shop.nav.cart')"
                 >

@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import { useFormat } from '@/composables/useFormat';
 import { useShop } from '@/composables/useShop';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import * as shop from '@/routes/shop';
 import type { Product } from '@/types/shop';
@@ -11,11 +12,12 @@ import type { Product } from '@/types/shop';
 const props = defineProps<{ product: Product }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 const { currency } = useShop();
 const { money } = useFormat();
 
 const href = computed<string>(() =>
-    shop.product.url({ product: props.product.slug }),
+    localized(shop.product.url({ product: props.product.slug })),
 );
 
 const thumbnail = computed<string | null>(

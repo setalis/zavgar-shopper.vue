@@ -2,6 +2,7 @@
 import { Head, router } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import HreflangLinks from '@/components/shop/hreflang-links.vue';
 import Container from '@/components/shop/container.vue';
 import PageHead from '@/components/shop/page-head.vue';
 import ProductCard from '@/components/shop/product-card.vue';
@@ -23,6 +24,8 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { useLocalizedRoute } from '@/composables/useLocalizedRoute';
+import type { HreflangLink } from '@/composables/useLocalizedRoute';
 import { useTrans } from '@/composables/useTrans';
 import { stripHtml } from '@/lib/format';
 import { withPriceParams } from '@/lib/price-filter';
@@ -49,15 +52,17 @@ const props = defineProps<{
     products: Paginated<Product>;
     priceRange: PriceRange | null;
     filters: Filters;
+    hreflang: HreflangLink[];
 }>();
 
 const { t } = useTrans();
+const { localized } = useLocalizedRoute();
 
 const sort = ref<string>(props.filters.sort);
 const filtersOpen = ref<boolean>(false);
 
 const crumbs = computed(() => [
-    { label: t('shop.nav.home'), href: home.url() },
+    { label: t('shop.nav.home'), href: localized(home.url()) },
     { label: props.collection.name },
 ]);
 
@@ -72,7 +77,9 @@ function visit(overrides: Partial<Filters> = {}): void {
     filtersOpen.value = false;
 
     router.get(
-        shop.collection.url({ collection: props.collection.slug }),
+        localized(
+            shop.collection.url({ collection: props.collection.slug }),
+        ),
         withPriceParams({ sort: next.sort }, next.price_min, next.price_max),
         { preserveState: true, preserveScroll: true, replace: true },
     );
@@ -84,7 +91,9 @@ watch(sort, (value) => {
 </script>
 
 <template>
-    <Head :title="collection.name" />
+    <Head :title="collection.name">
+        <HreflangLinks :links="hreflang" />
+    </Head>
 
     <PageHead
         :title="collection.name"

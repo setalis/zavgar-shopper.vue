@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shopper\Pages\Product;
 
+use App\Actions\Product\DuplicateProductToDraftAction;
 use App\Filament\Actions\SpreadsheetImportAction;
 use App\Filament\Exports\Jobs\PrepareProductCsvExport;
 use App\Filament\Exports\ProductExporter;
@@ -12,12 +13,16 @@ use App\Models\Category;
 use App\Models\PendingProductImport;
 use App\Models\Product;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\ExportAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Mckenziearts\Icons\Untitledui\Enums\Untitledui;
+use Shopper\Core\Events\Products\ProductDeleted;
 use Shopper\Feature;
 use Shopper\Livewire\Pages\Product\Index as BaseIndex;
 
@@ -46,6 +51,54 @@ final class Index extends BaseIndex
 
         return $table
             ->columns($this->columnsWithCategory($table))
+            ->recordActions([
+                ActionGroup::make([
+                    Action::make('edit')
+                        ->label(__('shopper::forms.actions.edit'))
+                        ->icon(Untitledui::Edit03)
+                        ->color('primary')
+                        ->action(fn (Product $record) => $this->redirectRoute(
+                            name: 'shopper.products.edit',
+                            parameters: ['product' => $record],
+                            navigate: true
+                        ))
+                        ->authorize('edit_products')
+                        ->visible(shopper()->auth()->user()->can('edit_products')),
+                    Action::make('copyToDraft')
+                        ->label(__('backend.products.copy_to_draft'))
+                        ->icon(Untitledui::Copy03)
+                        ->color('gray')
+                        ->authorize('add_products')
+                        ->visible(shopper()->auth()->user()->can('add_products'))
+                        ->action(function (Product $record): void {
+                            $draft = app(DuplicateProductToDraftAction::class)->handle($record);
+
+                            Notification::make()
+                                ->title(__('shopper::pages/products.notifications.replicated'))
+                                ->success()
+                                ->send();
+
+                            $this->redirectRoute(
+                                name: 'shopper.products.edit',
+                                parameters: ['product' => $draft],
+                                navigate: true
+                            );
+                        }),
+                    Action::make(__('shopper::forms.actions.delete'))
+                        ->icon(Untitledui::Trash03)
+                        ->modalIcon(Untitledui::Trash03)
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(function (Product $record): void {
+                            event(new ProductDeleted($record));
+
+                            $record->delete();
+                        })
+                        ->authorize('delete_products')
+                        ->visible(shopper()->auth()->user()->can('delete_products')),
+                ])
+                    ->tooltip('Actions'),
+            ])
             ->headerActions([
                 Action::make('pendingImports')
                     ->label(__('backend.product_imports.menu'))

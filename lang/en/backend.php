@@ -18,6 +18,9 @@ return [
             'button_text' => 'Button text (English)',
         ],
     ],
+    'products' => [
+        'copy_to_draft' => 'Copy to draft',
+    ],
     'tax' => [
         'ttc' => 'TTC',
         'ht' => 'HT',

@@ -18,6 +18,9 @@ return [
             'button_text' => 'Текст кнопки (English)',
         ],
     ],
+    'products' => [
+        'copy_to_draft' => 'Копіювати в чернетку',
+    ],
     'tax' => [
         'ttc' => 'з ПДВ',
         'ht' => 'без ПДВ',

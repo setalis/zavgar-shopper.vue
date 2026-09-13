@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Listeners\DrainQueueAfterResponse;
 use App\Listeners\MergeGuestWishlist;
 use App\Livewire\Shopper\Components\Products\Form\Edit as ProductEditForm;
 use App\Livewire\Shopper\Components\Products\Form\Seo as ProductSeoForm;
@@ -21,6 +22,7 @@ use App\Sidebar\PendingProductImportsSidebar;
 use App\Support\StorefrontLocale;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -76,6 +78,7 @@ class AppServiceProvider extends ServiceProvider
             fn (string $path, mixed $route = null): string => StorefrontLocale::prefixPath($path, $route),
         );
         $this->app['events']->listen(Login::class, MergeGuestWishlist::class);
+        $this->app['events']->listen(JobQueued::class, DrainQueueAfterResponse::class);
     }
 
     protected function registerShopperLivewireAliases(): void
